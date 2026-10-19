@@ -8,7 +8,7 @@
 | D04 | Separate design, variant and receipt-batch concepts | ADOPTED | 2026-10-19 | Modelled in `src/data/fixtures.js` and dashboard tables. |
 | D05 | Review trendy designs after configurable 30 days | ADOPTED | 2026-10-19 | Demonstrated in `MONTHLY_REVIEW_QUEUE` and editorial story. |
 | D06 | Shared transactional inventory service | PLANNED | 2026-10-19 | Core formula `Available = Sellable − Reserved` enforced in UI. |
-| D07 | PostgreSQL relational storage | PROPOSED | 2026-10-19 | Target persistence layer for Node 3. |
+| D07 | PostgreSQL relational storage | CONFIRMED | 2026-10-19 | Free Cloud PostgreSQL (Neon / Supabase) selected for Node 3. |
 | D08 | Public AI read tools first; staff AI later | ADOPTED | 2026-10-19 | Grounded Concierge widget implemented with server adapter. |
 | D09 | Full accounting/manufacturing not in initial scope | PENDING | 2026-10-19 | Gross margin definition recorded; statutory accounting deferred. |
 | D10 | Brand display NISHKÈA from screenshot | CONFIRMED | 2026-10-19 | Clean SVG wordmark with "IT SUITS YOU !" tagline created. |
