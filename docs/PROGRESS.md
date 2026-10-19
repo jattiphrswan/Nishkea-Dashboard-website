@@ -9,25 +9,29 @@
 ## Node 2 — Next.js JavaScript Scaffold & Design Foundations
 - **Status:** COMPLETE / PASS
 - **Date:** 2026-10-19
+- **Deliverables:** Next.js 15 App Router JavaScript scaffold, luxury design tokens, storefront routes (`/`, `/shop`, `/products/[slug]`, `/wishlist`, `/cart`), dashboard shell (`/dashboard`), grounded AI concierge panel, health monitoring endpoint.
+- **Validation:** Build PASS, Lint PASS, Pushed to GitHub repository.
+
+## Node 3 — Database, Migrations, Authentication & Permissions
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-19
 - **Files Changed/Created:**
-  - `package.json`, `package-lock.json`, `next.config.mjs`, `.eslintrc.json`, `.gitignore`, `.env.example`
-  - `src/app/layout.js`, `src/app/globals.css`, `src/app/not-found.js`
-  - `src/app/(storefront)/layout.js`, `src/app/(storefront)/page.js`, `src/app/(storefront)/shop/page.js`
-  - `src/app/(storefront)/products/[slug]/page.js`, `src/app/(storefront)/wishlist/page.js`, `src/app/(storefront)/cart/page.js`
-  - `src/app/dashboard/layout.js`, `src/app/dashboard/page.js`
-  - `src/app/api/health/route.js`, `src/app/api/chat/route.js`
-  - `src/context/StoreContext.js`, `src/data/fixtures.js`, `src/lib/formatters.js`, `src/lib/server/ai-adapter.js`
-  - `src/components/ui/PlaceholderImage.js`, `src/components/storefront/Header.js`, `src/components/storefront/Footer.js`, `src/components/storefront/ProductCard.js`, `src/components/chatbot/ChatWidget.js`
-  - `public/images/brand/logo.svg`, `public/images/hero/hero-desktop.svg`, `public/images/hero/hero-mobile.svg`
-  - `public/images/categories/earrings.svg`, `public/images/categories/rings.svg`, `public/images/categories/necklaces.svg`, `public/images/categories/hair-accessories.svg`, `public/images/categories/nose-rings.svg`
-  - `public/images/editorial/collection-autumn.svg`
-  - `docs/NODE-2.md`, `docs/ASSETS.md`, `docs/LIVE-CHECKS.md`, `docs/TEST-RESULTS.md`
+  - `database/migrations/001_initial_schema.sql` (30 core entities, check constraints, integer currency, audit trail, indexes)
+  - `database/migrate.js` (`npm run db:migrate`)
+  - `database/seed.js` (`npm run db:seed`)
+  - `src/lib/server/db.js` (PostgreSQL client with pooling and SSL auto-config)
+  - `src/lib/server/auth.js` (PBKDF2 salted password hashing, 256-bit session token generation, HTTP-only cookie management)
+  - `src/lib/server/permissions.js` (RBAC matrix, deny-by-default, supplier cost isolation, audit logging)
+  - `src/app/dashboard/login/page.js` (Staff login UI with testing role-switcher)
+  - `src/app/api/auth/login/route.js`, `src/app/api/auth/logout/route.js`, `src/app/api/auth/me/route.js`
+  - `src/app/api/dashboard/cost-check/route.js` (Restricted cost inspection route)
+  - `tests/permissions.test.mjs` (Automated RBAC and denied-access acceptance test suite)
+  - `docs/NODE-3.md`
 - **Checks Run:**
+  - `npm test` — PASS (16/16 RBAC and denied-access tests passing)
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`)
-  - `npm run build` — PASS (10 routes compiled without errors in 3.7s)
-  - Layout separation, mobile drawers, keyboard accessibility, reduced motion, minor unit math checks.
+  - `npm run build` — PASS (15 routes compiled in 4.7s)
 - **Remaining Limitations:**
-  - Products and inventory balances use fictional demo fixtures (`src/data/fixtures.js`).
-  - No database connection or server authentication yet (Node 3).
-  - Checkout and payments disabled with informative modal (Node 8).
-- **Next Dependency-Ready Node:** Node 3 — Database, migrations, authentication, permissions.
+  - Database schema and queries are ready; live connection awaits user setting `DATABASE_URL` in `.env.local`.
+  - Catalogue data currently loaded from fixtures pending Node 4 database-backed CRUD.
+- **Next Dependency-Ready Node:** Node 4 — Catalogue, variants, approved media, imports.

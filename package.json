@@ -7,11 +7,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:migrate": "node database/migrate.js",
+    "db:seed": "node database/seed.js",
+    "test": "node tests/permissions.test.mjs",
+    "test:permissions": "node tests/permissions.test.mjs"
   },
   "dependencies": {
+    "dotenv": "^18.0.8",
     "lucide-react": "^1.59.0",
     "next": "^15.2.1",
+    "pg": "^8.23.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
