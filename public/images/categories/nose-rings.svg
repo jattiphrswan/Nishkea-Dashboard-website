@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <rect width="600" height="600" fill="#FAF7F2"/>
+  <rect x="20" y="20" width="560" height="560" fill="none" stroke="#E7DDE0" stroke-width="1"/>
+  <!-- Nose Ring / Nath Illustration -->
+  <g transform="translate(300, 230)">
+    <circle cx="0" cy="0" r="85" fill="none" stroke="#701A36" stroke-width="5" stroke-dasharray="480, 50"/>
+    <circle cx="0" cy="0" r="70" fill="none" stroke="#B69763" stroke-width="2"/>
+    <!-- Intricate pearl / cluster motif -->
+    <circle cx="60" cy="60" r="14" fill="#B69763"/>
+    <circle cx="80" cy="40" r="8" fill="#701A36"/>
+    <circle cx="40" cy="80" r="8" fill="#701A36"/>
+    <!-- Chain link -->
+    <path d="M 60 60 Q 140 100 200 40" fill="none" stroke="#B69763" stroke-width="1.5" stroke-dasharray="3,3"/>
+  </g>
+  <text x="300" y="470" font-family="'Cormorant Garamond', serif" font-size="28" font-weight="600" fill="#241B20" text-anchor="middle">Nose Rings &amp; Pins</text>
+  <text x="300" y="500" font-family="'Manrope', sans-serif" font-size="12" letter-spacing="0.15em" fill="#701A36" font-weight="600" text-anchor="middle">40+ DESIGNS • HOOPS, CLUSTERS &amp; STUDS</text>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="100%" height="100%">
+  <defs>
+    <linearGradient id="editGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#55132A"/>
+      <stop offset="100%" stop-color="#701A36"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="700" fill="url(#editGrad)"/>
+  
+  <rect x="30" y="30" width="1140" height="640" fill="none" stroke="#B69763" stroke-width="1.5" stroke-opacity="0.4"/>
+  <rect x="45" y="45" width="1110" height="610" fill="none" stroke="#FFFFFF" stroke-width="0.5" stroke-opacity="0.2"/>
+  
+  <circle cx="850" cy="350" r="220" fill="none" stroke="#B69763" stroke-width="1" stroke-dasharray="6,8" opacity="0.5"/>
+  <circle cx="850" cy="350" r="160" fill="none" stroke="#FAF7F2" stroke-width="2" opacity="0.3"/>
+  <circle cx="850" cy="350" r="100" fill="#B69763" fill-opacity="0.15"/>
+  
+  <text x="120" y="240" font-family="'Manrope', sans-serif" font-size="12" letter-spacing="0.3em" fill="#B69763" font-weight="600">EDITORIAL FEATURE</text>
+  <text x="120" y="315" font-family="'Cormorant Garamond', Georgia, serif" font-size="52" font-weight="500" fill="#FAF7F2">The Velvet &amp; Gold</text>
+  <text x="120" y="375" font-family="'Cormorant Garamond', Georgia, serif" font-size="52" font-style="italic" fill="#FAF7F2">Monthly Trend Edit</text>
+  
+  <text x="120" y="440" font-family="'Manrope', sans-serif" font-size="15" fill="#E7DDE0" font-weight="400">
+    Every month, 30 curated pieces are unveiled for a strictly monitored lifecycle.
+  </text>
+  <text x="120" y="470" font-family="'Manrope', sans-serif" font-size="15" fill="#E7DDE0" font-weight="400">
+    Reviewed at 30 days to ensure exclusivity, freshness, and zero inventory deadstock.
+  </text>
+  
+  <text x="120" y="550" font-family="'Manrope', sans-serif" font-size="12" fill="#B69763" font-weight="500">
+    [Editorial Asset Placeholder • Recommended: 1200 × 700 px]
+  </text>
+</svg>

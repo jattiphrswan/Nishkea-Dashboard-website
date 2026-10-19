@@ -1,0 +1,14 @@
+# Project working rules
+- Use Next.js App Router, React and JavaScript. No .ts, .tsx or TypeScript config.
+- Read README.md, docs/DECISIONS.md and docs/PROGRESS.md before changing code.
+- Work one dependency-ready node at a time: focused prompt → implement → verify → fix → record result.
+- Preserve scope and update documentation when behavior changes.
+- Distinguish mock data from connected production features in UI and reports.
+- Server-side authorization is mandatory for every protected query and mutation.
+- Never expose secrets, supplier costs or customer data in public bundles or chatbot context.
+- Stock changes go through transactional inventory services, never arbitrary counter edits.
+- Use integer minor currency units and one explicit currency per transaction.
+- Keep public brand styling separate from operational dashboard density.
+- Respect reduced motion and keyboard navigation.
+- Do not fabricate product materials, claims, reviews, certifications or policies.
+- Do not publish, charge customers or contact people during documentation/scaffold nodes.

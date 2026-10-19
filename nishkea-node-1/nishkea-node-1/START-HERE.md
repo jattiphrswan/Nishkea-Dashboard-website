@@ -1,0 +1,7 @@
+# First implementation prompt — Node 2
+Paste this into your coding agent after extracting this folder:
+
+Read AGENTS.md, README.md and every document in docs/. Build Node 2 only: the JavaScript Next.js foundation for NISHKÈA. Create the App Router scaffold, separate storefront and dashboard layouts, shared design tokens, reusable controls, responsive navigation, product-card primitive, loading/empty/error states and clearly fictional fixtures. Use .js/.jsx only. Implement a small home-page direction preview with burgundy, ivory and proposed gold accents; do not claim that the full storefront or dashboard is finished. Keep the dashboard a mock shell with no real business records. Use the supplied screenshot only as reference; display a text wordmark until a proper logo asset is supplied. Do not scrape screenshot product photos. Implement restrained motion with reduced-motion support. Document environment keys without values. Do not create payment, AI, database or hosting accounts. Select dependency versions from current official documentation when implementation begins, pin them in the lockfile, and record choices. Run appropriate build/lint and keyboard/mobile checks. Update docs/PROGRESS.md with changed files, checks and limitations. Stop after the Node 2 acceptance gate; give the next dependency-ready node.
+
+## Suggested local commands after implementation
+Use the package manager selected in the implementation and follow its generated README. Never assume installation/build has already run for this documentation pack.

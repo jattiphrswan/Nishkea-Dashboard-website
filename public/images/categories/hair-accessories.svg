@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <rect width="600" height="600" fill="#FAF7F2"/>
+  <rect x="20" y="20" width="560" height="560" fill="none" stroke="#E7DDE0" stroke-width="1"/>
+  <!-- Hair Band / Scrunchie Illustration -->
+  <g transform="translate(300, 240)">
+    <path d="M -110 -20 C -70 -70, 70 -70, 110 -20 C 140 30, 90 90, 50 80 C 10 70, -20 85, -60 70 C -110 50, -130 10, -110 -20 Z" fill="#701A36" fill-opacity="0.18" stroke="#701A36" stroke-width="4"/>
+    <ellipse cx="0" cy="15" rx="55" ry="32" fill="#FAF7F2" stroke="#B69763" stroke-width="2"/>
+    <!-- Decorative bow/knot -->
+    <circle cx="0" cy="-45" r="14" fill="#B69763"/>
+  </g>
+  <text x="300" y="470" font-family="'Cormorant Garamond', serif" font-size="28" font-weight="600" fill="#241B20" text-anchor="middle">Hair Accessories</text>
+  <text x="300" y="500" font-family="'Manrope', sans-serif" font-size="12" letter-spacing="0.15em" fill="#701A36" font-weight="600" text-anchor="middle">30+ DESIGNS • BANDS &amp; SCRUNCHIES</text>
+</svg>

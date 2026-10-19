@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <rect width="600" height="600" fill="#FAF7F2"/>
+  <rect x="20" y="20" width="560" height="560" fill="none" stroke="#E7DDE0" stroke-width="1"/>
+  <!-- Ring Illustration -->
+  <g transform="translate(300, 240)">
+    <ellipse cx="0" cy="0" rx="90" ry="45" fill="none" stroke="#701A36" stroke-width="8"/>
+    <ellipse cx="0" cy="8" rx="84" ry="40" fill="none" stroke="#B69763" stroke-width="4"/>
+    <!-- Gemstone crown -->
+    <polygon points="0,-48 24,-24 0,0 -24,-24" fill="#B69763"/>
+    <circle cx="0" cy="-24" r="8" fill="#FFFFFF"/>
+  </g>
+  <text x="300" y="470" font-family="'Cormorant Garamond', serif" font-size="28" font-weight="600" fill="#241B20" text-anchor="middle">Rings</text>
+  <text x="300" y="500" font-family="'Manrope', sans-serif" font-size="12" letter-spacing="0.15em" fill="#701A36" font-weight="600" text-anchor="middle">30+ DESIGNS • MULTI-SIZE MATRIX</text>
+</svg>
