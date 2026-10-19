@@ -88,8 +88,8 @@ export const PRODUCTS = [
     reviewDate: '2026-10-31', // 30-day review cycle
     reorderPolicy: 'review_required',
     images: [
-      { id: 'img-01', url: '/images/categories/earrings.svg', alt: 'Aurelia Filigree Chandelier Drops in Antique Gold pair view' },
-      { id: 'img-02', url: '/images/brand/logo.svg', alt: 'Aurelia Filigree detail packaging and presentation' }
+      { id: 'img-01', url: '/images/prodcuts/earring 1.png', alt: 'Aurelia Filigree Chandelier Drops pair view' },
+      { id: 'img-02', url: '/images/prodcuts/earring-3.png', alt: 'Aurelia Filigree detail packaging and presentation' }
     ],
     description: 'Intricately handcrafted antique-gold tone chandeliers featuring floral filigree lacework and suspended baroque glass pearls. Designed with hypoallergenic titanium posts for lightweight evening wear.',
     careInstructions: 'Store in airtight pouch away from water, fragrance, and hairsprays. Wipe gently with dry microfiber cloth after each wear.',
@@ -125,7 +125,8 @@ export const PRODUCTS = [
     reviewDate: '2026-11-15',
     reorderPolicy: 'reorder_at_threshold',
     images: [
-      { id: 'img-03', url: '/images/categories/rings.svg', alt: 'Celeste Marquise Solitaire Band top angle view' }
+      { id: 'img-03', url: '/images/prodcuts/ring-1.png', alt: 'Celeste Marquise Solitaire Band top angle view' },
+      { id: 'img-03b', url: '/images/prodcuts/ring-3.png', alt: 'Celeste Marquise side view' }
     ],
     description: 'An architectural dual-band solitaire showcasing a faceted marquise cubic zirconia set in bezel prongs. Polished mirror finish with inner tapered comfort fit.',
     careInstructions: 'Avoid impact with abrasive hard surfaces. Clean with lukewarm water and soft bristle brush.',
@@ -162,7 +163,8 @@ export const PRODUCTS = [
     reviewDate: '2026-10-18', // 30-day review passed! Creates review task
     reorderPolicy: 'review_required',
     images: [
-      { id: 'img-04', url: '/images/categories/necklaces.svg', alt: 'Nocturne Layered Velvet Choker draped front view' }
+      { id: 'img-04', url: '/images/prodcuts/neackless-1.png', alt: 'Nocturne Layered Velvet Choker draped front view' },
+      { id: 'img-04b', url: '/images/prodcuts/neackless-3.png', alt: 'Nocturne Layered Velvet Choker detail' }
     ],
     description: 'Plush wine-burgundy French velvet band paired with a tiered 18k gold vermeil curb chain and cabochon garnet drop pendant. Features an adjustable 5cm extender.',
     careInstructions: 'Keep velvet dry. Store suspended to avoid creasing.',
@@ -197,7 +199,8 @@ export const PRODUCTS = [
     reviewDate: '2026-12-10',
     reorderPolicy: 'reorder_at_threshold',
     images: [
-      { id: 'img-05', url: '/images/categories/hair-accessories.svg', alt: 'Seraphina Silk Scrunchie & Clip Set styled flat lay' }
+      { id: 'img-05', url: '/images/prodcuts/scrunie.png', alt: 'Seraphina Silk Scrunchie & Clip Set styled flat lay' },
+      { id: 'img-05b', url: '/images/prodcuts/scrunchie2.png', alt: 'Seraphina Silk Scrunchie collection' }
     ],
     description: 'Pure 22-momme Mulberry silk oversized scrunchie matched with two hand-set freshwater pearl gold-plated snap barrettes. Prevents hair creases and friction damage.',
     careInstructions: 'Hand wash cold using delicate silk detergent. Dry flat away from direct sunlight.',
@@ -268,7 +271,8 @@ export const PRODUCTS = [
     reviewDate: '2026-11-01',
     reorderPolicy: 'reorder_at_threshold',
     images: [
-      { id: 'img-07', url: '/images/categories/earrings.svg', alt: 'Astrid Pavé Huggie Hoops pair view' }
+      { id: 'img-07', url: '/images/prodcuts/Gold Hoops on Oxblood Silk.png', alt: 'Astrid Pavé Huggie Hoops on silk' },
+      { id: 'img-07b', url: '/images/prodcuts/earring -2.png', alt: 'Astrid Pavé Huggie Hoops pair view' }
     ],
     description: 'Sleek everyday huggie hoops encrusted with micro-pavé zirconia stones and secure click-latch closure. Engineered for comfortable all-day wear.',
     careInstructions: 'Remove before swimming, sauna or workout. Wipe dry with soft lint-free cloth.',
@@ -304,7 +308,8 @@ export const PRODUCTS = [
     reviewDate: '2026-09-01',
     reorderPolicy: 'blocked_clearance',
     images: [
-      { id: 'img-08', url: '/images/categories/rings.svg', alt: 'Valeria Sculpted Wave Band organic undulating ring' }
+      { id: 'img-08', url: '/images/prodcuts/ring-2.png', alt: 'Valeria Sculpted Wave Band organic undulating ring' },
+      { id: 'img-08b', url: '/images/prodcuts/ring-4.png', alt: 'Valeria Wave Band stacked view' }
     ],
     description: 'Organic undulating liquid metal band with asymmetrical high-polish waves. Final clearance piece from the late summer capsule.',
     careInstructions: 'Avoid harsh household chemicals. Store in dry pouch.',
@@ -339,7 +344,8 @@ export const PRODUCTS = [
     reviewDate: '2026-12-10',
     reorderPolicy: 'reorder_at_threshold',
     images: [
-      { id: 'img-09', url: '/images/categories/necklaces.svg', alt: 'Solis Radiance Medallion coin pendant on paperclip chain' }
+      { id: 'img-09', url: '/images/prodcuts/neakless-2.png', alt: 'Solis Radiance Medallion coin pendant on paperclip chain' },
+      { id: 'img-09b', url: '/images/prodcuts/neackless-4.png', alt: 'Solis Radiance Medallion chain close-up' }
     ],
     description: 'Embossed sunburst coin medallion strung on an Italian paperclip chain. Finished with a decorative front toggle clasp.',
     careInstructions: 'Clean gently with jewellery polishing cloth.',

@@ -18,13 +18,14 @@ export default function HomePage() {
         <div className="container-storefront" style={{ padding: 0 }}>
           <div style={{ position: 'relative' }}>
             <picture>
-              <source media="(max-width: 767px)" srcSet="/images/hero/hero-mobile.svg" />
+              <source media="(max-width: 767px)" srcSet="/images/hero/1.png" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/hero/hero-desktop.svg"
+                src="/images/hero/1.png"
                 alt="NISHKÈA Handcrafted Elegance — The Autumn Edit 2026"
                 className="hero-banner"
                 loading="eager"
+                style={{ width: '100%', maxHeight: '680px', objectFit: 'cover' }}
               />
             </picture>
 
@@ -184,9 +185,9 @@ export default function HomePage() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/editorial/collection-autumn.svg"
+              src="/images/editorial/1.png"
               alt="The Velvet & Gold Monthly Trend Edit"
-              style={{ width: '100%', height: 'auto', display: 'block' }}
+              style={{ width: '100%', maxHeight: '520px', objectFit: 'cover', display: 'block' }}
             />
             <div
               style={{
