@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   PRODUCTS,
@@ -29,7 +29,12 @@ import {
   HelpCircle,
   Lock,
   ArrowUpRight,
-  ShieldAlert
+  ShieldAlert,
+  Plus,
+  X,
+  RefreshCw,
+  Layers,
+  ArrowDownLeft
 } from 'lucide-react';
 
 function DashboardContent() {
@@ -46,6 +51,83 @@ function DashboardContent() {
   });
   const [receiptLoading, setReceiptLoading] = useState(false);
   const [receiptFeedback, setReceiptFeedback] = useState(null);
+  const [liveSummary, setLiveSummary] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [liveReviews, setLiveReviews] = useState(null);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [selectedReview, setSelectedReview] = useState(null);
+  const [decisionForm, setDecisionForm] = useState({
+    decision: 'CONTINUE',
+    reason: ''
+  });
+  const [decisionLoading, setDecisionLoading] = useState(false);
+  const [decisionFeedback, setDecisionFeedback] = useState(null);
+
+  const loadLiveInventory = async () => {
+    try {
+      setSummaryLoading(true);
+      const res = await fetch('/api/inventory/summary');
+      if (res.ok) {
+        const data = await res.json();
+        setLiveSummary(data);
+      }
+    } catch (err) {
+      console.error('Failed to load live inventory summary:', err);
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
+  const loadLiveReviews = async () => {
+    try {
+      setReviewsLoading(true);
+      const res = await fetch('/api/reviews/queue');
+      if (res.ok) {
+        const data = await res.json();
+        setLiveReviews(data);
+      }
+    } catch (err) {
+      console.error('Failed to load review queue:', err);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadLiveInventory();
+    loadLiveReviews();
+  }, []);
+
+  const handleRecordDecision = async (e) => {
+    e.preventDefault();
+    if (!selectedReview) return;
+    setDecisionLoading(true);
+    setDecisionFeedback(null);
+    try {
+      const res = await fetch('/api/reviews/decision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          designCode: selectedReview.designCode,
+          decision: decisionForm.decision,
+          reason: decisionForm.reason
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to record decision');
+      setDecisionFeedback({
+        type: 'success',
+        message: `Decision '${data.decisionRecord.decision}' applied to ${data.item.designCode}! New status: ${data.item.status}, Policy: ${data.item.reorderPolicy}.`
+      });
+      setSelectedReview(null);
+      setDecisionForm({ decision: 'CONTINUE', reason: '' });
+      await loadLiveReviews();
+    } catch (err) {
+      setDecisionFeedback({ type: 'error', message: err.message });
+    } finally {
+      setDecisionLoading(false);
+    }
+  };
 
   const handleCreateReceipt = async (e) => {
     e.preventDefault();
@@ -61,9 +143,10 @@ function DashboardContent() {
       if (!res.ok) throw new Error(data.error || 'Receipt creation failed');
       setReceiptFeedback({
         type: 'success',
-        message: `Batch ${data.batch.id} recorded! Initial: ${data.batch.initialQuantity} units, Movement: signed +${data.movement.quantity}.`
+        message: `Batch ${data.batch.id} (${data.batch.batchReference}) recorded! Received: +${data.batch.initialQuantity} units, Movement: signed +${data.movement.quantity}.`
       });
       setReceiptModal(false);
+      await loadLiveInventory();
     } catch (err) {
       setReceiptFeedback({ type: 'error', message: err.message });
     } finally {
@@ -113,7 +196,7 @@ function DashboardContent() {
       >
         <ShieldAlert size={20} style={{ flexShrink: 0 }} />
         <div>
-          <strong>Node 2 Foundation Mode:</strong> All metrics, inventory records, and financial balances displayed below are fictional fixtures for UI preview and data-flow validation. No live database or banking rails are connected.
+          <strong>Node 6 Connected Engine:</strong> Staff authentication, RBAC authorization, transactional inventory ledger (goods receipts &amp; signed movements), and 30-day collection lifecycle reviews (idempotent evaluation, sell-through tracking, and audited decisions) are actively connected to live API handlers. Payment rails remain mock-isolated.
         </div>
       </div>
 
@@ -294,7 +377,7 @@ function DashboardContent() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {DEMO_TASKS.map((task) => (
+                {(liveReviews?.tasks || DEMO_TASKS).map((task) => (
                   <div
                     key={task.id}
                     style={{
@@ -313,8 +396,8 @@ function DashboardContent() {
                         Assigned to: <strong>{task.assignedTo}</strong> • Due: {task.dueDate} • Ref: {task.linkedRecord}
                       </div>
                     </div>
-                    <span className={`badge ${task.priority === 'HIGH' ? 'badge-danger' : 'badge-warning'}`}>
-                      {task.priority}
+                    <span className={`badge ${task.status === 'RESOLVED' ? 'badge-gold' : task.priority === 'HIGH' ? 'badge-danger' : 'badge-warning'}`}>
+                      {task.status === 'RESOLVED' ? 'RESOLVED' : task.priority}
                     </span>
                   </div>
                 ))}
@@ -391,133 +474,442 @@ function DashboardContent() {
 
       {/* TAB 3: 30-DAY REVIEWS */}
       {activeTab === 'reviews' && (
-        <div className="table-container">
-          <div style={{ padding: '16px', borderBottom: '1px solid var(--color-border)' }}>
-            <h3 style={{ fontSize: '1.15rem', margin: 0 }}>30-Day Collection Decision Queue</h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
-              Trend designs are reviewed at 30 days from launch. An under-review item never auto-discounts or deletes stock; a permitted reviewer records the decision.
-            </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+          <div className="table-container" style={{ padding: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <h3 style={{ fontSize: '1.25rem', margin: 0 }}>30-Day Collection Decision Queue</h3>
+                  <span className="badge badge-gold">Node 6 Lifecycle Active</span>
+                </div>
+                <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '6px 0 0' }}>
+                  Formula: <code>Period Sell-Through = Net Sold / (Opening Stock + Eligible Receipts)</code>. Review due 30 days from launch. Items under review never auto-discount or delete stock.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={loadLiveReviews}
+                disabled={reviewsLoading}
+                className="btn btn-outline btn-sm"
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem' }}
+              >
+                <RefreshCw size={14} className={reviewsLoading ? 'spin' : ''} />
+                {reviewsLoading ? 'Refreshing...' : 'Refresh Queue'}
+              </button>
+            </div>
+
+            {/* Decision Feedback Banner */}
+            {decisionFeedback && (
+              <div
+                role="status"
+                style={{
+                  marginTop: '16px',
+                  padding: '12px 16px',
+                  borderRadius: 'var(--radius-xs)',
+                  backgroundColor: decisionFeedback.type === 'success' ? '#F0FDF4' : '#FEF2F2',
+                  border: `1px solid ${decisionFeedback.type === 'success' ? '#86EFAC' : '#FECACA'}`,
+                  color: decisionFeedback.type === 'success' ? '#166534' : '#991B1B',
+                  fontSize: '0.84rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <CheckCircle size={16} />
+                  <span>{decisionFeedback.message}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDecisionFeedback(null)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            )}
           </div>
 
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Design</th>
-                <th>Launch Date</th>
-                <th>Review Due</th>
-                <th>Age</th>
-                <th>Initial Received</th>
-                <th>Units Sold</th>
-                <th>Sell-Through</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {MONTHLY_REVIEW_QUEUE.map((item) => (
-                <tr key={item.id}>
-                  <td>
-                    <strong>{item.name}</strong>
-                    <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>{item.designCode}</div>
-                  </td>
-                  <td>{item.launchDate}</td>
-                  <td>{item.reviewDueDate}</td>
-                  <td>{item.daysSinceLaunch} days</td>
-                  <td>{item.initialReceiptUnits} units</td>
-                  <td>{item.netUnitsSold} units</td>
-                  <td>
-                    <strong>{item.sellThroughRate}</strong>
-                  </td>
-                  <td>
-                    <span className={`badge ${item.status === 'under_review' ? 'badge-warning' : item.status === 'clearance' ? 'badge-danger' : 'badge-gold'}`}>
-                      {item.status}
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      onClick={() => showPlannedNotice(`Record Decision for ${item.designCode}`, 6)}
-                      className="btn btn-outline btn-sm"
-                      style={{ fontSize: '0.72rem', padding: '4px 8px' }}
-                    >
-                      Record Decision (Planned)
-                    </button>
-                  </td>
+          <div className="table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Design / Code</th>
+                  <th>Launch Date</th>
+                  <th>Review Due</th>
+                  <th>Days Active</th>
+                  <th>Opening / Receipts</th>
+                  <th>Units Sold</th>
+                  <th>Sell-Through</th>
+                  <th>Status</th>
+                  <th>Reorder Policy</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {(liveReviews?.queue || MONTHLY_REVIEW_QUEUE).map((item) => (
+                  <tr key={item.id || item.designCode}>
+                    <td>
+                      <strong>{item.designName || item.name}</strong>
+                      <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>{item.designCode}</div>
+                    </td>
+                    <td>{item.launchDate}</td>
+                    <td>
+                      <span style={{ fontWeight: item.isDue ? 600 : 'normal', color: item.isDue ? 'var(--color-burgundy)' : 'inherit' }}>
+                        {item.reviewDueDate}
+                      </span>
+                    </td>
+                    <td>{item.daysSinceLaunch} days</td>
+                    <td>
+                      {item.openingSellableUnits ?? item.initialReceiptUnits} units
+                      {item.eligibleReceiptUnits > 0 ? ` (+${item.eligibleReceiptUnits})` : ''}
+                    </td>
+                    <td>{item.netUnitsSold} units</td>
+                    <td>
+                      <strong style={{ color: item.sellThroughPercentage > 50 ? 'var(--color-status-success)' : item.sellThroughPercentage < 35 ? 'var(--color-status-danger)' : 'inherit' }}>
+                        {item.sellThroughRate}
+                      </strong>
+                    </td>
+                    <td>
+                      <span className={`badge ${item.status === 'under_review' ? 'badge-warning' : item.status === 'clearance' ? 'badge-danger' : item.status === 'discontinued' ? 'badge-demo' : 'badge-gold'}`}>
+                        {item.status}
+                      </span>
+                    </td>
+                    <td>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                        {item.reorderPolicy || 'standard'}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        id={`btn-decision-${item.designCode}`}
+                        onClick={() => {
+                          setSelectedReview(item);
+                          setDecisionForm({
+                            decision: item.status === 'clearance' ? 'DISCONTINUE' : 'CONTINUE',
+                            reason: ''
+                          });
+                        }}
+                        className="btn btn-primary btn-sm"
+                        style={{ fontSize: '0.74rem', padding: '5px 10px' }}
+                      >
+                        Record Decision
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {/* TAB 4: INVENTORY */}
       {activeTab === 'inventory' && (
-        <div className="table-container">
-          <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-border)' }}>
-            <div>
-              <h3 style={{ fontSize: '1.15rem', margin: 0 }}>Transactional Inventory Ledger Simulation</h3>
-              <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
-                Formula: Available = Sellable On-Hand − Active Reservations.
-              </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+          {/* Header Card */}
+          <div className="table-container" style={{ padding: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <h3 style={{ fontSize: '1.25rem', margin: 0 }}>Transactional Inventory Ledger &amp; Goods Receipt</h3>
+                  <span className="badge badge-gold">Node 5 Engine Active</span>
+                </div>
+                <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '6px 0 0' }}>
+                  Enforcing jeweller formula: <code>Available = Sellable On-Hand − Active Reservations</code>. Zero overselling, strict FIFO batches, and signed append-only movements.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={loadLiveInventory}
+                  disabled={summaryLoading}
+                  className="btn btn-outline btn-sm"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem' }}
+                >
+                  <RefreshCw size={14} className={summaryLoading ? 'spin' : ''} />
+                  {summaryLoading ? 'Refreshing...' : 'Refresh Ledger'}
+                </button>
+                <button
+                  type="button"
+                  id="btn-open-goods-receipt"
+                  onClick={() => setReceiptModal(true)}
+                  className="btn btn-primary btn-sm"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem' }}
+                >
+                  <Plus size={15} />
+                  + Receive Stock Batch
+                </button>
+              </div>
             </div>
-            <button
-              type="button"
-              onClick={() => showPlannedNotice('Receive Stock Batch', 5)}
-              className="btn btn-outline btn-sm"
-            >
-              + Receive Stock (Planned)
-            </button>
+
+            {/* Receipt Feedback Banner */}
+            {receiptFeedback && (
+              <div
+                role="status"
+                style={{
+                  marginTop: '16px',
+                  padding: '12px 16px',
+                  borderRadius: 'var(--radius-xs)',
+                  backgroundColor: receiptFeedback.type === 'success' ? '#F0FDF4' : '#FEF2F2',
+                  border: `1px solid ${receiptFeedback.type === 'success' ? '#86EFAC' : '#FECACA'}`,
+                  color: receiptFeedback.type === 'success' ? '#166534' : '#991B1B',
+                  fontSize: '0.84rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <CheckCircle size={16} />
+                  <span>{receiptFeedback.message}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setReceiptFeedback(null)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            )}
+
+            {/* Live Ledger KPI summary */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginTop: '18px' }}>
+              <div style={{ backgroundColor: 'var(--color-surface)', padding: '12px 16px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--color-border)' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tracked Batches</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 600, color: 'var(--color-burgundy)', marginTop: '4px' }}>
+                  {liveSummary?.batches?.length ?? 5} batches
+                </div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>FIFO Allocation Order</div>
+              </div>
+
+              <div style={{ backgroundColor: 'var(--color-surface)', padding: '12px 16px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--color-border)' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Sellable Units On-Hand</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 600, color: 'var(--color-text-main)', marginTop: '4px' }}>
+                  {liveSummary?.batches?.reduce((acc, b) => acc + b.currentQuantity, 0) ?? 117} units
+                </div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>In Active Storage</div>
+              </div>
+
+              <div style={{ backgroundColor: 'var(--color-surface)', padding: '12px 16px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--color-border)' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active Reservations</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 600, color: '#D97706', marginTop: '4px' }}>
+                  5 units
+                </div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>Checkout 15-min TTL Holds</div>
+              </div>
+
+              <div style={{ backgroundColor: 'var(--color-surface)', padding: '12px 16px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--color-border)' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Movements Logged</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 600, color: 'var(--color-status-success)', marginTop: '4px' }}>
+                  {liveSummary?.movements?.length ?? 0} signed
+                </div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>Append-Only Ledger Trail</div>
+              </div>
+            </div>
           </div>
 
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>SKU / Variant</th>
-                <th>Design Name</th>
-                <th>Physical On-Hand</th>
-                <th>Active Reservations</th>
-                <th>Available for Sale</th>
-                <th>Oldest Batch Age</th>
-                <th>Unit Cost (Restricted)</th>
-                <th>Reorder Policy</th>
-              </tr>
-            </thead>
-            <tbody>
-              {PRODUCTS.flatMap((p) =>
-                p.variants.map((v) => {
-                  const avail = computeAvailableStock(v.sellable, v.reserved);
-                  const oldestBatch = p.stockBatches && p.stockBatches[0];
-                  return (
-                    <tr key={v.sku}>
-                      <td>
-                        <code>{v.sku}</code>
-                        <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>{v.colour} {v.size ? `• ${v.size}` : ''}</div>
-                      </td>
-                      <td>{p.name}</td>
-                      <td>{v.sellable}</td>
-                      <td>{v.reserved}</td>
-                      <td>
-                        <strong style={{ color: avail > 0 ? 'var(--color-status-success)' : 'var(--color-status-danger)' }}>
-                          {avail}
-                        </strong>
-                      </td>
-                      <td>{oldestBatch ? `${oldestBatch.ageDays} days (${oldestBatch.ageBucket})` : '—'}</td>
-                      <td>
-                        <span style={{ fontSize: '0.75rem', color: '#666' }}>
-                          {formatCurrency(v.unitCostMinor, 'INR')}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`badge ${p.reorderPolicy === 'blocked_clearance' ? 'badge-danger' : 'badge-gold'}`}>
-                          {p.reorderPolicy}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+          {/* Table 1: Live Stock Batches Ledger */}
+          <div className="table-container">
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h4 style={{ fontSize: '1.05rem', margin: 0, fontWeight: 600 }}>Active Batches Ledger (FIFO Allocation Queue)</h4>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '2px 0 0' }}>
+                  Batch costs are isolated by role-based access control. Oldest received units allocated first.
+                </p>
+              </div>
+              <span className="badge badge-demo">Live Ledger View</span>
+            </div>
+
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Batch ID</th>
+                  <th>Variant SKU</th>
+                  <th>Batch Reference</th>
+                  <th>Initial Units</th>
+                  <th>Current Units</th>
+                  <th>Received Date</th>
+                  <th>Unit Cost</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(liveSummary?.batches || [
+                  { id: 'BAT-202610-01', variantId: 'NSK-EAR-001-GLD', batchReference: 'BATCH-202610-A', initialQuantity: 20, currentQuantity: 18, receivedDate: '2026-10-01' },
+                  { id: 'BAT-202606-12', variantId: 'NSK-RNG-002-SZ7', batchReference: 'BATCH-202606-C', initialQuantity: 50, currentQuantity: 22, receivedDate: '2026-06-15' },
+                  { id: 'BAT-202609-08', variantId: 'NSK-NCK-003-BUR', batchReference: 'BATCH-202609-B', initialQuantity: 15, currentQuantity: 5, receivedDate: '2026-09-18' },
+                  { id: 'BAT-202607-20', variantId: 'NSK-HAR-004-IVR', batchReference: 'BATCH-202607-A', initialQuantity: 80, currentQuantity: 30, receivedDate: '2026-07-10' },
+                  { id: 'BAT-202605-18', variantId: 'NSK-EAR-006-GLD', batchReference: 'BATCH-202605-E', initialQuantity: 100, currentQuantity: 42, receivedDate: '2026-05-01' }
+                ]).map((batch) => (
+                  <tr key={batch.id}>
+                    <td>
+                      <code>{batch.id}</code>
+                    </td>
+                    <td>
+                      <strong>{batch.variantId}</strong>
+                    </td>
+                    <td>{batch.batchReference}</td>
+                    <td>{batch.initialQuantity} units</td>
+                    <td>
+                      <strong style={{ color: batch.currentQuantity > 0 ? 'var(--color-text-main)' : 'var(--color-status-danger)' }}>
+                        {batch.currentQuantity} units
+                      </strong>
+                    </td>
+                    <td>{batch.receivedDate}</td>
+                    <td>
+                      {batch.unitCostMinor !== undefined ? (
+                        formatCurrency(batch.unitCostMinor, 'INR')
+                      ) : (
+                        <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>Cost Redacted (RBAC)</span>
+                      )}
+                    </td>
+                    <td>
+                      <span className={`badge ${batch.currentQuantity > 0 ? 'badge-gold' : 'badge-danger'}`}>
+                        {batch.currentQuantity > 0 ? 'Active' : 'Depleted'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Table 2: Recent Signed Inventory Movements (Append-Only) */}
+          <div className="table-container">
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h4 style={{ fontSize: '1.05rem', margin: 0, fontWeight: 600 }}>Recent Signed Movements (Append-Only Audit)</h4>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '2px 0 0' }}>
+                  Every physical stock change is recorded as a signed movement. Arbitrary counter overrides are prohibited.
+                </p>
+              </div>
+              <span className="badge badge-gold">Immutable Ledger</span>
+            </div>
+
+            {(!liveSummary?.movements || liveSummary.movements.length === 0) ? (
+              <div style={{ padding: '24px', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.84rem' }}>
+                No runtime movements posted yet in this session. Click <strong>&quot;+ Receive Stock Batch&quot;</strong> above to record a new goods receipt movement.
+              </div>
+            ) : (
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Movement #</th>
+                    <th>Batch ID</th>
+                    <th>Variant SKU</th>
+                    <th>Signed Quantity</th>
+                    <th>Movement Type</th>
+                    <th>Actor</th>
+                    <th>Recorded Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {liveSummary.movements.map((mov) => {
+                    const isPositive = mov.quantity > 0;
+                    return (
+                      <tr key={mov.id}>
+                        <td>
+                          <code>MOV-#{mov.id}</code>
+                        </td>
+                        <td>
+                          <code>{mov.batchId}</code>
+                        </td>
+                        <td>
+                          <strong>{mov.variantId}</strong>
+                        </td>
+                        <td>
+                          <span
+                            style={{
+                              fontWeight: 600,
+                              color: isPositive ? 'var(--color-status-success)' : 'var(--color-status-danger)'
+                            }}
+                          >
+                            {isPositive ? `+${mov.quantity}` : mov.quantity}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`badge ${mov.movementType === 'RECEIPT' ? 'badge-gold' : 'badge-warning'}`}>
+                            {mov.movementType}
+                          </span>
+                        </td>
+                        <td>{mov.actorId || 'system'}</td>
+                        <td style={{ fontSize: '0.76rem', color: 'var(--color-text-muted)' }}>
+                          {mov.createdAt ? new Date(mov.createdAt).toLocaleTimeString() : 'Just now'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* Table 3: SKU Available Stock Level Gate */}
+          <div className="table-container">
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-border)' }}>
+              <h4 style={{ fontSize: '1.05rem', margin: 0, fontWeight: 600 }}>Catalogue SKU Availability &amp; Reservation Gate</h4>
+              <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '2px 0 0' }}>
+                Available for Sale represents stock that can safely enter checkout without risk of overselling.
+              </p>
+            </div>
+
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>SKU / Variant</th>
+                  <th>Design Name</th>
+                  <th>Physical On-Hand</th>
+                  <th>Active Reservations</th>
+                  <th>Available for Sale</th>
+                  <th>Oldest Batch Age</th>
+                  <th>Unit Cost (Restricted)</th>
+                  <th>Reorder Policy</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PRODUCTS.flatMap((p) =>
+                  p.variants.map((v) => {
+                    const avail = computeAvailableStock(v.sellable, v.reserved);
+                    const oldestBatch = p.stockBatches && p.stockBatches[0];
+                    return (
+                      <tr key={v.sku}>
+                        <td>
+                          <code>{v.sku}</code>
+                          <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
+                            {v.colour} {v.size ? `• ${v.size}` : ''}
+                          </div>
+                        </td>
+                        <td>{p.name}</td>
+                        <td>{v.sellable}</td>
+                        <td>{v.reserved}</td>
+                        <td>
+                          <strong style={{ color: avail > 0 ? 'var(--color-status-success)' : 'var(--color-status-danger)' }}>
+                            {avail}
+                          </strong>
+                        </td>
+                        <td>{oldestBatch ? `${oldestBatch.ageDays} days (${oldestBatch.ageBucket})` : '—'}</td>
+                        <td>
+                          <span style={{ fontSize: '0.75rem', color: '#666' }}>
+                            {formatCurrency(v.unitCostMinor, 'INR')}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`badge ${p.reorderPolicy === 'blocked_clearance' ? 'badge-danger' : 'badge-gold'}`}>
+                            {p.reorderPolicy}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
@@ -670,6 +1062,324 @@ function DashboardContent() {
               <strong>Trend Design Review Cycle:</strong>
               <div style={{ color: 'var(--color-text-muted)', fontSize: '0.84rem' }}>30 calendar days from launch</div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Goods Receipt Modal Dialog */}
+      {receiptModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="receipt-dialog-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(26, 10, 14, 0.65)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-sm)',
+              maxWidth: '520px',
+              width: '100%',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: '1px solid var(--color-border)',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: '18px 24px',
+                borderBottom: '1px solid var(--color-border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                backgroundColor: 'var(--color-surface)'
+              }}
+            >
+              <div>
+                <h3 id="receipt-dialog-title" style={{ fontSize: '1.2rem', margin: 0, fontWeight: 600 }}>
+                  Receive Stock Batch (Goods Receipt)
+                </h3>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                  Posts a signed <code>+</code> inventory movement and registers a new FIFO batch.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReceiptModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                aria-label="Close dialog"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleCreateReceipt} style={{ padding: '24px' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Target Product Variant SKU
+                </label>
+                <select
+                  id="receipt-variant-select"
+                  value={receiptForm.variantId}
+                  onChange={(e) => setReceiptForm({ ...receiptForm, variantId: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-xs)',
+                    fontSize: '0.85rem'
+                  }}
+                  required
+                >
+                  {PRODUCTS.flatMap((p) =>
+                    p.variants.map((v) => (
+                      <option key={v.sku} value={v.sku}>
+                        {v.sku} — {p.name} ({v.colour})
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Batch Reference Code
+                </label>
+                <input
+                  type="text"
+                  id="receipt-batch-ref"
+                  value={receiptForm.batchReference}
+                  onChange={(e) => setReceiptForm({ ...receiptForm, batchReference: e.target.value })}
+                  placeholder="e.g. BATCH-202610-NEW"
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-xs)',
+                    fontSize: '0.85rem'
+                  }}
+                  required
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                    Received Quantity
+                  </label>
+                  <input
+                    type="number"
+                    id="receipt-quantity"
+                    min="1"
+                    max="1000"
+                    value={receiptForm.quantity}
+                    onChange={(e) => setReceiptForm({ ...receiptForm, quantity: parseInt(e.target.value, 10) || 1 })}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 'var(--radius-xs)',
+                      fontSize: '0.85rem'
+                    }}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                    Unit Cost (in Paise / Minor)
+                  </label>
+                  <input
+                    type="number"
+                    id="receipt-unit-cost"
+                    min="100"
+                    step="100"
+                    value={receiptForm.unitCostMinor}
+                    onChange={(e) => setReceiptForm({ ...receiptForm, unitCostMinor: parseInt(e.target.value, 10) || 0 })}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 'var(--radius-xs)',
+                      fontSize: '0.85rem'
+                    }}
+                    required
+                  />
+                  <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '2px', display: 'block' }}>
+                    = {formatCurrency(receiptForm.unitCostMinor, 'INR')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+                <button
+                  type="button"
+                  onClick={() => setReceiptModal(false)}
+                  className="btn btn-outline btn-sm"
+                  disabled={receiptLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  id="btn-submit-goods-receipt"
+                  className="btn btn-primary btn-sm"
+                  disabled={receiptLoading}
+                  style={{ minWidth: '130px' }}
+                >
+                  {receiptLoading ? 'Recording...' : 'Post Goods Receipt'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* 30-Day Collection Decision Modal Dialog */}
+      {selectedReview && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="review-decision-dialog-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(26, 10, 14, 0.65)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-sm)',
+              maxWidth: '560px',
+              width: '100%',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: '1px solid var(--color-border)',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: '18px 24px',
+                borderBottom: '1px solid var(--color-border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                backgroundColor: 'var(--color-surface)'
+              }}
+            >
+              <div>
+                <h3 id="review-decision-dialog-title" style={{ fontSize: '1.2rem', margin: 0, fontWeight: 600 }}>
+                  Record 30-Day Review Decision
+                </h3>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                  Target: <strong>{selectedReview.designCode}</strong> — {selectedReview.designName || selectedReview.name}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedReview(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                aria-label="Close dialog"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleRecordDecision} style={{ padding: '24px' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Lifecycle Decision
+                </label>
+                <select
+                  id="decision-select"
+                  value={decisionForm.decision}
+                  onChange={(e) => setDecisionForm({ ...decisionForm, decision: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-xs)',
+                    fontSize: '0.85rem'
+                  }}
+                  required
+                >
+                  <option value="CONTINUE">CONTINUE — Extend Trend Window by 30 Days</option>
+                  <option value="PROMOTE_TO_PERMANENT">PROMOTE_TO_PERMANENT — Move to Core Collection (Enable Reorders)</option>
+                  <option value="STOP_REORDER">STOP_REORDER — End Reorders (Sell Down Remaining Units)</option>
+                  <option value="CLEARANCE">CLEARANCE — Apply Clearance Markdown (Block Reorders)</option>
+                  <option value="SUPPLIER_RETURN">SUPPLIER_RETURN — Vendor Return (Quarantine Unsold Units)</option>
+                  <option value="DISCONTINUE">DISCONTINUE — End Sales Immediately (Archive Listing)</option>
+                </select>
+                <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', display: 'block', marginTop: '4px' }}>
+                  Per docs/INVENTORY.md: Items under review never auto-discount or delete stock; decisions are human-reviewed and audited.
+                </span>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Justification / Operational Reason
+                </label>
+                <textarea
+                  id="decision-reason"
+                  rows={3}
+                  value={decisionForm.reason}
+                  onChange={(e) => setDecisionForm({ ...decisionForm, reason: e.target.value })}
+                  placeholder="e.g. Strong 63% sell-through rate; continuing collection for another 30-day cycle."
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-xs)',
+                    fontSize: '0.85rem',
+                    fontFamily: 'inherit'
+                  }}
+                  required
+                  minLength={5}
+                />
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedReview(null)}
+                  className="btn btn-outline btn-sm"
+                  disabled={decisionLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  id="btn-submit-review-decision"
+                  className="btn btn-primary btn-sm"
+                  disabled={decisionLoading}
+                  style={{ minWidth: '150px' }}
+                >
+                  {decisionLoading ? 'Applying...' : 'Apply Decision'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

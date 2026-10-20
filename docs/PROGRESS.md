@@ -47,5 +47,45 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`)
   - `npm run build` — PASS (15 routes compiled successfully)
   - Browser Verification: Live Chromium visual inspection verified all images, typography, and responsive layouts.
-- **Next Dependency-Ready Node:** Node 5 — Operational Inventory Transactions, Reservation Ledger & Goods Receipt.
+## Node 5 — Operational Inventory Transactions, Reservation Ledger & Goods Receipt
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-20
+- **Deliverables:**
+  - Core transactional inventory engine (`src/lib/server/inventory.js`) enforcing:
+    - Formula: `Available = Sellable On-Hand − Active Reservations`.
+    - Zero overselling rejection gate.
+    - FIFO batch allocation for ageing and supplier cost isolation.
+    - Append-only signed ledger movements (`RECEIPT`, `RESERVATION_ALLOCATION`, `DISPATCH_CONSUME`, `STOCK_ADJUSTMENT`).
+    - Idempotent reservation TTL expiry and release.
+  - Server-side inventory API routes (`/api/inventory/summary`, `/api/inventory/receipt`, `/api/inventory/reserve`, `/api/inventory/adjust`) with RBAC authorization checks.
+  - Live backoffice UI (`src/app/dashboard/page.js` TAB 4):
+    - Goods Receipt Modal dialog for warehouse batch intake.
+    - Active Batches Ledger with FIFO queue ordering and RBAC cost redaction.
+    - Recent Signed Movements ledger trail.
+    - SKU stock availability level gates.
+- **Validation:**
+  - `npm test` — PASS (26/26 tests passing: 16 permissions tests + 10 inventory engine tests).
+  - Browser Verification: Live Chromium interaction posted batch `BATCH-202610-AUTUMN-RECEIPT` for 35 units, verified signed `+35` movement `MOV-#1`, updated sellable units on-hand to 152, screenshot captured (`inventory_goods_receipt_success_1792489532081.png`).
+- **Next Dependency-Ready Node:** Node 6 — 30-Day Collection Reviews, Sell-Through Tracking & Lifecycle Automation.
 
+## Node 6 — 30-Day Collection Reviews, Sell-Through Tracking & Lifecycle Automation
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-20
+- **Deliverables:**
+  - Collection review engine (`src/lib/server/reviews.js`) implementing:
+    - 30-calendar-day review interval calculation from launch.
+    - Idempotent queue evaluation (`evaluateReviewQueue`) transitioning due designs to `under_review` and generating open review tasks without duplicates.
+    - Period Sell-Through Rate formula: `Net Units Sold / (Opening Sellable Stock + Eligible Receipts in Period)` with `N/A` zero-denominator protection.
+    - Permitted lifecycle decisions: `CONTINUE`, `PROMOTE_TO_PERMANENT`, `STOP_REORDER`, `CLEARANCE`, `DISCONTINUE`, `SUPPLIER_RETURN`.
+    - Server-side RBAC permission gating (`review:decision` restricted to Manager/Owner; denied to Sales).
+    - Automatic operational task resolution and audit logging.
+  - Server API routes: `GET /api/reviews/queue` and `POST /api/reviews/decision`.
+  - Backoffice Dashboard UI (`src/app/dashboard/page.js`):
+    - TAB 3: Live 30-Day Collection Decision Queue table with calculated sell-through rates, status badges, and reorder policies.
+    - Interactive "Record Decision" modal dialog with justification validation.
+    - TAB 1: Live Priority Team Tasks reflecting automated review task generation and resolution.
+- **Validation:**
+  - `npm test` — PASS (49/49 tests passing: 16 permissions + 10 inventory + 23 reviews).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - Browser Verification: Live Chromium interaction recorded `CONTINUE` decision for `NSK-EAR-001`, verified status transition to `active`, extended review date +30 days, verified linked task resolution, full screenshot captured (`reviews_decision_success_1792489974935.png`).
+- **Next Dependency-Ready Node:** Node 7 — Complete Luxury Storefront, Dynamic Category Filters & Product Detail Experience.

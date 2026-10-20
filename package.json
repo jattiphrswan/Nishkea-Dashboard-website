@@ -9,9 +9,10 @@
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "node database/migrate.js",
-    "test": "node tests/permissions.test.mjs && node tests/inventory.test.mjs",
+    "test": "node tests/permissions.test.mjs && node tests/inventory.test.mjs && node tests/reviews.test.mjs",
     "test:permissions": "node tests/permissions.test.mjs",
-    "test:inventory": "node tests/inventory.test.mjs"
+    "test:inventory": "node tests/inventory.test.mjs",
+    "test:reviews": "node tests/reviews.test.mjs"
   },
   "dependencies": {
     "dotenv": "^18.0.8",
