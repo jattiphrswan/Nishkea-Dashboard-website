@@ -17,40 +17,40 @@ export const CATEGORIES = [
     id: 'cat-earrings',
     name: 'Earrings',
     slug: 'earrings',
-    description: 'Chandelier drops, jhumkas, modern studs and huggie hoops crafted in pairs.',
+    description: 'Chandelier drops, modern studs, and huggie hoops crafted in pairs.',
     defaultSalesUnit: 'pair',
     estimatedDesigns: '20+ designs',
-    image: '/images/categories/earrings.svg',
+    image: '/images/prodcuts/Gold Hoops on Oxblood Silk.png',
     featured: true
   },
   {
     id: 'cat-rings',
     name: 'Rings',
     slug: 'rings',
-    description: 'Statement cocktail bands, adjustable solitaires, and delicate stackable rings.',
+    description: 'Statement cocktail bands, solitaires, and delicate stackable rings.',
     defaultSalesUnit: 'piece',
     estimatedDesigns: '30+ designs',
-    image: '/images/categories/rings.svg',
+    image: '/images/prodcuts/ring-1.png',
     featured: true
   },
   {
     id: 'cat-necklaces',
     name: 'Necklaces & Pendants',
     slug: 'necklaces',
-    description: 'Layered chokers, gemstone pendants, and collar pieces with adjustable chains.',
+    description: 'Layered chokers, gemstone pendants, and collar pieces.',
     defaultSalesUnit: 'piece',
     estimatedDesigns: '39 designs',
-    image: '/images/categories/necklaces.svg',
+    image: '/images/prodcuts/neackless-1.png',
     featured: true
   },
   {
     id: 'cat-hair-accessories',
     name: 'Hair Accessories',
     slug: 'hair-accessories',
-    description: 'Silk-blend scrunchies, pearl-studded headbands, and decorative barrettes.',
+    description: 'Mulberry silk scrunchies, pearl-studded headbands, and bow barrettes.',
     defaultSalesUnit: 'piece',
     estimatedDesigns: '30+ designs',
-    image: '/images/categories/hair-accessories.svg',
+    image: '/images/prodcuts/hearband-1.png',
     featured: true
   },
   {
@@ -60,7 +60,7 @@ export const CATEGORIES = [
     description: 'Traditional Maharashtrian naths, minimalist clip-on studs, and Kundan hoops.',
     defaultSalesUnit: 'piece',
     estimatedDesigns: '40+ designs',
-    image: '/images/categories/nose-rings.svg',
+    image: '/images/hero/10.png',
     featured: true
   }
 ];
@@ -236,7 +236,8 @@ export const PRODUCTS = [
     reviewDate: '2026-11-04',
     reorderPolicy: 'review_required',
     images: [
-      { id: 'img-06', url: '/images/categories/nose-rings.svg', alt: 'Chandrika Pearl Nath traditional bridal hoop' }
+      { id: 'img-06', url: '/images/hero/10.png', alt: 'Chandrika Pearl Nath & Basra Pearl Collar' },
+      { id: 'img-06b', url: '/images/prodcuts/Gold Hoops on Oxblood Silk.png', alt: 'Chandrika Pearl detail' }
     ],
     description: 'Traditional crescent non-piercing press nath with miniature Basra-style seed pearls, ruby red tourmaline glass cabochon, and delicate hairpin chain.',
     careInstructions: 'Do not bend clip excessively. Clean with dry cotton bud.',
@@ -357,7 +358,128 @@ export const PRODUCTS = [
     stockBatches: [
       { batchId: 'BAT-202609-15', receivedDate: '2026-09-10', quantity: 25, remainingQty: 16, ageDays: 39, unitCostMinor: 95000, ageBucket: '31-60 days' }
     ]
+  },
+  {
+    id: 'des-009',
+    code: 'NSK-RNG-009',
+    name: 'Empress Solitaire Ruby Cocktail Ring',
+    slug: 'empress-solitaire-ruby-cocktail-ring',
+    category: 'rings',
+    categoryName: 'Rings',
+    collectionType: 'monthly_trend',
+    collectionName: 'Autumn Trend Edit',
+    lifecycle: 'active',
+    publishState: 'published',
+    salesUnit: 'piece',
+    priceMinor: 219900,
+    currency: 'INR',
+    rating: 4.9,
+    reviewCount: 31,
+    isNew: true,
+    isBestSeller: true,
+    launchDate: '2026-10-12',
+    reviewDate: '2026-11-12',
+    reorderPolicy: 'review_required',
+    images: [
+      { id: 'img-10', url: '/images/prodcuts/ring-3.png', alt: 'Empress Solitaire Ruby Cocktail Ring' },
+      { id: 'img-10b', url: '/images/hero/8.png', alt: 'Empress Solitaire Ruby Ring lifestyle wear' }
+    ],
+    description: 'A radiant emerald-cut synthetic pigeon-blood ruby crowned in an 18k yellow gold vermeil bezel with micropavé diamond-simulant shoulders.',
+    careInstructions: 'Avoid harsh perfumes or hot water. Clean with soft jewellery cloth.',
+    materials: 'Solid brass base with heavy 18k electroplate, laboratory ruby crystal, zirconia.',
+    dimensions: 'Center stone: 9 × 7 mm | Band width: 2.4 mm',
+    variants: [
+      { sku: 'NSK-RNG-009-SZ7', colour: 'Yellow Gold / Pigeon Blood Ruby', size: 'US 7 (17.3mm)', sellable: 15, reserved: 2, available: 13, unitCostMinor: 75000 }
+    ],
+    stockBatches: [
+      { batchId: 'BAT-202610-12', receivedDate: '2026-10-12', quantity: 20, remainingQty: 15, ageDays: 8, unitCostMinor: 75000, ageBucket: '0-30 days' }
+    ]
+  },
+  {
+    id: 'des-010',
+    code: 'NSK-HAR-010',
+    name: 'Imperial Crimson Silk Padded Headband',
+    slug: 'imperial-crimson-silk-padded-headband',
+    category: 'hair-accessories',
+    categoryName: 'Hair Accessories',
+    collectionType: 'monthly_trend',
+    collectionName: 'Autumn Trend Edit',
+    lifecycle: 'active',
+    publishState: 'published',
+    salesUnit: 'piece',
+    priceMinor: 169900,
+    currency: 'INR',
+    rating: 4.8,
+    reviewCount: 27,
+    isNew: true,
+    isBestSeller: false,
+    launchDate: '2026-10-08',
+    reviewDate: '2026-11-08',
+    reorderPolicy: 'review_required',
+    images: [
+      { id: 'img-11', url: '/images/prodcuts/hearband-1.png', alt: 'Imperial Crimson Silk Padded Headband with pearl accent' },
+      { id: 'img-11b', url: '/images/prodcuts/screnchie3.png', alt: 'Atelier French Silk Bow Barrette' }
+    ],
+    description: 'Sculptural knot padded headband wrapped in hand-draped oxblood Mulberry silk and centered with an exquisite single baroque glass pearl.',
+    careInstructions: 'Spot clean only with damp soft cloth. Store in bespoke dust bag.',
+    materials: '22-momme Mulberry silk, flexible memory band, hand-stitched faux pearl.',
+    dimensions: 'Width: 3.8 cm | Fits all standard crown sizes',
+    variants: [
+      { sku: 'NSK-HAR-010-OXB', colour: 'Signature Oxblood Silk', size: 'One Size', sellable: 20, reserved: 1, available: 19, unitCostMinor: 52000 }
+    ],
+    stockBatches: [
+      { batchId: 'BAT-202610-08', receivedDate: '2026-10-08', quantity: 25, remainingQty: 20, ageDays: 12, unitCostMinor: 52000, ageBucket: '0-30 days' }
+    ]
+  },
+  {
+    id: 'des-011',
+    code: 'NSK-HAR-011',
+    name: 'Atelier Silk Bow Barrette',
+    slug: 'atelier-silk-bow-barrette',
+    category: 'hair-accessories',
+    categoryName: 'Hair Accessories',
+    collectionType: 'permanent',
+    collectionName: 'Signature Permanent',
+    lifecycle: 'active',
+    publishState: 'published',
+    salesUnit: 'piece',
+    priceMinor: 139900,
+    currency: 'INR',
+    rating: 4.9,
+    reviewCount: 45,
+    isNew: false,
+    isBestSeller: true,
+    launchDate: '2026-08-15',
+    reviewDate: '2026-12-15',
+    reorderPolicy: 'reorder_at_threshold',
+    images: [
+      { id: 'img-12', url: '/images/prodcuts/screnchie3.png', alt: 'Atelier Silk Bow Barrette with gold tone clip' },
+      { id: 'img-12b', url: '/images/hero/6.png', alt: 'Atelier Silk Bow Barrette on model' }
+    ],
+    description: 'Double-winged couture bow in rich burgundy satin silk fastened with an ergonomic gold-tone French spring clip.',
+    careInstructions: 'Keep away from hair spray. Store flat.',
+    materials: 'Heavyweight satin silk, stainless steel gold electroplated barrette clip.',
+    dimensions: 'Bow span: 14 cm × 9 cm',
+    variants: [
+      { sku: 'NSK-HAR-011-BUR', colour: 'Burgundy Satin', size: 'Standard (14cm)', sellable: 22, reserved: 3, available: 19, unitCostMinor: 41000 }
+    ],
+    stockBatches: [
+      { batchId: 'BAT-202608-20', receivedDate: '2026-08-15', quantity: 30, remainingQty: 22, ageDays: 66, unitCostMinor: 41000, ageBucket: '61-90 days' }
+    ]
   }
+];
+
+export const HERO_GALLERY = [
+  { id: 'hg-01', title: 'The Gilded Drop', subtitle: '18K Gold Twisted Hoops with Baroque Pearl', image: '/images/hero/1.png', category: 'Earrings', link: '/shop?category=earrings' },
+  { id: 'hg-02', title: 'Sculpted Silhouette', subtitle: 'Organic Wave & Knot Cocktail Ring in Solid Vermeil', image: '/images/hero/2.png', category: 'Rings', link: '/shop?category=rings' },
+  { id: 'hg-03', title: 'Lumière Ruby Drop', subtitle: 'Emerald-Cut Ruby Pendant on Delicate Link Chain', image: '/images/hero/3.png', category: 'Necklaces', link: '/shop?category=necklaces' },
+  { id: 'hg-04', title: 'Modern Atelier Tailoring', subtitle: 'Polished Sculptural Huggies for Everyday Luxury', image: '/images/hero/4.png', category: 'Earrings', link: '/shop?category=earrings' },
+  { id: 'hg-05', title: 'The Autumn Edit', subtitle: 'Layered Vermeil Medallions and Pearl Accents', image: '/images/hero/5.png', category: 'Collection', link: '/shop' },
+  { id: 'hg-06', title: 'Pure Mulberry Silk', subtitle: 'Atelier French Ribbon Hair Bow with Gold Clasp', image: '/images/hero/6.png', category: 'Hair', link: '/shop?category=hair-accessories' },
+  { id: 'hg-07', title: 'Oxblood Velvet Touch', subtitle: 'Oversized Silk Scrunchie & Gold Huggies', image: '/images/hero/7.png', category: 'Hair', link: '/shop?category=hair-accessories' },
+  { id: 'hg-08', title: 'The Morning Gilded Ritual', subtitle: 'Bezel-Set Ruby Solitaire Ring in 18K Electroplate', image: '/images/hero/8.png', category: 'Rings', link: '/shop?category=rings' },
+  { id: 'hg-09', title: 'Baroque Radiance', subtitle: 'Handcrafted Hammered Gold Studs with Natural Pearls', image: '/images/hero/9.png', category: 'Earrings', link: '/shop?category=earrings' },
+  { id: 'hg-10', title: 'Heritage Basra Grace', subtitle: 'Pure Basra Pearl Pendant on Diamond-Set Collar', image: '/images/hero/10.png', category: 'Necklaces', link: '/shop?category=necklaces' }
 ];
 
 // Dashboard Operational Fixtures

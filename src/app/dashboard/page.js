@@ -37,6 +37,39 @@ function DashboardContent() {
   const initialTab = searchParams.get('tab') || 'overview';
   const [activeTab, setActiveTab] = useState(initialTab);
   const [actionNotice, setActionNotice] = useState(null);
+  const [receiptModal, setReceiptModal] = useState(false);
+  const [receiptForm, setReceiptForm] = useState({
+    variantId: 'NSK-EAR-001-GLD',
+    batchReference: 'BATCH-202610-NEW',
+    quantity: 10,
+    unitCostMinor: 85000
+  });
+  const [receiptLoading, setReceiptLoading] = useState(false);
+  const [receiptFeedback, setReceiptFeedback] = useState(null);
+
+  const handleCreateReceipt = async (e) => {
+    e.preventDefault();
+    setReceiptLoading(true);
+    setReceiptFeedback(null);
+    try {
+      const res = await fetch('/api/inventory/receipt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(receiptForm)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Receipt creation failed');
+      setReceiptFeedback({
+        type: 'success',
+        message: `Batch ${data.batch.id} recorded! Initial: ${data.batch.initialQuantity} units, Movement: signed +${data.movement.quantity}.`
+      });
+      setReceiptModal(false);
+    } catch (err) {
+      setReceiptFeedback({ type: 'error', message: err.message });
+    } finally {
+      setReceiptLoading(false);
+    }
+  };
 
   const showPlannedNotice = (actionName, nodeNumber) => {
     setActionNotice({

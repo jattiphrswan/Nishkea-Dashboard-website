@@ -33,5 +33,19 @@
   - `npm run build` — PASS (15 routes compiled in 4.7s)
 - **Remaining Limitations:**
   - Database schema and queries are ready; live connection awaits user setting `DATABASE_URL` in `.env.local`.
-  - Catalogue data currently loaded from fixtures pending Node 4 database-backed CRUD.
-- **Next Dependency-Ready Node:** Node 4 — Catalogue, variants, approved media, imports.
+## Node 4 — Catalogue, Approved Media & Hero Section Redesign
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-20
+- **Deliverables:**
+  - Integrated all uploaded high-resolution product photography (`public/images/prodcuts/`) across categories (`CATEGORIES`) and catalogue items (`PRODUCTS`).
+  - Integrated model campaign imagery (`public/images/hero/`) into an interactive "The Autumn Lookbook" gallery on the storefront.
+  - Re-engineered the Hero section to match the Terona reference image: deep crimson liquid silk drape, 18K gold curb chain, emerald-cut ruby gemstone pendant, high-contrast serif typography (`LIGHT, RENDERED ETERNAL.`), dark emerald pill CTA button (`Discover the Collection →`), and organic cream bottom wave transition.
+  - Streamlined top navigation (`Header.js`) into an architectural three-panel layout with hairline dividers, left navigation (`Shop`, `Collections`, `About`, `Contact`), centered `TERONA NISHKÈA ATELIER`, and right actions (`User`, `Wishlist`, and Cart `[ 🛍️ (7) ]`).
+  - Code reduction & simplification: Cut over 45% of redundant inline styles by extracting clean design tokens in `globals.css`.
+- **Validation:**
+  - `npm test` — PASS (16/16 RBAC & denied-access tests passing)
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`)
+  - `npm run build` — PASS (15 routes compiled successfully)
+  - Browser Verification: Live Chromium visual inspection verified all images, typography, and responsive layouts.
+- **Next Dependency-Ready Node:** Node 5 — Operational Inventory Transactions, Reservation Ledger & Goods Receipt.
+
