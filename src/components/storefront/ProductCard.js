@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useStore } from '../../context/StoreContext';
-import { formatCurrency } from '../../lib/formatters';
+import { formatCurrency, computeAvailableStock } from '../../lib/formatters';
 import { Heart } from 'lucide-react';
 import PlaceholderImage from '../ui/PlaceholderImage';
 
@@ -12,6 +12,11 @@ export default function ProductCard({ product }) {
   const isWishlisted = isInWishlist(product.id);
 
   const mainImage = (product.images && product.images[0]?.url) || '/images/categories/earrings.svg';
+
+  const totalAvailable = product.variants?.reduce(
+    (acc, v) => acc + computeAvailableStock(v.sellable, v.reserved),
+    0
+  ) ?? 0;
 
   return (
     <article className="product-card" aria-label={product.name}>
@@ -27,9 +32,13 @@ export default function ProductCard({ product }) {
         </Link>
 
         {/* Top Badges */}
-        <div className="product-card-badge">
+        <div className="product-card-badge" style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
           {product.lifecycle === 'clearance' ? (
             <span className="badge badge-danger">Clearance</span>
+          ) : totalAvailable <= 0 ? (
+            <span className="badge badge-danger">Sold Out</span>
+          ) : totalAvailable <= 5 ? (
+            <span className="badge badge-warning">Low Stock ({totalAvailable} left)</span>
           ) : product.isNew ? (
             <span className="badge badge-burgundy">New</span>
           ) : product.isBestSeller ? (

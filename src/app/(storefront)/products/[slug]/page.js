@@ -2,7 +2,6 @@
 
 import React, { useState, use } from 'react';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { PRODUCTS } from '../../../../data/fixtures';
 import { useStore } from '../../../../context/StoreContext';
 import { formatCurrency, computeAvailableStock } from '../../../../lib/formatters';
@@ -13,11 +12,14 @@ import {
   Heart,
   ShieldAlert,
   ChevronRight,
-  Info,
   Sparkles,
   ArrowLeft,
   Truck,
-  RotateCcw
+  RotateCcw,
+  Check,
+  Maximize2,
+  X,
+  ChevronDown
 } from 'lucide-react';
 
 export default function ProductDetailPage({ params }) {
@@ -31,6 +33,9 @@ export default function ProductDetailPage({ params }) {
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [addedFeedback, setAddedFeedback] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [activeAccordion, setActiveAccordion] = useState('materials');
 
   if (!product) {
     return (
@@ -52,9 +57,46 @@ export default function ProductDetailPage({ params }) {
   const activeImage = product.images[selectedImageIndex] || product.images[0];
 
   const availableUnits = computeAvailableStock(currentVariant.sellable, currentVariant.reserved);
+  const isOutOfStock = availableUnits <= 0;
+
+  const handleAddToCart = () => {
+    if (isOutOfStock) return;
+    addToCart(product, currentVariant, quantity);
+    setAddedFeedback(true);
+    setTimeout(() => {
+      setAddedFeedback(false);
+    }, 2200);
+  };
+
+  // JSON-LD Structured Metadata for SEO
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    image: activeImage?.url,
+    description: product.description,
+    sku: currentVariant.sku,
+    brand: {
+      '@type': 'Brand',
+      name: 'NISHKÈA'
+    },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'INR',
+      price: (product.priceMinor / 100).toFixed(2),
+      availability: availableUnits > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      url: `https://nishkea.internal/products/${product.slug}`
+    }
+  };
 
   return (
     <div style={{ padding: 'var(--space-6) 0 var(--space-16)' }}>
+      {/* JSON-LD Rich Snippet */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <div className="container-storefront">
         {/* Breadcrumb Navigation */}
         <nav
@@ -65,7 +107,8 @@ export default function ProductDetailPage({ params }) {
             gap: '8px',
             fontSize: '0.78rem',
             color: 'var(--color-text-muted)',
-            marginBottom: 'var(--space-6)'
+            marginBottom: 'var(--space-6)',
+            flexWrap: 'wrap'
           }}
         >
           <Link href="/">Home</Link>
@@ -76,28 +119,6 @@ export default function ProductDetailPage({ params }) {
           <ChevronRight size={13} />
           <span style={{ color: 'var(--color-text-main)', fontWeight: 600 }}>{product.name}</span>
         </nav>
-
-        {/* Fictional Fixture Notice Banner */}
-        <div
-          role="note"
-          style={{
-            backgroundColor: '#FEF7EC',
-            border: '1px solid #F5DEB3',
-            borderRadius: 'var(--radius-xs)',
-            padding: '10px 16px',
-            marginBottom: 'var(--space-8)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            fontSize: '0.8rem',
-            color: '#8C5311'
-          }}
-        >
-          <ShieldAlert size={18} style={{ flexShrink: 0 }} />
-          <div>
-            <strong>Node 2 Architectural Foundation:</strong> Product specifications, pricing, and variant availability are fictional fixtures for UI preview. No live payment gateway or warehouse counter is connected.
-          </div>
-        </div>
 
         {/* Product Showcase Grid */}
         <div
@@ -112,14 +133,27 @@ export default function ProductDetailPage({ params }) {
           <style jsx>{`
             @media (min-width: 900px) {
               .product-detail-grid {
-                grid-template-columns: 1fr 1fr !important;
+                grid-template-columns: 1.05fr 0.95fr !important;
+                gap: 56px !important;
               }
             }
           `}</style>
 
-          {/* Left Column: Image Gallery */}
+          {/* Left Column: Image Gallery & Lightbox */}
           <div>
-            <div style={{ marginBottom: '16px', borderRadius: 'var(--radius-xs)', overflow: 'hidden' }}>
+            <div
+              style={{
+                position: 'relative',
+                marginBottom: '16px',
+                borderRadius: 'var(--radius-xs)',
+                overflow: 'hidden',
+                backgroundColor: '#FAF8F6',
+                border: '1px solid var(--color-border)',
+                cursor: 'zoom-in'
+              }}
+              onClick={() => setLightboxOpen(true)}
+              title="Click to expand high-resolution view"
+            >
               <PlaceholderImage
                 src={activeImage?.url}
                 alt={activeImage?.alt || product.name}
@@ -127,19 +161,39 @@ export default function ProductDetailPage({ params }) {
                 priority={true}
                 category={product.categoryName}
               />
+              <button
+                type="button"
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  bottom: '12px',
+                  backgroundColor: 'rgba(255,255,255,0.85)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer'
+                }}
+                aria-label="Enlarge image"
+              >
+                <Maximize2 size={16} />
+              </button>
             </div>
 
             {/* Thumbnails */}
             {product.images.length > 1 && (
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 {product.images.map((img, idx) => (
                   <button
-                    key={img.id}
+                    key={img.id || idx}
                     type="button"
                     onClick={() => setSelectedImageIndex(idx)}
                     style={{
-                      width: '74px',
-                      height: '74px',
+                      width: '76px',
+                      height: '76px',
                       padding: 0,
                       border: selectedImageIndex === idx ? '2px solid var(--color-burgundy)' : '1px solid var(--color-border)',
                       borderRadius: 'var(--radius-xs)',
@@ -156,40 +210,40 @@ export default function ProductDetailPage({ params }) {
             )}
           </div>
 
-          {/* Right Column: Information & Controls */}
+          {/* Right Column: Information, Variants & Actions */}
           <div>
             {/* Badges */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
               <span className="badge badge-burgundy">{product.categoryName}</span>
-              <span className="badge badge-gold">{product.collectionName}</span>
+              <span className="badge badge-gold">{product.collectionName || product.collectionType}</span>
               {product.lifecycle === 'under_review' && (
-                <span className="badge badge-warning">30-Day Review Pending</span>
+                <span className="badge badge-warning">30-Day Trend Review</span>
               )}
               {product.lifecycle === 'clearance' && (
-                <span className="badge badge-danger">Clearance</span>
+                <span className="badge badge-danger">Clearance Edition</span>
               )}
             </div>
 
             {/* Title & Code */}
-            <h1 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', marginBottom: '8px', lineHeight: 1.2 }}>
+            <h1 style={{ fontSize: 'clamp(1.8rem, 3.2vw, 2.6rem)', marginBottom: '8px', lineHeight: 1.2 }}>
               {product.name}
             </h1>
-            <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginBottom: '16px' }}>
+            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '18px' }}>
               Design Code: <strong>{product.code}</strong> • SKU: <strong>{currentVariant.sku}</strong>
             </div>
 
-            {/* Price & Unit */}
+            {/* Price & Sales Unit */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'baseline',
                 gap: '12px',
-                marginBottom: '24px',
+                marginBottom: '20px',
                 paddingBottom: '16px',
                 borderBottom: '1px solid var(--color-border)'
               }}
             >
-              <span style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--color-burgundy)' }}>
+              <span style={{ fontSize: '2.1rem', fontWeight: 700, color: 'var(--color-burgundy)' }}>
                 {formatCurrency(product.priceMinor, product.currency)}
               </span>
               <span style={{ fontSize: '0.86rem', color: 'var(--color-text-muted)' }}>
@@ -206,20 +260,24 @@ export default function ProductDetailPage({ params }) {
               {product.description}
             </p>
 
-            {/* Variant Selector */}
+            {/* Variant Option Combination Selector */}
             {product.variants.length > 0 && (
-              <div style={{ marginBottom: '24px' }}>
+              <div style={{ marginBottom: '22px' }}>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
-                  Option Combination: <span style={{ color: 'var(--color-burgundy)' }}>{currentVariant.colour} {currentVariant.size ? `— ${currentVariant.size}` : ''}</span>
+                  Option: <span style={{ color: 'var(--color-burgundy)' }}>{currentVariant.colour} {currentVariant.size ? `• ${currentVariant.size}` : ''}</span>
                 </label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                   {product.variants.map((v, idx) => (
                     <button
                       key={v.sku}
                       type="button"
-                      onClick={() => setSelectedVariantIndex(idx)}
+                      id={`variant-btn-${v.sku}`}
+                      onClick={() => {
+                        setSelectedVariantIndex(idx);
+                        setQuantity(1);
+                      }}
                       className={`btn btn-sm ${selectedVariantIndex === idx ? 'btn-primary' : 'btn-outline'}`}
-                      style={{ borderRadius: 'var(--radius-xs)', fontSize: '0.78rem' }}
+                      style={{ borderRadius: 'var(--radius-xs)', fontSize: '0.8rem', padding: '6px 12px' }}
                     >
                       {v.colour} {v.size ? `(${v.size})` : ''}
                     </button>
@@ -228,17 +286,45 @@ export default function ProductDetailPage({ params }) {
               </div>
             )}
 
-            {/* Stock Availability Indicator (Transactional Rule Simulation) */}
-            <div style={{ marginBottom: '24px', fontSize: '0.8rem' }}>
-              <span style={{ color: availableUnits > 0 ? 'var(--color-status-success)' : 'var(--color-status-danger)', fontWeight: 600 }}>
-                ● {availableUnits > 0 ? `Available: ${availableUnits} units` : 'Out of Stock'}
-              </span>
-              <span style={{ color: 'var(--color-text-muted)', marginLeft: '8px' }}>
-                (On-hand: {currentVariant.sellable} | Active Reservations: {currentVariant.reserved})
+            {/* Real-Time Stock Availability Indicator */}
+            <div
+              id="stock-indicator"
+              style={{
+                marginBottom: '24px',
+                padding: '10px 14px',
+                borderRadius: 'var(--radius-xs)',
+                backgroundColor: isOutOfStock ? '#FEF2F2' : availableUnits <= 5 ? '#FFFBEB' : '#F0FDF4',
+                border: `1px solid ${isOutOfStock ? '#FECACA' : availableUnits <= 5 ? '#FDE68A' : '#BBF7D0'}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '0.82rem'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span
+                  style={{
+                    color: isOutOfStock ? 'var(--color-status-danger)' : availableUnits <= 5 ? '#D97706' : 'var(--color-status-success)',
+                    fontWeight: 700
+                  }}
+                >
+                  ●
+                </span>
+                <strong style={{ color: isOutOfStock ? '#991B1B' : availableUnits <= 5 ? '#92400E' : '#166534' }}>
+                  {isOutOfStock
+                    ? 'Currently Out of Stock (Reservation Locked)'
+                    : availableUnits <= 5
+                    ? `Low Vault Stock: Only ${availableUnits} units remaining`
+                    : `In Stock: ${availableUnits} units available for dispatch`}
+                </strong>
+              </div>
+
+              <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
+                On-Hand: {currentVariant.sellable} • Holds: {currentVariant.reserved}
               </span>
             </div>
 
-            {/* Quantity and Actions */}
+            {/* Quantity Stepper & Add to Bag Actions */}
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap' }}>
               {/* Quantity increment/decrement */}
               <div
@@ -247,13 +333,16 @@ export default function ProductDetailPage({ params }) {
                   alignItems: 'center',
                   border: '1px solid var(--color-border)',
                   borderRadius: 'var(--radius-xs)',
-                  backgroundColor: '#FFFFFF'
+                  backgroundColor: '#FFFFFF',
+                  opacity: isOutOfStock ? 0.5 : 1
                 }}
               >
                 <button
                   type="button"
+                  id="btn-qty-minus"
+                  disabled={isOutOfStock || quantity <= 1}
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  style={{ width: '36px', height: '42px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '1rem' }}
+                  style={{ width: '38px', height: '44px', border: 'none', background: 'none', cursor: isOutOfStock ? 'not-allowed' : 'pointer', fontSize: '1rem' }}
                   aria-label="Decrease quantity"
                 >
                   −
@@ -263,32 +352,54 @@ export default function ProductDetailPage({ params }) {
                 </span>
                 <button
                   type="button"
-                  onClick={() => setQuantity((q) => Math.min(10, q + 1))}
-                  style={{ width: '36px', height: '42px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '1rem' }}
+                  id="btn-qty-plus"
+                  disabled={isOutOfStock || quantity >= Math.min(10, availableUnits)}
+                  onClick={() => setQuantity((q) => Math.min(Math.min(10, availableUnits), q + 1))}
+                  style={{ width: '38px', height: '44px', border: 'none', background: 'none', cursor: isOutOfStock ? 'not-allowed' : 'pointer', fontSize: '1rem' }}
                   aria-label="Increase quantity"
                 >
                   +
                 </button>
               </div>
 
-              {/* Add to Preview Bag */}
+              {/* Add to Bag Button */}
               <button
                 type="button"
+                id="btn-add-to-cart"
                 className="btn btn-primary"
-                onClick={() => addToCart(product, currentVariant, quantity)}
-                style={{ flex: 1, minWidth: '180px', height: '44px' }}
+                disabled={isOutOfStock}
+                onClick={handleAddToCart}
+                style={{
+                  flex: 1,
+                  minWidth: '200px',
+                  height: '46px',
+                  backgroundColor: addedFeedback ? 'var(--color-status-success)' : undefined,
+                  borderColor: addedFeedback ? 'var(--color-status-success)' : undefined,
+                  transition: 'background-color 0.2s ease, transform 0.15s ease'
+                }}
               >
-                <ShoppingBag size={18} /> Add to Preview Bag
+                {addedFeedback ? (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Check size={18} /> Added to Preview Bag
+                  </span>
+                ) : isOutOfStock ? (
+                  'Sold Out'
+                ) : (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <ShoppingBag size={18} /> Add to Preview Bag
+                  </span>
+                )}
               </button>
 
-              {/* Wishlist Toggle */}
+              {/* Wishlist Toggle Button */}
               <button
                 type="button"
+                id="btn-toggle-wishlist"
                 onClick={() => toggleWishlist(product)}
                 className="btn btn-outline"
                 style={{
-                  width: '44px',
-                  height: '44px',
+                  width: '46px',
+                  height: '46px',
                   padding: 0,
                   color: isWishlisted ? 'var(--color-burgundy)' : 'inherit'
                 }}
@@ -298,7 +409,7 @@ export default function ProductDetailPage({ params }) {
               </button>
             </div>
 
-            {/* Service Highlights */}
+            {/* Service & Shipping Highlights */}
             <div
               style={{
                 backgroundColor: 'var(--color-surface)',
@@ -313,29 +424,123 @@ export default function ProductDetailPage({ params }) {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.82rem' }}>
                 <Truck size={18} color="var(--color-burgundy)" />
-                <span>Complimentary insured courier delivery across India over ₹3,000.</span>
+                <span>Complimentary insured courier delivery across India on orders over ₹3,000.</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.82rem' }}>
                 <RotateCcw size={18} color="var(--color-burgundy)" />
-                <span>7-day return window in unworn condition with tags intact.</span>
+                <span>7-day transparent inspection window in original unworn condition.</span>
               </div>
             </div>
 
             {/* Technical Specifications Accordion Details */}
             <div style={{ borderTop: '1px solid var(--color-border)' }}>
-              <div style={{ padding: '16px 0', borderBottom: '1px solid var(--color-border-subtle)' }}>
-                <h4 style={{ fontSize: '0.92rem', marginBottom: '6px' }}>Materials &amp; Finish</h4>
-                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{product.materials}</p>
+              {/* Materials & Metal Purity */}
+              <div style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                <button
+                  type="button"
+                  onClick={() => setActiveAccordion(activeAccordion === 'materials' ? '' : 'materials')}
+                  style={{
+                    width: '100%',
+                    padding: '14px 0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '0.94rem',
+                    fontWeight: 600
+                  }}
+                >
+                  <span>Materials &amp; Artisanal Finish</span>
+                  <ChevronDown
+                    size={16}
+                    style={{
+                      transform: activeAccordion === 'materials' ? 'rotate(180deg)' : 'none',
+                      transition: 'transform 0.2s ease'
+                    }}
+                  />
+                </button>
+                {activeAccordion === 'materials' && (
+                  <div style={{ paddingBottom: '14px', fontSize: '0.86rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
+                    <p style={{ margin: '0 0 6px' }}>{product.materials}</p>
+                    <p style={{ margin: 0, fontSize: '0.78rem' }}>
+                      Certified ethically sourced components. Hallmarked finish handcrafted by traditional artisans.
+                    </p>
+                  </div>
+                )}
               </div>
 
-              <div style={{ padding: '16px 0', borderBottom: '1px solid var(--color-border-subtle)' }}>
-                <h4 style={{ fontSize: '0.92rem', marginBottom: '6px' }}>Care Guidelines</h4>
-                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{product.careInstructions}</p>
+              {/* Care Guidelines */}
+              <div style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                <button
+                  type="button"
+                  onClick={() => setActiveAccordion(activeAccordion === 'care' ? '' : 'care')}
+                  style={{
+                    width: '100%',
+                    padding: '14px 0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '0.94rem',
+                    fontWeight: 600
+                  }}
+                >
+                  <span>Preservation &amp; Care Guidelines</span>
+                  <ChevronDown
+                    size={16}
+                    style={{
+                      transform: activeAccordion === 'care' ? 'rotate(180deg)' : 'none',
+                      transition: 'transform 0.2s ease'
+                    }}
+                  />
+                </button>
+                {activeAccordion === 'care' && (
+                  <div style={{ paddingBottom: '14px', fontSize: '0.86rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
+                    <p style={{ margin: 0 }}>{product.careInstructions}</p>
+                  </div>
+                )}
               </div>
 
-              <div style={{ padding: '16px 0' }}>
-                <h4 style={{ fontSize: '0.92rem', marginBottom: '6px' }}>Dimensions &amp; Scale</h4>
-                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{product.dimensions}</p>
+              {/* Dimensions & Specifications */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setActiveAccordion(activeAccordion === 'dimensions' ? '' : 'dimensions')}
+                  style={{
+                    width: '100%',
+                    padding: '14px 0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '0.94rem',
+                    fontWeight: 600
+                  }}
+                >
+                  <span>Dimensions, Weight &amp; Sales Unit</span>
+                  <ChevronDown
+                    size={16}
+                    style={{
+                      transform: activeAccordion === 'dimensions' ? 'rotate(180deg)' : 'none',
+                      transition: 'transform 0.2s ease'
+                    }}
+                  />
+                </button>
+                {activeAccordion === 'dimensions' && (
+                  <div style={{ paddingBottom: '14px', fontSize: '0.86rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
+                    <p style={{ margin: '0 0 6px' }}><strong>Dimensions:</strong> {product.dimensions}</p>
+                    <p style={{ margin: '0 0 6px' }}>
+                      <strong>Sales Unit:</strong> {product.salesUnit === 'pair' ? 'Sold as a matching Pair' : product.salesUnit === 'set' ? 'Complete Set' : 'Single Piece'}
+                    </p>
+                    <p style={{ margin: 0 }}><strong>Category:</strong> {product.categoryName}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -344,9 +549,20 @@ export default function ProductDetailPage({ params }) {
         {/* Related Category Recommendations */}
         {relatedProducts.length > 0 && (
           <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-12)' }}>
-            <h3 style={{ fontSize: '1.6rem', marginBottom: 'var(--space-6)' }}>
-              More from {product.categoryName}
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 'var(--space-6)' }}>
+              <div>
+                <span style={{ fontSize: '0.78rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', fontWeight: 600 }}>
+                  COMPLEMENTARY PIECES
+                </span>
+                <h3 style={{ fontSize: '1.6rem', margin: '4px 0 0' }}>
+                  More from {product.categoryName}
+                </h3>
+              </div>
+              <Link href={`/shop?category=${product.category}`} style={{ fontSize: '0.84rem', color: 'var(--color-burgundy)', fontWeight: 600 }}>
+                Explore All {product.categoryName} →
+              </Link>
+            </div>
+
             <div className="product-grid">
               {relatedProducts.map((rel) => (
                 <ProductCard key={rel.id} product={rel} />
@@ -355,6 +571,79 @@ export default function ProductDetailPage({ params }) {
           </div>
         )}
       </div>
+
+      {/* High-Resolution Lightbox Modal */}
+      {lightboxOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setLightboxOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(26, 10, 14, 0.92)',
+            zIndex: 10000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'relative',
+              maxWidth: '850px',
+              width: '100%',
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-xs)',
+              overflow: 'hidden'
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setLightboxOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '12px',
+                right: '12px',
+                backgroundColor: 'rgba(255,255,255,0.9)',
+                border: '1px solid var(--color-border)',
+                borderRadius: '50%',
+                width: '36px',
+                height: '36px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                zIndex: 10
+              }}
+              aria-label="Close high-resolution preview"
+            >
+              <X size={18} />
+            </button>
+            <div style={{ maxHeight: '80vh', overflow: 'hidden' }}>
+              <PlaceholderImage
+                src={activeImage?.url}
+                alt={activeImage?.alt || product.name}
+                aspectRatio="1 / 1"
+                category={product.categoryName}
+              />
+            </div>
+            <div style={{ padding: '14px 20px', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <strong>{product.name}</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginLeft: '10px' }}>
+                  SKU: {currentVariant.sku}
+                </span>
+              </div>
+              <span style={{ fontSize: '0.82rem', color: 'var(--color-burgundy)', fontWeight: 600 }}>
+                {formatCurrency(product.priceMinor, product.currency)}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

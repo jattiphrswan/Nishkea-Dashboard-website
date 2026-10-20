@@ -89,3 +89,29 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - Browser Verification: Live Chromium interaction recorded `CONTINUE` decision for `NSK-EAR-001`, verified status transition to `active`, extended review date +30 days, verified linked task resolution, full screenshot captured (`reviews_decision_success_1792489974935.png`).
 - **Next Dependency-Ready Node:** Node 7 — Complete Luxury Storefront, Dynamic Category Filters & Product Detail Experience.
+
+## Node 7 — Complete Luxury Storefront, Dynamic Category Filters & Product Detail Experience
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-20
+- **Deliverables:**
+  - Dynamic catalogue experience (`src/app/(storefront)/shop/page.js`):
+    - Real-time search by keyword, category, description, and SKU.
+    - Category tabs with live design count chips (`Earrings`, `Rings`, `Necklaces & Pendants`, `Hair Accessories`, `Nose Rings & Pins`).
+    - Collection type filters (`30-Day Trend`, `Permanent Line`, `Clearance`).
+    - Price range filters (`Under ₹1,500`, `₹1,500 – ₹3,000`, `Above ₹3,000`).
+    - Bidirectional URL deep-linking sync (`/shop?category=earrings&collection=monthly_trend`).
+    - Removable active filter chips and clear empty-state card.
+  - Enhanced Product Detail Page (`src/app/(storefront)/products/[slug]/page.js`):
+    - Dynamic variant picker updating SKU, colour, size, and real-time available stock.
+    - Live vault stock indicator (`In Stock`, `Low Vault Stock`, `Out of Stock`).
+    - Stock-gated Add to Bag button and quantity stepper preventing overselling.
+    - Image gallery with high-resolution lightbox zoom modal.
+    - Specifications accordions for Materials/Purity, Dimensions/Weight/Sales Unit, Care Guidelines, and Insured Delivery.
+    - Schema.org `Product` JSON-LD structured metadata.
+  - Enhanced ProductCard (`src/components/storefront/ProductCard.js`):
+    - Real-time stock computation badges (`Sold Out`, `Low Stock`, `Clearance`).
+- **Validation:**
+  - `npm test` — PASS (98/98 tests passing across RBAC, inventory, reviews, and storefront suites).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - Browser Verification: Tested category filter (`btn-cat-earrings`), navigated to `Aurelia Chandelier Drops` PDP, switched to Rhodium Silver variant (`NSK-EAR-001-SLV`, 12 units available), added to preview bag, expanded accordions, screenshot captured (`node7_pdp_verified_1792490842901.png`).
+- **Next Dependency-Ready Node:** Node 8 — Checkout, Client-to-Server Order Confirmation, Transactional Reservations & Shipping.
