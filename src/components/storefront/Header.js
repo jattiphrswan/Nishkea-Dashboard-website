@@ -16,6 +16,7 @@ export default function Header() {
   }, [pathname]);
 
   const navLinks = [
+    { label: 'All Products', href: '/products' },
     { label: 'Shop', href: '/shop' },
     { label: 'Collections', href: '/shop?category=necklaces' },
     { label: 'About', href: '/shop#about' },
@@ -112,7 +113,10 @@ export default function Header() {
                 </Link>
               ))}
               <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <Link href="/shop" onClick={() => setMobileOpen(false)} className="btn btn-primary" style={{ justifyContent: 'center' }}>
+                <Link href="/products" onClick={() => setMobileOpen(false)} className="btn btn-primary" style={{ justifyContent: 'center' }}>
+                  All Products & Gallery
+                </Link>
+                <Link href="/shop" onClick={() => setMobileOpen(false)} className="btn btn-outline" style={{ justifyContent: 'center' }}>
                   Explore All Jewellery
                 </Link>
                 <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="btn btn-outline btn-sm" style={{ justifyContent: 'center' }}>

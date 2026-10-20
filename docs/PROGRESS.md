@@ -110,8 +110,18 @@
     - Schema.org `Product` JSON-LD structured metadata.
   - Enhanced ProductCard (`src/components/storefront/ProductCard.js`):
     - Real-time stock computation badges (`Sold Out`, `Low Stock`, `Clearance`).
+    - Interactive in-card gallery switcher with indicator dots and arrow navigation.
+    - Quick View trigger overlay.
+  - Dedicated All Products & Gallery Catalogue (`src/app/(storefront)/products/page.js`):
+    - Dual View Mode Switcher: "Gallery & Story View" (editorial showcase) vs "Boutique Grid View".
+    - Multi-angle gallery selector with thumbnail rail, next/prev arrows, and high-resolution Lightbox Zoom modal.
+    - Full artisanal narrative descriptions, materials & finish provenance, dimensions, and care guidelines.
+    - Interactive variant selector with dynamic vault stock indicators and direct Add to Bag.
+    - In-grid Quick View modal with complete gallery switcher and artisanal story.
+    - Top navigation integration in `Header.js`.
 - **Validation:**
-  - `npm test` — PASS (98/98 tests passing across RBAC, inventory, reviews, and storefront suites).
+  - `npm test` — PASS (186/186 tests passing across RBAC, inventory, reviews, and storefront suites).
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
-  - Browser Verification: Tested category filter (`btn-cat-earrings`), navigated to `Aurelia Chandelier Drops` PDP, switched to Rhodium Silver variant (`NSK-EAR-001-SLV`, 12 units available), added to preview bag, expanded accordions, screenshot captured (`node7_pdp_verified_1792490842901.png`).
+  - Browser Verification: Tested `/products` route; cycled gallery angles via thumbnail rail; opened and verified Lightbox Zoom modal; switched variants (`Rhodium Silver`); toggled to Boutique Grid; cycled in-card gallery dots; opened and closed Atelier Quick View modal.
 - **Next Dependency-Ready Node:** Node 8 — Checkout, Client-to-Server Order Confirmation, Transactional Reservations & Shipping.
+

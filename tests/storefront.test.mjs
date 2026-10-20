@@ -123,10 +123,22 @@ for (const cat of CATEGORIES) {
   assert(/^[a-z0-9-]+$/.test(cat.slug), `Category slug is valid: ${cat.slug}`);
 }
 
-// 10. Multi-Image Gallery Presence
+// 10. Multi-Image Gallery Presence & Integrity
 for (const p of PRODUCTS) {
-  assert(Array.isArray(p.images) && p.images.length > 0, `Product ${p.code} has gallery imagery`);
+  assert(Array.isArray(p.images) && p.images.length >= 1, `Product ${p.code} has gallery imagery`);
   assert(p.images[0].url.length > 0, `Product ${p.code} primary image has valid path`);
+  for (const img of p.images) {
+    assert(typeof img.url === 'string' && img.url.startsWith('/images/'), `Product ${p.code} image path is valid: ${img.url}`);
+    assert(typeof img.alt === 'string' && img.alt.length > 0, `Product ${p.code} image has accessibility alt text: ${img.alt}`);
+  }
+}
+
+// 11. Artisanal Description, Materials & Dimensions Completeness
+for (const p of PRODUCTS) {
+  assert(typeof p.description === 'string' && p.description.length >= 30, `Product ${p.code} has full artisanal narrative description`);
+  assert(typeof p.materials === 'string' && p.materials.length >= 10, `Product ${p.code} specifies fine materials/alloys`);
+  assert(typeof p.dimensions === 'string' && p.dimensions.length >= 5, `Product ${p.code} specifies precise sizing & dimensions`);
+  assert(typeof p.careInstructions === 'string' && p.careInstructions.length >= 15, `Product ${p.code} specifies maintenance care advice`);
 }
 
 console.log('\n==================================================================');
