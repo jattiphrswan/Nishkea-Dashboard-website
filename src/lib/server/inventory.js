@@ -26,7 +26,7 @@ export const INVENTORY_CONFIG = {
 };
 
 // In-Memory Transactional Fallback Ledger (Active when live DB URL is pending)
-let memoryBatches = [
+export let memoryBatches = [
   { id: 'BAT-202610-01', variantId: 'NSK-EAR-001-GLD', batchReference: 'BATCH-202610-A', unitCostMinor: 85000, initialQuantity: 20, currentQuantity: 18, receivedDate: '2026-10-01' },
   { id: 'BAT-202606-12', variantId: 'NSK-RNG-002-SZ7', batchReference: 'BATCH-202606-C', unitCostMinor: 62000, initialQuantity: 50, currentQuantity: 22, receivedDate: '2026-06-15' },
   { id: 'BAT-202609-08', variantId: 'NSK-NCK-003-BUR', batchReference: 'BATCH-202609-B', unitCostMinor: 110000, initialQuantity: 15, currentQuantity: 5, receivedDate: '2026-09-18' },
@@ -34,8 +34,8 @@ let memoryBatches = [
   { id: 'BAT-202605-18', variantId: 'NSK-EAR-006-GLD', batchReference: 'BATCH-202605-E', unitCostMinor: 42000, initialQuantity: 100, currentQuantity: 42, receivedDate: '2026-05-01' }
 ];
 
-let memoryMovements = [];
-let memoryReservations = [
+export let memoryMovements = [];
+export let memoryReservations = [
   { id: 'res-init-01', orderRef: 'NSK-2026-1082', variantId: 'NSK-EAR-001-GLD', batchId: 'BAT-202610-01', quantity: 2, state: 'ACTIVE', expiresAt: new Date(Date.now() + 600000).toISOString() },
   { id: 'res-init-02', orderRef: 'NSK-2026-1081', variantId: 'NSK-RNG-002-SZ7', batchId: 'BAT-202606-12', quantity: 3, state: 'ACTIVE', expiresAt: new Date(Date.now() + 600000).toISOString() }
 ];

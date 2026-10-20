@@ -78,6 +78,40 @@ function DashboardContent() {
   const [returnLoading, setReturnLoading] = useState(false);
   const [returnFeedback, setReturnFeedback] = useState(null);
 
+  // Node 9: Suppliers & Purchase Orders State
+  const [liveSuppliers, setLiveSuppliers] = useState([]);
+  const [suppliersLoading, setSuppliersLoading] = useState(false);
+  const [livePOs, setLivePOs] = useState([]);
+  const [posLoading, setPosLoading] = useState(false);
+
+  // Modals State for POs
+  const [createPOModal, setCreatePOModal] = useState(false);
+  const [poSupplierId, setPoSupplierId] = useState('');
+  const [poVariantId, setPoVariantId] = useState('');
+  const [poQuantity, setPoQuantity] = useState(20);
+  const [poExpectedDate, setPoExpectedDate] = useState('');
+  const [poNotes, setPoNotes] = useState('');
+  const [createPOLoading, setCreatePOLoading] = useState(false);
+  const [createPOFeedback, setCreatePOFeedback] = useState(null);
+
+  const [approvePOModal, setApprovePOModal] = useState(null);
+  const [approvePONotes, setApprovePONotes] = useState('Approved for artisanal procurement');
+  const [approvePOLoading, setApprovePOLoading] = useState(false);
+  const [approvePOFeedback, setApprovePOFeedback] = useState(null);
+
+  const [receiveModalPO, setReceiveModalPO] = useState(null);
+  const [receiveItems, setReceiveItems] = useState({});
+  const [receiveBatchRef, setReceiveBatchRef] = useState('');
+  const [receiveLoading, setReceiveLoading] = useState(false);
+  const [receiveFeedback, setReceiveFeedback] = useState(null);
+
+  const [returnSupplierModalPO, setReturnSupplierModalPO] = useState(null);
+  const [returnSupplierItems, setReturnSupplierItems] = useState({});
+  const [returnSupplierReason, setReturnSupplierReason] = useState('DEFECTIVE_OR_DAMAGED');
+  const [returnSupplierNotes, setReturnSupplierNotes] = useState('');
+  const [returnSupplierLoading, setReturnSupplierLoading] = useState(false);
+  const [returnSupplierFeedback, setReturnSupplierFeedback] = useState(null);
+
   const loadLiveInventory = async () => {
     try {
       setSummaryLoading(true);
@@ -123,10 +157,42 @@ function DashboardContent() {
     }
   };
 
+  const loadLiveSuppliers = async () => {
+    try {
+      setSuppliersLoading(true);
+      const res = await fetch('/api/suppliers');
+      if (res.ok) {
+        const data = await res.json();
+        setLiveSuppliers(data.suppliers || []);
+      }
+    } catch (err) {
+      console.error('Failed to load suppliers:', err);
+    } finally {
+      setSuppliersLoading(false);
+    }
+  };
+
+  const loadLivePOs = async () => {
+    try {
+      setPosLoading(true);
+      const res = await fetch('/api/purchase-orders');
+      if (res.ok) {
+        const data = await res.json();
+        setLivePOs(data.purchaseOrders || []);
+      }
+    } catch (err) {
+      console.error('Failed to load purchase orders:', err);
+    } finally {
+      setPosLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadLiveInventory();
     loadLiveReviews();
     loadLiveOrders();
+    loadLiveSuppliers();
+    loadLivePOs();
   }, []);
 
   const handleRecordDecision = async (e) => {
@@ -261,6 +327,150 @@ function DashboardContent() {
     }
   };
 
+  const handleCreatePO = async (e) => {
+    e.preventDefault();
+    if (!poSupplierId || !poVariantId) {
+      setCreatePOFeedback({ type: 'error', message: 'Please select a supplier and variant' });
+      return;
+    }
+    setCreatePOLoading(true);
+    setCreatePOFeedback(null);
+    try {
+      const res = await fetch('/api/purchase-orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          supplierId: poSupplierId,
+          lines: [{ variantId: poVariantId, quantity: parseInt(poQuantity, 10) }],
+          expectedDeliveryDate: poExpectedDate || undefined,
+          notes: poNotes
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create purchase order');
+      setCreatePOFeedback({
+        type: 'success',
+        message: `✓ Purchase Order ${data.purchaseOrder.poNumber} generated! Status: ${data.purchaseOrder.status} (${data.requiresApproval ? 'Pending Approval' : 'Auto-approved'}).`
+      });
+      await loadLivePOs();
+      await loadLiveSuppliers();
+      setTimeout(() => {
+        setCreatePOModal(false);
+        setCreatePOFeedback(null);
+        setPoNotes('');
+      }, 1600);
+    } catch (err) {
+      setCreatePOFeedback({ type: 'error', message: err.message });
+    } finally {
+      setCreatePOLoading(false);
+    }
+  };
+
+  const handleApprovePO = async (e) => {
+    e.preventDefault();
+    if (!approvePOModal) return;
+    setApprovePOLoading(true);
+    setApprovePOFeedback(null);
+    try {
+      const res = await fetch(`/api/purchase-orders/${approvePOModal.id}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approvalNotes: approvePONotes })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'PO approval failed');
+      setApprovePOFeedback(`✓ Purchase Order ${approvePOModal.poNumber} approved by manager! Ready for goods receipt.`);
+      await loadLivePOs();
+      setTimeout(() => {
+        setApprovePOModal(null);
+        setApprovePOFeedback(null);
+      }, 1500);
+    } catch (err) {
+      setApprovePOFeedback(`Error: ${err.message}`);
+    } finally {
+      setApprovePOLoading(false);
+    }
+  };
+
+  const handleReceiveShipment = async (e) => {
+    e.preventDefault();
+    if (!receiveModalPO) return;
+    setReceiveLoading(true);
+    setReceiveFeedback(null);
+    try {
+      const itemsToReceive = Object.entries(receiveItems)
+        .map(([variantId, qty]) => ({ variantId, quantity: parseInt(qty, 10) }))
+        .filter((i) => i.quantity > 0);
+
+      if (itemsToReceive.length === 0) {
+        throw new Error('Please enter a quantity greater than 0 to receive');
+      }
+
+      const res = await fetch(`/api/purchase-orders/${receiveModalPO.id}/receive`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: itemsToReceive,
+          batchReference: receiveBatchRef || undefined
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Goods receipt failed');
+
+      setReceiveFeedback(`✓ Received shipment! PO status is now ${data.purchaseOrder.status}. FIFO batches and signed movements appended to inventory ledger.`);
+      await loadLivePOs();
+      await loadLiveInventory();
+      setTimeout(() => {
+        setReceiveModalPO(null);
+        setReceiveFeedback(null);
+      }, 1600);
+    } catch (err) {
+      setReceiveFeedback(`Error: ${err.message}`);
+    } finally {
+      setReceiveLoading(false);
+    }
+  };
+
+  const handleReturnSupplier = async (e) => {
+    e.preventDefault();
+    if (!returnSupplierModalPO) return;
+    setReturnSupplierLoading(true);
+    setReturnSupplierFeedback(null);
+    try {
+      const itemsToReturn = Object.entries(returnSupplierItems)
+        .map(([variantId, qty]) => ({ variantId, quantity: parseInt(qty, 10) }))
+        .filter((i) => i.quantity > 0);
+
+      if (itemsToReturn.length === 0) {
+        throw new Error('Please enter a quantity greater than 0 to return');
+      }
+
+      const res = await fetch(`/api/purchase-orders/${returnSupplierModalPO.id}/return`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: itemsToReturn,
+          reason: returnSupplierReason,
+          notes: returnSupplierNotes
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Vendor return failed');
+
+      setReturnSupplierFeedback(`✓ Vendor return recorded! Inventory movement signed and deducted.`);
+      await loadLivePOs();
+      await loadLiveInventory();
+      setTimeout(() => {
+        setReturnSupplierModalPO(null);
+        setReturnSupplierFeedback(null);
+      }, 1600);
+    } catch (err) {
+      setReturnSupplierFeedback(`Error: ${err.message}`);
+    } finally {
+      setReturnSupplierLoading(false);
+    }
+  };
+
   const showPlannedNotice = (actionName, nodeNumber) => {
     setActionNotice({
       title: `${actionName} (Planned)`,
@@ -303,7 +513,7 @@ function DashboardContent() {
       >
         <ShieldAlert size={20} style={{ flexShrink: 0 }} />
         <div>
-          <strong>Node 6 Connected Engine:</strong> Staff authentication, RBAC authorization, transactional inventory ledger (goods receipts &amp; signed movements), and 30-day collection lifecycle reviews (idempotent evaluation, sell-through tracking, and audited decisions) are actively connected to live API handlers. Payment rails remain mock-isolated.
+          <strong>Node 9 Connected Engine:</strong> Staff authentication, RBAC authorization, transactional inventory ledger (FIFO goods receipts &amp; signed movements), 30-day collection lifecycle reviews, checkout orders &amp; courier dispatch, and artisan supplier directory with multi-tier PO approvals, FIFO goods receipts, and bounded vendor returns are actively connected to live API handlers.
         </div>
       </div>
 
@@ -1135,15 +1345,377 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* TAB 6: SUPPLIERS */}
+      {/* TAB 6: SUPPLIERS & PURCHASE ORDERS (Live Node 9 Connection) */}
       {activeTab === 'suppliers' && (
-        <div className="table-container" style={{ padding: 'var(--space-8)', textAlign: 'center' }}>
-          <Truck size={36} color="var(--color-burgundy)" style={{ margin: '0 auto 12px' }} />
-          <h3>Suppliers &amp; Purchase Orders</h3>
-          <p style={{ maxWidth: '540px', margin: '8px auto 20px', fontSize: '0.88rem' }}>
-            Supplier directory, minimum order quantities, lead times, purchase order approvals, and partial receipt ledgers are planned for <strong>Node 9</strong>.
-          </p>
-          <span className="badge badge-demo">Planned — Node 9</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+          {/* Quick Metrics Bar */}
+          <div className="dashboard-stats-grid">
+            <div className="stat-card">
+              <span className="stat-card-label">Contracted Artisan Guilds</span>
+              <span className="stat-card-value">{liveSuppliers.length}</span>
+              <span className="stat-card-subtext">Jaipur, Surat, Bengaluru &amp; Mumbai</span>
+            </div>
+
+            <div className="stat-card">
+              <span className="stat-card-label">Total Procurement Value</span>
+              <span className="stat-card-value" style={{ color: 'var(--color-burgundy)' }}>
+                {livePOs.length > 0 && livePOs[0]?.totalCostMinor !== null
+                  ? formatCurrency(
+                      livePOs.reduce((sum, p) => sum + (p.totalCostMinor || 0), 0),
+                      'INR'
+                    )
+                  : 'RBAC Cost Isolated'}
+              </span>
+              <span className="stat-card-subtext">Across {livePOs.length} total procurement orders</span>
+            </div>
+
+            <div className="stat-card">
+              <span className="stat-card-label">Pending Approval</span>
+              <span className="stat-card-value" style={{ color: '#D97706' }}>
+                {livePOs.filter((p) => p.status === 'PENDING_APPROVAL').length}
+              </span>
+              <span className="stat-card-subtext">High-value or staff drafted POs</span>
+            </div>
+
+            <div className="stat-card">
+              <span className="stat-card-label">Active Receiving / In-Transit</span>
+              <span className="stat-card-value" style={{ color: 'var(--color-gold)' }}>
+                {livePOs.filter((p) => p.status === 'APPROVED' || p.status === 'PARTIALLY_RECEIVED').length}
+              </span>
+              <span className="stat-card-subtext">Awaiting full vault intake</span>
+            </div>
+          </div>
+
+          {/* Section 1: Purchase Orders Queue */}
+          <div className="table-container">
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+              <div>
+                <h3 style={{ fontSize: '1.15rem', margin: 0, fontWeight: 600 }}>Purchase Orders &amp; Receipts Ledger</h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                  Multi-tier approvals, zero over-receipt gating (Received ≤ Ordered), and bounded vendor returns.
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (liveSuppliers.length > 0) {
+                      setPoSupplierId(liveSuppliers[0].id);
+                      setPoVariantId(liveSuppliers[0].products[0]?.variantId || '');
+                      setPoQuantity(liveSuppliers[0].products[0]?.moq || 20);
+                    }
+                    setCreatePOModal(true);
+                  }}
+                  className="btn btn-primary btn-sm"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Plus size={14} />
+                  <span>Draft Purchase Order</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    loadLivePOs();
+                    loadLiveSuppliers();
+                  }}
+                  disabled={posLoading}
+                  className="btn btn-outline btn-sm"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <RefreshCw size={13} className={posLoading ? 'animate-spin' : ''} />
+                  <span>Refresh</span>
+                </button>
+              </div>
+            </div>
+
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>PO Reference</th>
+                  <th>Artisan Guild Partner</th>
+                  <th>Order Items &amp; SKUs</th>
+                  <th>Reconciliation (Ord / Rcv / Ret)</th>
+                  <th>Total Commitment</th>
+                  <th>Delivery Due</th>
+                  <th>Approval / State</th>
+                  <th>Operational Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {livePOs.map((po) => {
+                  const rec = po.reconciliation || {
+                    totalOrdered: po.lines?.reduce((s, l) => s + l.orderedQuantity, 0) || 0,
+                    totalReceived: po.lines?.reduce((s, l) => s + l.receivedQuantity, 0) || 0,
+                    totalReturned: po.lines?.reduce((s, l) => s + l.returnedQuantity, 0) || 0,
+                    percentReceived: 0
+                  };
+
+                  return (
+                    <tr key={po.id}>
+                      <td>
+                        <strong style={{ fontFamily: 'monospace', color: 'var(--color-burgundy)' }}>
+                          {po.poNumber}
+                        </strong>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                          Created: {po.createdAt?.slice(0, 10)}
+                        </div>
+                      </td>
+                      <td>
+                        <div style={{ fontWeight: 600 }}>{po.supplierName}</div>
+                        <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>ID: {po.supplierId}</div>
+                      </td>
+                      <td style={{ fontSize: '0.8rem', maxWidth: '240px' }}>
+                        {po.lines?.map((l) => (
+                          <div key={l.id || l.variantId} style={{ marginBottom: '4px' }}>
+                            <strong>{l.orderedQuantity}×</strong> {l.designName || l.variantId}
+                            <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', display: 'block' }}>
+                              Received: {l.receivedQuantity} | Returned: {l.returnedQuantity}
+                            </span>
+                          </div>
+                        ))}
+                      </td>
+                      <td>
+                        <div style={{ fontSize: '0.82rem', fontWeight: 600 }}>
+                          {rec.totalReceived} / {rec.totalOrdered} rcvd
+                          {rec.totalReturned > 0 && (
+                            <span style={{ color: 'var(--color-status-danger)', marginLeft: '4px', fontSize: '0.75rem' }}>
+                              (-{rec.totalReturned} ret)
+                            </span>
+                          )}
+                        </div>
+                        <div
+                          style={{
+                            width: '100%',
+                            height: '6px',
+                            backgroundColor: '#E5E7EB',
+                            borderRadius: '3px',
+                            marginTop: '6px',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: `${Math.min(100, rec.percentReceived || 0)}%`,
+                              height: '100%',
+                              backgroundColor:
+                                po.status === 'FULFILLED'
+                                  ? '#10B981'
+                                  : po.status === 'PARTIALLY_RECEIVED'
+                                  ? 'var(--color-burgundy)'
+                                  : 'var(--color-gold)'
+                            }}
+                          />
+                        </div>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                          {rec.remainingPending > 0 ? `${rec.remainingPending} pending` : 'All items accounted'}
+                        </span>
+                      </td>
+                      <td>
+                        {po.totalCostMinor !== null ? (
+                          <strong>{formatCurrency(po.totalCostMinor, po.currency || 'INR')}</strong>
+                        ) : (
+                          <span className="badge badge-neutral" style={{ fontSize: '0.7rem' }}>
+                            Cost Isolated
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ fontSize: '0.8rem', whiteSpace: 'nowrap' }}>
+                        {po.expectedDeliveryDate || '—'}
+                      </td>
+                      <td>
+                        <span
+                          className={`badge ${
+                            po.status === 'FULFILLED'
+                              ? 'badge-success'
+                              : po.status === 'PARTIALLY_RECEIVED'
+                              ? 'badge-burgundy'
+                              : po.status === 'APPROVED'
+                              ? 'badge-gold'
+                              : 'badge-warning'
+                          }`}
+                        >
+                          {po.status}
+                        </span>
+                        {po.approvedBy && (
+                          <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                            By {po.approvedBy}
+                          </div>
+                        )}
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {po.status === 'PENDING_APPROVAL' && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setApprovePOModal(po);
+                                setApprovePONotes('Approved for production & restock intake');
+                              }}
+                              className="btn btn-primary btn-sm"
+                              style={{ fontSize: '0.72rem', padding: '4px 8px' }}
+                            >
+                              Approve PO
+                            </button>
+                          )}
+
+                          {(po.status === 'APPROVED' || po.status === 'PARTIALLY_RECEIVED') && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReceiveModalPO(po);
+                                const defaultQtys = {};
+                                po.lines?.forEach((l) => {
+                                  defaultQtys[l.variantId] = Math.max(0, l.orderedQuantity - l.receivedQuantity);
+                                });
+                                setReceiveItems(defaultQtys);
+                                setReceiveBatchRef(`BAT-${po.poNumber.replace('PO-', '')}-${Date.now().toString(36).slice(-3).toUpperCase()}`);
+                              }}
+                              className="btn btn-outline btn-sm"
+                              style={{ fontSize: '0.72rem', padding: '4px 8px', borderColor: 'var(--color-burgundy)', color: 'var(--color-burgundy)' }}
+                            >
+                              Receive Shipment
+                            </button>
+                          )}
+
+                          {rec.totalReceived > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReturnSupplierModalPO(po);
+                                const defaultReturns = {};
+                                po.lines?.forEach((l) => {
+                                  defaultReturns[l.variantId] = 0;
+                                });
+                                setReturnSupplierItems(defaultReturns);
+                              }}
+                              className="btn btn-outline btn-sm"
+                              style={{ fontSize: '0.72rem', padding: '4px 8px', borderColor: '#D97706', color: '#B45309' }}
+                            >
+                              Vendor Return
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Section 2: Artisan Guilds Directory */}
+          <div className="table-container" style={{ padding: '20px' }}>
+            <div style={{ marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '1.15rem', margin: 0, fontWeight: 600 }}>Contracted Artisan Guilds &amp; Terms</h3>
+              <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                Catalog mappings, standard lead times, minimum order quantities (MOQ), and wholesale unit price protections.
+              </p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '16px' }}>
+              {liveSuppliers.map((supplier) => (
+                <div
+                  key={supplier.id}
+                  style={{
+                    backgroundColor: '#FAF8F6',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-xs)',
+                    padding: '16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                      <div>
+                        <h4 style={{ fontSize: '1rem', fontWeight: 600, margin: 0 }}>{supplier.name}</h4>
+                        <span style={{ fontSize: '0.76rem', color: 'var(--color-text-muted)' }}>
+                          {supplier.city}, {supplier.state}
+                        </span>
+                      </div>
+                      <span className="badge badge-gold">{supplier.code}</span>
+                    </div>
+
+                    <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '6px 0 12px' }}>
+                      {supplier.notes}
+                    </p>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.78rem', marginBottom: '12px', backgroundColor: '#FFFFFF', padding: '8px 12px', borderRadius: '4px' }}>
+                      <div>
+                        <span style={{ color: 'var(--color-text-muted)', display: 'block' }}>Lead Time:</span>
+                        <strong>{supplier.leadTimeDays} Days</strong>
+                      </div>
+                      <div>
+                        <span style={{ color: 'var(--color-text-muted)', display: 'block' }}>Terms:</span>
+                        <strong>{supplier.paymentTerms}</strong>
+                      </div>
+                      <div>
+                        <span style={{ color: 'var(--color-text-muted)', display: 'block' }}>Contact:</span>
+                        <span>{supplier.contactPerson}</span>
+                      </div>
+                      <div>
+                        <span style={{ color: 'var(--color-text-muted)', display: 'block' }}>Phone:</span>
+                        <span>{supplier.phone}</span>
+                      </div>
+                    </div>
+
+                    <div style={{ fontSize: '0.78rem' }}>
+                      <strong style={{ display: 'block', marginBottom: '6px' }}>Contracted Catalogue Variants:</strong>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {supplier.products?.map((p) => (
+                          <div
+                            key={p.variantId}
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              padding: '4px 8px',
+                              backgroundColor: '#FFFFFF',
+                              borderRadius: '3px',
+                              border: '1px solid #ECE7E2'
+                            }}
+                          >
+                            <div>
+                              <code>{p.variantId}</code>
+                              <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginLeft: '6px' }}>
+                                MOQ: {p.moq}
+                              </span>
+                            </div>
+                            <div style={{ fontWeight: 600 }}>
+                              {p.unitCostMinor !== null ? (
+                                formatCurrency(p.unitCostMinor, 'INR')
+                              ) : (
+                                <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>Cost Hidden</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #ECE7E2', display: 'flex', justifyContent: 'flex-end' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPoSupplierId(supplier.id);
+                        if (supplier.products && supplier.products.length > 0) {
+                          setPoVariantId(supplier.products[0].variantId);
+                          setPoQuantity(supplier.products[0].moq);
+                        }
+                        setCreatePOModal(true);
+                      }}
+                      className="btn btn-outline btn-sm"
+                      style={{ fontSize: '0.74rem' }}
+                    >
+                      Draft Restock PO
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
@@ -1778,6 +2350,656 @@ function DashboardContent() {
                   style={{ minWidth: '160px' }}
                 >
                   {returnLoading ? 'Processing...' : 'Complete Inspection & Refund'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Node 9: Create Purchase Order Modal Dialog */}
+      {createPOModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="create-po-modal-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(26, 10, 14, 0.65)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-sm)',
+              maxWidth: '560px',
+              width: '100%',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: '1px solid var(--color-border)',
+              overflow: 'hidden'
+            }}
+          >
+            <div
+              style={{
+                padding: '18px 24px',
+                borderBottom: '1px solid var(--color-border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                backgroundColor: 'var(--color-surface)'
+              }}
+            >
+              <div>
+                <h3 id="create-po-modal-title" style={{ fontSize: '1.2rem', margin: 0, fontWeight: 600 }}>
+                  Draft Artisan Purchase Order
+                </h3>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                  Restock vault inventory with contracted artisan partner MOQs and terms.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCreatePOModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                aria-label="Close dialog"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreatePO} style={{ padding: '24px' }}>
+              {createPOFeedback && (
+                <div
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: '4px',
+                    backgroundColor: createPOFeedback.type === 'error' ? '#FEE2E2' : '#E8F5E9',
+                    color: createPOFeedback.type === 'error' ? '#991B1B' : '#1B5E20',
+                    fontSize: '0.85rem',
+                    marginBottom: '16px'
+                  }}
+                >
+                  {createPOFeedback.message}
+                </div>
+              )}
+
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Artisan Guild / Supplier
+                </label>
+                <select
+                  value={poSupplierId}
+                  onChange={(e) => {
+                    const sId = e.target.value;
+                    setPoSupplierId(sId);
+                    const sup = liveSuppliers.find((s) => s.id === sId);
+                    if (sup && sup.products && sup.products.length > 0) {
+                      setPoVariantId(sup.products[0].variantId);
+                      setPoQuantity(sup.products[0].moq);
+                    }
+                  }}
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                >
+                  {liveSuppliers.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} ({s.code} — {s.city})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Contracted Design Variant
+                </label>
+                <select
+                  value={poVariantId}
+                  onChange={(e) => {
+                    const vId = e.target.value;
+                    setPoVariantId(vId);
+                    const sup = liveSuppliers.find((s) => s.id === poSupplierId);
+                    const p = sup?.products?.find((prod) => prod.variantId === vId);
+                    if (p) setPoQuantity(p.moq);
+                  }}
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                >
+                  {liveSuppliers
+                    .find((s) => s.id === poSupplierId)
+                    ?.products?.map((p) => (
+                      <option key={p.variantId} value={p.variantId}>
+                        {p.variantId} (MOQ: {p.moq}) {p.unitCostMinor ? `— ${formatCurrency(p.unitCostMinor, 'INR')}/unit` : ''}
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                    Order Quantity
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={poQuantity}
+                    onChange={(e) => setPoQuantity(parseInt(e.target.value, 10) || 0)}
+                    style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                  />
+                  <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '4px', display: 'block' }}>
+                    Must satisfy supplier MOQ requirement.
+                  </span>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                    Expected Delivery Date
+                  </label>
+                  <input
+                    type="date"
+                    value={poExpectedDate}
+                    onChange={(e) => setPoExpectedDate(e.target.value)}
+                    style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Procurement Notes
+                </label>
+                <input
+                  type="text"
+                  value={poNotes}
+                  onChange={(e) => setPoNotes(e.target.value)}
+                  placeholder="e.g. Seasonal festive bridal restock"
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+                <button
+                  type="button"
+                  onClick={() => setCreatePOModal(false)}
+                  className="btn btn-outline btn-sm"
+                  disabled={createPOLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-sm"
+                  disabled={createPOLoading}
+                  style={{ minWidth: '150px' }}
+                >
+                  {createPOLoading ? 'Submitting...' : 'Create Purchase Order'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Node 9: Approve Purchase Order Modal Dialog */}
+      {approvePOModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="approve-po-modal-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(26, 10, 14, 0.65)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-sm)',
+              maxWidth: '520px',
+              width: '100%',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: '1px solid var(--color-border)',
+              overflow: 'hidden'
+            }}
+          >
+            <div
+              style={{
+                padding: '18px 24px',
+                borderBottom: '1px solid var(--color-border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                backgroundColor: 'var(--color-surface)'
+              }}
+            >
+              <div>
+                <h3 id="approve-po-modal-title" style={{ fontSize: '1.2rem', margin: 0, fontWeight: 600 }}>
+                  Approve Purchase Order
+                </h3>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                  Target: <strong>{approvePOModal.poNumber}</strong> ({approvePOModal.supplierName})
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setApprovePOModal(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                aria-label="Close dialog"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleApprovePO} style={{ padding: '24px' }}>
+              {approvePOFeedback && (
+                <div style={{ padding: '10px 14px', borderRadius: '4px', backgroundColor: '#E8F5E9', color: '#1B5E20', fontSize: '0.85rem', marginBottom: '16px' }}>
+                  {approvePOFeedback}
+                </div>
+              )}
+
+              <div style={{ backgroundColor: '#FAF8F6', padding: '12px 16px', borderRadius: '4px', marginBottom: '16px', fontSize: '0.82rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <span style={{ color: 'var(--color-text-muted)' }}>Supplier:</span>
+                  <strong>{approvePOModal.supplierName}</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <span style={{ color: 'var(--color-text-muted)' }}>Committed Value:</span>
+                  <strong>
+                    {approvePOModal.totalCostMinor !== null
+                      ? formatCurrency(approvePOModal.totalCostMinor, approvePOModal.currency || 'INR')
+                      : 'RBAC Cost Isolated'}
+                  </strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: 'var(--color-text-muted)' }}>Ordered Items:</span>
+                  <span>{approvePOModal.lines?.map((l) => `${l.orderedQuantity}× ${l.variantId}`).join(', ')}</span>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Manager Approval Notes
+                </label>
+                <input
+                  type="text"
+                  value={approvePONotes}
+                  onChange={(e) => setApprovePONotes(e.target.value)}
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+                <button
+                  type="button"
+                  onClick={() => setApprovePOModal(null)}
+                  className="btn btn-outline btn-sm"
+                  disabled={approvePOLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-sm"
+                  disabled={approvePOLoading}
+                  style={{ minWidth: '150px' }}
+                >
+                  {approvePOLoading ? 'Approving...' : 'Confirm Approval'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Node 9: Receive Goods Shipment Modal Dialog */}
+      {receiveModalPO && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="receive-po-modal-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(26, 10, 14, 0.65)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-sm)',
+              maxWidth: '560px',
+              width: '100%',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: '1px solid var(--color-border)',
+              overflow: 'hidden'
+            }}
+          >
+            <div
+              style={{
+                padding: '18px 24px',
+                borderBottom: '1px solid var(--color-border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                backgroundColor: 'var(--color-surface)'
+              }}
+            >
+              <div>
+                <h3 id="receive-po-modal-title" style={{ fontSize: '1.2rem', margin: 0, fontWeight: 600 }}>
+                  Receive Goods Shipment (Intake to Vault)
+                </h3>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                  Target: <strong>{receiveModalPO.poNumber}</strong> ({receiveModalPO.supplierName})
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReceiveModalPO(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                aria-label="Close dialog"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleReceiveShipment} style={{ padding: '24px' }}>
+              {receiveFeedback && (
+                <div style={{ padding: '10px 14px', borderRadius: '4px', backgroundColor: '#E8F5E9', color: '#1B5E20', fontSize: '0.85rem', marginBottom: '16px' }}>
+                  {receiveFeedback}
+                </div>
+              )}
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Vault Batch Reference Identifier
+                </label>
+                <input
+                  type="text"
+                  value={receiveBatchRef}
+                  onChange={(e) => setReceiveBatchRef(e.target.value)}
+                  placeholder="e.g. BATCH-202610-A"
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                />
+                <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '4px', display: 'block' }}>
+                  Batch will be appended to physical FIFO inventory ledger with signed RECEIPT movement.
+                </span>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '8px' }}>
+                  Line Quantities Received (Zero Over-Receipt Gating)
+                </label>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {receiveModalPO.lines?.map((line) => {
+                    const remainingPending = line.orderedQuantity - line.receivedQuantity;
+                    const currentVal = receiveItems[line.variantId] !== undefined ? receiveItems[line.variantId] : 0;
+
+                    return (
+                      <div
+                        key={line.id || line.variantId}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '10px 12px',
+                          backgroundColor: '#FAF8F6',
+                          borderRadius: '4px',
+                          border: '1px solid var(--color-border)'
+                        }}
+                      >
+                        <div style={{ flex: 1, paddingRight: '12px' }}>
+                          <div style={{ fontWeight: 600, fontSize: '0.82rem' }}>
+                            {line.designName || line.variantId}
+                          </div>
+                          <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
+                            Ordered: {line.orderedQuantity} | Received so far: {line.receivedQuantity} | Remaining: <strong>{remainingPending}</strong>
+                          </div>
+                        </div>
+
+                        <div style={{ width: '100px' }}>
+                          <input
+                            type="number"
+                            min="0"
+                            max={remainingPending}
+                            value={currentVal}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value, 10) || 0;
+                              setReceiveItems({
+                                ...receiveItems,
+                                [line.variantId]: Math.min(val, remainingPending)
+                              });
+                            }}
+                            style={{
+                              width: '100%',
+                              padding: '6px 8px',
+                              border: '1px solid var(--color-border)',
+                              borderRadius: '4px',
+                              textAlign: 'center',
+                              fontSize: '0.85rem',
+                              fontWeight: 600
+                            }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+                <button
+                  type="button"
+                  onClick={() => setReceiveModalPO(null)}
+                  className="btn btn-outline btn-sm"
+                  disabled={receiveLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-sm"
+                  disabled={receiveLoading}
+                  style={{ minWidth: '170px' }}
+                >
+                  {receiveLoading ? 'Receiving...' : 'Confirm Goods Intake'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Node 9: Vendor Return Modal Dialog */}
+      {returnSupplierModalPO && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="return-supplier-modal-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(26, 10, 14, 0.65)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-sm)',
+              maxWidth: '560px',
+              width: '100%',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: '1px solid var(--color-border)',
+              overflow: 'hidden'
+            }}
+          >
+            <div
+              style={{
+                padding: '18px 24px',
+                borderBottom: '1px solid var(--color-border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                backgroundColor: 'var(--color-surface)'
+              }}
+            >
+              <div>
+                <h3 id="return-supplier-modal-title" style={{ fontSize: '1.2rem', margin: 0, fontWeight: 600 }}>
+                  Return Defective Units to Vendor
+                </h3>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                  Target: <strong>{returnSupplierModalPO.poNumber}</strong> ({returnSupplierModalPO.supplierName})
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReturnSupplierModalPO(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                aria-label="Close dialog"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleReturnSupplier} style={{ padding: '24px' }}>
+              {returnSupplierFeedback && (
+                <div style={{ padding: '10px 14px', borderRadius: '4px', backgroundColor: '#E8F5E9', color: '#1B5E20', fontSize: '0.85rem', marginBottom: '16px' }}>
+                  {returnSupplierFeedback}
+                </div>
+              )}
+
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Vendor Claim Reason
+                </label>
+                <select
+                  value={returnSupplierReason}
+                  onChange={(e) => setReturnSupplierReason(e.target.value)}
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                >
+                  <option value="DEFECTIVE_OR_DAMAGED">DEFECTIVE_OR_DAMAGED — Physical flaw or transit breakage</option>
+                  <option value="SPECIFICATION_MISMATCH">SPECIFICATION_MISMATCH — Plating/carat deviation</option>
+                  <option value="QUALITY_AUDIT_FAIL">QUALITY_AUDIT_FAIL — Micron thickness or stone setting failure</option>
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Units to Return (Bounded: Returned ≤ Received)
+                </label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {returnSupplierModalPO.lines
+                    ?.filter((l) => l.receivedQuantity > 0)
+                    ?.map((line) => {
+                      const maxEligible = line.receivedQuantity - line.returnedQuantity;
+                      const currentVal = returnSupplierItems[line.variantId] !== undefined ? returnSupplierItems[line.variantId] : 0;
+
+                      return (
+                        <div
+                          key={line.id || line.variantId}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '10px 12px',
+                            backgroundColor: '#FAF8F6',
+                            borderRadius: '4px',
+                            border: '1px solid var(--color-border)'
+                          }}
+                        >
+                          <div style={{ flex: 1, paddingRight: '12px' }}>
+                            <div style={{ fontWeight: 600, fontSize: '0.82rem' }}>
+                              {line.designName || line.variantId}
+                            </div>
+                            <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
+                              Total Received: {line.receivedQuantity} | Prev Returned: {line.returnedQuantity} | Max Returnable: <strong>{maxEligible}</strong>
+                            </div>
+                          </div>
+
+                          <div style={{ width: '100px' }}>
+                            <input
+                              type="number"
+                              min="0"
+                              max={maxEligible}
+                              value={currentVal}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value, 10) || 0;
+                                setReturnSupplierItems({
+                                  ...returnSupplierItems,
+                                  [line.variantId]: Math.min(val, maxEligible)
+                                });
+                              }}
+                              style={{
+                                width: '100%',
+                                padding: '6px 8px',
+                                border: '1px solid var(--color-border)',
+                                borderRadius: '4px',
+                                textAlign: 'center',
+                                fontSize: '0.85rem',
+                                fontWeight: 600
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Claim Notes / Vendor RMA Code
+                </label>
+                <input
+                  type="text"
+                  value={returnSupplierNotes}
+                  onChange={(e) => setReturnSupplierNotes(e.target.value)}
+                  placeholder="e.g. RMA-JPR-2026-891: Defective pearl clasp identified during intake QC"
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+                <button
+                  type="button"
+                  onClick={() => setReturnSupplierModalPO(null)}
+                  className="btn btn-outline btn-sm"
+                  disabled={returnSupplierLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-sm"
+                  disabled={returnSupplierLoading}
+                  style={{ minWidth: '170px' }}
+                >
+                  {returnSupplierLoading ? 'Processing...' : 'Confirm Vendor Return'}
                 </button>
               </div>
             </form>

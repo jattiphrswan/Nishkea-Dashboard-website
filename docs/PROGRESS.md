@@ -153,4 +153,38 @@
   - Browser Verification: Completed live checkout for *Aurelia Filigree Chandelier Drops*, verified order confirmation screen with `PAID` and `PENDING_PICKING` statuses; opened backoffice dashboard Tab 5, confirmed courier dispatch for `NSK-2026-1081` via BlueDart Express, verified fulfillment state updated to `DISPATCHED` with tracking `BLUEDART-NSK-3288587`.
 - **Next Dependency-Ready Node:** Node 9 — Suppliers, Purchase Approvals & Partial Receipts.
 
+## Node 9 — Suppliers, Purchase Approvals & Partial Receipts
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-20
+- **Deliverables:**
+  - Database schema migration (`database/migrations/002_suppliers_and_po.sql`): `suppliers`, `supplier_products`, `purchase_orders`, and `purchase_order_lines`.
+  - Core procurement engine (`src/lib/server/suppliers.js`) enforcing:
+    - Artisan guild catalogue mappings with Minimum Order Quantity (MOQ) validation.
+    - Multi-tier purchase order approvals with high-value threshold gating ($\ge \text{₹1,00,000.00}$ mandates `PENDING_APPROVAL`).
+    - Manager/Owner RBAC gating for PO approvals (HTTP 403 Forbidden for unauthorized staff).
+    - Zero over-receipt protection gate ($\text{Received} \le \text{Ordered}$) throwing descriptive validation errors.
+    - Bounded vendor returns ($\text{Returned} \le \text{Received}$) with defect RMA tracking.
+    - Quantity reconciliation invariants:
+      $$\text{Remaining Pending} = \text{Ordered} - \text{Received}; \quad \text{Net Accepted On-Hand} = \text{Received} - \text{Returned}$$
+    - Direct integration with transactional physical inventory ledger (`createGoodsReceipt`, FIFO `StockBatch`, and signed `RECEIPT` / `SUPPLIER_RETURN` movements).
+    - Server-side RBAC supplier cost isolation (`cost:view` permission redaction to `null`).
+  - REST API Routes:
+    - `GET /api/suppliers`
+    - `GET /api/purchase-orders`, `POST /api/purchase-orders`
+    - `GET /api/purchase-orders/[id]`
+    - `POST /api/purchase-orders/[id]/approve`
+    - `POST /api/purchase-orders/[id]/receive`
+    - `POST /api/purchase-orders/[id]/return`
+  - Backoffice Tab 6 (Suppliers & Purchase Orders in `src/app/dashboard/page.js`):
+    - Real-time KPI summary metrics bar.
+    - Live purchase orders and receipts ledger table with visual progress meters and contextual action buttons.
+    - Contracted artisan guilds directory cards with lead times, payment terms, and catalogue variants.
+    - 4 interactive modals: *Draft Purchase Order*, *Approve Purchase Order*, *Receive Goods Shipment* (with remaining pending quantity bounds), and *Return Defective to Vendor*.
+- **Validation:**
+  - `npm test` — PASS (276/276 tests passing across all 6 test suites, including 49/49 in `tests/suppliers.test.mjs`).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - Browser Verification: Navigated to `/dashboard?tab=suppliers`, verified KPI cards and PO ledger; approved `PO-2026-0042` with status transition to `APPROVED`; received final shipment of 20 units for `PO-2026-0041` with status transition to `FULFILLED` (100% rcvd); visual evidence recorded in `supplier_dashboard_final_1792494351725.png`.
+- **Next Dependency-Ready Node:** Node 10 — CRM, Wholesale / Retail Customer Segmentation & Sales Pipeline.
+
+
 

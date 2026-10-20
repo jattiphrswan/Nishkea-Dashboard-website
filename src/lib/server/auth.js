@@ -189,3 +189,5 @@ export async function getCurrentStaffSession() {
 
   return null;
 }
+
+export const getAuthenticatedStaff = getCurrentStaffSession;
