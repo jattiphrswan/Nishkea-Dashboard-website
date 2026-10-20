@@ -237,17 +237,16 @@ export default function CartPage() {
                 </div>
 
                 {/* Checkout Trigger */}
-                <button
-                  type="button"
+                <Link
+                  href="/checkout"
                   className="btn btn-primary"
-                  onClick={() => setCheckoutModalOpen(true)}
                   style={{ width: '100%', padding: '14px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                 >
-                  <Lock size={16} /> Proceed to Checkout
-                </button>
+                  <Lock size={16} /> Proceed to Insured Checkout
+                </Link>
 
                 <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
-                  🔒 Secure SSL Checkout Placeholder (Node 8)
+                  🔒 256-Bit SSL Checkout with Atomic Vault Reservations
                 </div>
               </div>
             </div>

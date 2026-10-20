@@ -63,6 +63,21 @@ function DashboardContent() {
   const [decisionLoading, setDecisionLoading] = useState(false);
   const [decisionFeedback, setDecisionFeedback] = useState(null);
 
+  // Node 8: Orders, Dispatch & Returns State
+  const [liveOrders, setLiveOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [dispatchModalOrder, setDispatchModalOrder] = useState(null);
+  const [dispatchCarrier, setDispatchCarrier] = useState('BlueDart Express');
+  const [dispatchTracking, setDispatchTracking] = useState('');
+  const [dispatchLoading, setDispatchLoading] = useState(false);
+  const [dispatchFeedback, setDispatchFeedback] = useState(null);
+
+  const [returnModalOrder, setReturnModalOrder] = useState(null);
+  const [returnDisposition, setReturnDisposition] = useState('SELLABLE_RESTOCK');
+  const [returnNotes, setReturnNotes] = useState('');
+  const [returnLoading, setReturnLoading] = useState(false);
+  const [returnFeedback, setReturnFeedback] = useState(null);
+
   const loadLiveInventory = async () => {
     try {
       setSummaryLoading(true);
@@ -93,9 +108,25 @@ function DashboardContent() {
     }
   };
 
+  const loadLiveOrders = async () => {
+    try {
+      setOrdersLoading(true);
+      const res = await fetch('/api/orders');
+      if (res.ok) {
+        const data = await res.json();
+        setLiveOrders(data.orders || []);
+      }
+    } catch (err) {
+      console.error('Failed to load live orders:', err);
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadLiveInventory();
     loadLiveReviews();
+    loadLiveOrders();
   }, []);
 
   const handleRecordDecision = async (e) => {
@@ -151,6 +182,82 @@ function DashboardContent() {
       setReceiptFeedback({ type: 'error', message: err.message });
     } finally {
       setReceiptLoading(false);
+    }
+  };
+
+  const handleConfirmDispatch = async (e) => {
+    e.preventDefault();
+    if (!dispatchModalOrder) return;
+    setDispatchLoading(true);
+    setDispatchFeedback(null);
+    try {
+      const res = await fetch(`/api/orders/${dispatchModalOrder.id}/dispatch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          carrier: dispatchCarrier,
+          trackingNumber: dispatchTracking || `BLUEDART-NSK-${Math.floor(1000000 + Math.random() * 9000000)}`
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Dispatch failed');
+      setDispatchFeedback(`✓ Order ${dispatchModalOrder.orderNumber} dispatched! Signed inventory reservation consumed.`);
+      await loadLiveOrders();
+      await loadLiveInventory();
+      setTimeout(() => {
+        setDispatchModalOrder(null);
+        setDispatchFeedback(null);
+      }, 1600);
+    } catch (err) {
+      setDispatchFeedback(`Error: ${err.message}`);
+    } finally {
+      setDispatchLoading(false);
+    }
+  };
+
+  const handleProcessReturn = async (e) => {
+    e.preventDefault();
+    if (!returnModalOrder) return;
+    setReturnLoading(true);
+    setReturnFeedback(null);
+    try {
+      // 1. Request Return
+      const retRes = await fetch(`/api/orders/${returnModalOrder.id}/return`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: returnModalOrder.lines.map((l) => ({ sku: l.sku, quantity: 1 })),
+          reason: 'CUSTOMER_RETURN_REQUEST',
+          customerNotes: returnNotes
+        })
+      });
+      const retData = await retRes.json();
+      if (!retRes.ok) throw new Error(retData.error || 'Return request failed');
+
+      // 2. Inspect & Execute Disposition
+      const inspectRes = await fetch(`/api/orders/${returnModalOrder.id}/inspect-return`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          returnId: retData.returnRecord.id,
+          disposition: returnDisposition,
+          inspectorNotes: returnNotes || 'Warehouse return inspection verified'
+        })
+      });
+      const inspectData = await inspectRes.json();
+      if (!inspectRes.ok) throw new Error(inspectData.error || 'Inspection resolution failed');
+
+      setReturnFeedback(`✓ Return inspected and ${returnDisposition === 'SELLABLE_RESTOCK' ? 'restocked into vault inventory' : 'marked as damaged/scrap'}! Order refunded.`);
+      await loadLiveOrders();
+      await loadLiveInventory();
+      setTimeout(() => {
+        setReturnModalOrder(null);
+        setReturnFeedback(null);
+      }, 1800);
+    } catch (err) {
+      setReturnFeedback(`Error: ${err.message}`);
+    } finally {
+      setReturnLoading(false);
     }
   };
 
@@ -913,14 +1020,26 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* TAB 5: ORDERS */}
+      {/* TAB 5: ORDERS (Live Node 8 Connection) */}
       {activeTab === 'orders' && (
         <div className="table-container">
-          <div style={{ padding: '16px', borderBottom: '1px solid var(--color-border)' }}>
-            <h3 style={{ fontSize: '1.15rem', margin: 0 }}>Orders &amp; Dispatch Queue</h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
-              Order line price snapshots, fulfillment states, and return history.
-            </p>
+          <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+            <div>
+              <h3 style={{ fontSize: '1.15rem', margin: 0, fontWeight: 600 }}>Orders &amp; Dispatch Queue</h3>
+              <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                Order line price snapshots, transactional vault reservations, courier dispatch, and return inspections.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={loadLiveOrders}
+              disabled={ordersLoading}
+              className="btn btn-outline btn-sm"
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <RefreshCw size={13} className={ordersLoading ? 'animate-spin' : ''} />
+              <span>Refresh Orders</span>
+            </button>
           </div>
 
           <table className="data-table">
@@ -928,47 +1047,89 @@ function DashboardContent() {
               <tr>
                 <th>Order Number</th>
                 <th>Customer</th>
-                <th>Items Summary</th>
+                <th>Allocated Items</th>
                 <th>Total</th>
                 <th>Payment Status</th>
                 <th>Fulfillment State</th>
-                <th>Date</th>
-                <th>Action</th>
+                <th>Tracking</th>
+                <th>Operational Action</th>
               </tr>
             </thead>
             <tbody>
-              {DEMO_ORDERS.map((ord) => (
-                <tr key={ord.id}>
-                  <td>
-                    <strong>{ord.orderNumber}</strong>
-                  </td>
-                  <td>
-                    {ord.customerName}
-                    <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>{ord.customerEmail}</div>
-                  </td>
-                  <td>{ord.itemsSummary}</td>
-                  <td>{formatCurrency(ord.totalMinor, ord.currency)}</td>
-                  <td>
-                    <span className={`badge ${ord.paymentStatus === 'PAID' ? 'badge-success' : 'badge-warning'}`}>
-                      {ord.paymentStatus}
-                    </span>
-                  </td>
-                  <td>
-                    <span className="badge badge-gold">{ord.fulfillmentStatus}</span>
-                  </td>
-                  <td>{formatDate(ord.date)}</td>
-                  <td>
-                    <button
-                      type="button"
-                      onClick={() => showPlannedNotice(`Dispatch ${ord.orderNumber}`, 8)}
-                      className="btn btn-outline btn-sm"
-                      style={{ fontSize: '0.72rem', padding: '4px 8px' }}
-                    >
-                      Inspect / Dispatch
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {(liveOrders.length > 0 ? liveOrders : DEMO_ORDERS).map((ord) => {
+                const customerName = ord.customer?.name || ord.customerName;
+                const customerEmail = ord.customer?.email || ord.customerEmail;
+                const itemsSummary = ord.lines
+                  ? ord.lines.map((l) => `${l.quantity}× ${l.designName || l.sku}`).join(', ')
+                  : ord.itemsSummary;
+                const totalMinor = ord.orderTotalMinor || ord.totalMinor;
+                const currency = ord.currency || 'INR';
+
+                return (
+                  <tr key={ord.id}>
+                    <td>
+                      <strong style={{ fontFamily: 'monospace', color: 'var(--color-burgundy)' }}>
+                        {ord.orderNumber}
+                      </strong>
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 600 }}>{customerName}</div>
+                      <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>{customerEmail}</div>
+                    </td>
+                    <td style={{ fontSize: '0.82rem', maxWidth: '280px' }}>
+                      {itemsSummary}
+                    </td>
+                    <td>
+                      <strong>{formatCurrency(totalMinor, currency)}</strong>
+                    </td>
+                    <td>
+                      <span className={`badge ${ord.paymentStatus === 'PAID' ? 'badge-success' : ord.paymentStatus === 'REFUNDED_RETURN' ? 'badge-danger' : 'badge-warning'}`}>
+                        {ord.paymentStatus}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`badge ${ord.fulfillmentStatus === 'DISPATCHED' ? 'badge-gold' : ord.fulfillmentStatus === 'RETURNED_INSPECTED' ? 'badge-neutral' : 'badge-warning'}`}>
+                        {ord.fulfillmentStatus}
+                      </span>
+                    </td>
+                    <td style={{ fontSize: '0.76rem', color: 'var(--color-text-muted)' }}>
+                      {ord.tracking ? (
+                        <div>
+                          <div><strong>{ord.tracking.carrier}</strong></div>
+                          <code>{ord.tracking.trackingNumber}</code>
+                        </div>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
+                    <td>
+                      {ord.fulfillmentStatus === 'DISPATCHED' ? (
+                        <button
+                          type="button"
+                          onClick={() => setReturnModalOrder(ord)}
+                          className="btn btn-outline btn-sm"
+                          style={{ fontSize: '0.72rem', padding: '4px 10px', borderColor: 'var(--color-gold)', color: 'var(--color-text-main)' }}
+                        >
+                          Process Return
+                        </button>
+                      ) : ord.paymentStatus === 'REFUNDED_RETURN' ? (
+                        <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                          ✓ Resolved
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setDispatchModalOrder(ord)}
+                          className="btn btn-primary btn-sm"
+                          style={{ fontSize: '0.72rem', padding: '4px 10px' }}
+                        >
+                          Dispatch Order
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -1377,6 +1538,246 @@ function DashboardContent() {
                   style={{ minWidth: '150px' }}
                 >
                   {decisionLoading ? 'Applying...' : 'Apply Decision'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Node 8: Dispatch Order Modal Dialog */}
+      {dispatchModalOrder && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="dispatch-modal-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(26, 10, 14, 0.65)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-sm)',
+              maxWidth: '540px',
+              width: '100%',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: '1px solid var(--color-border)',
+              overflow: 'hidden'
+            }}
+          >
+            <div
+              style={{
+                padding: '18px 24px',
+                borderBottom: '1px solid var(--color-border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                backgroundColor: 'var(--color-surface)'
+              }}
+            >
+              <div>
+                <h3 id="dispatch-modal-title" style={{ fontSize: '1.2rem', margin: 0, fontWeight: 600 }}>
+                  Dispatch Order &amp; Consume Stock
+                </h3>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                  Target Order: <strong>{dispatchModalOrder.orderNumber}</strong> ({dispatchModalOrder.customer?.name || dispatchModalOrder.customerName})
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDispatchModalOrder(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                aria-label="Close dialog"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmDispatch} style={{ padding: '24px' }}>
+              {dispatchFeedback && (
+                <div style={{ padding: '10px 14px', borderRadius: '4px', backgroundColor: '#E8F5E9', color: '#1B5E20', fontSize: '0.85rem', marginBottom: '16px' }}>
+                  {dispatchFeedback}
+                </div>
+              )}
+
+              <div style={{ backgroundColor: '#FAF8F6', padding: '12px 16px', borderRadius: '4px', marginBottom: '16px', fontSize: '0.82rem' }}>
+                <div style={{ fontWeight: 600, marginBottom: '4px' }}>Inventory Reservation Consumption:</div>
+                <div style={{ color: 'var(--color-text-muted)' }}>
+                  Confirming courier pickup will transition the reservation into a signed physical inventory deduction (DISPATCH movement) in the warehouse ledger.
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Courier Carrier
+                </label>
+                <select
+                  value={dispatchCarrier}
+                  onChange={(e) => setDispatchCarrier(e.target.value)}
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                >
+                  <option value="BlueDart Express">BlueDart Express (Air Courier Insured)</option>
+                  <option value="Delhivery Surface">Delhivery Express Logistics</option>
+                  <option value="DTDC Premium">DTDC Secure Value Transit</option>
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Waybill / Tracking Number
+                </label>
+                <input
+                  type="text"
+                  value={dispatchTracking}
+                  onChange={(e) => setDispatchTracking(e.target.value)}
+                  placeholder="e.g. BLUEDART-NSK-9281742 (leave blank to auto-generate)"
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+                <button
+                  type="button"
+                  onClick={() => setDispatchModalOrder(null)}
+                  className="btn btn-outline btn-sm"
+                  disabled={dispatchLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-sm"
+                  disabled={dispatchLoading}
+                  style={{ minWidth: '160px' }}
+                >
+                  {dispatchLoading ? 'Dispatching...' : 'Confirm Dispatch & Deduct'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Node 8: Return Inspection Modal Dialog */}
+      {returnModalOrder && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="return-modal-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(26, 10, 14, 0.65)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-sm)',
+              maxWidth: '540px',
+              width: '100%',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: '1px solid var(--color-border)',
+              overflow: 'hidden'
+            }}
+          >
+            <div
+              style={{
+                padding: '18px 24px',
+                borderBottom: '1px solid var(--color-border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                backgroundColor: 'var(--color-surface)'
+              }}
+            >
+              <div>
+                <h3 id="return-modal-title" style={{ fontSize: '1.2rem', margin: 0, fontWeight: 600 }}>
+                  Inspect Return &amp; Execute Disposition
+                </h3>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                  Target: Order <strong>{returnModalOrder.orderNumber}</strong>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReturnModalOrder(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                aria-label="Close dialog"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleProcessReturn} style={{ padding: '24px' }}>
+              {returnFeedback && (
+                <div style={{ padding: '10px 14px', borderRadius: '4px', backgroundColor: '#E8F5E9', color: '#1B5E20', fontSize: '0.85rem', marginBottom: '16px' }}>
+                  {returnFeedback}
+                </div>
+              )}
+
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Physical Inspection Disposition
+                </label>
+                <select
+                  value={returnDisposition}
+                  onChange={(e) => setReturnDisposition(e.target.value)}
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                >
+                  <option value="SELLABLE_RESTOCK">SELLABLE_RESTOCK — Sanitize &amp; Restock Units into Vault Ledger</option>
+                  <option value="DAMAGED_SCRAP">DAMAGED_SCRAP — Write Off Damaged Units (Scrap Ledger)</option>
+                  <option value="SUPPLIER_RETURN">SUPPLIER_RETURN — Return to Vendor Quarantine</option>
+                </select>
+                <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', display: 'block', marginTop: '4px' }}>
+                  Per docs/INVENTORY.md: Restock and refund are separate ledger events. Restock creates an append-only movement.
+                </span>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                  Inspector Notes &amp; Condition Details
+                </label>
+                <textarea
+                  rows={3}
+                  value={returnNotes}
+                  onChange={(e) => setReturnNotes(e.target.value)}
+                  placeholder="e.g. Original seals intact; sanitized with alcohol wipe and restocked into primary batch."
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem', fontFamily: 'inherit' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+                <button
+                  type="button"
+                  onClick={() => setReturnModalOrder(null)}
+                  className="btn btn-outline btn-sm"
+                  disabled={returnLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-sm"
+                  disabled={returnLoading}
+                  style={{ minWidth: '160px' }}
+                >
+                  {returnLoading ? 'Processing...' : 'Complete Inspection & Refund'}
                 </button>
               </div>
             </form>
