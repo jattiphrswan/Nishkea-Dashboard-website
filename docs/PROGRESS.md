@@ -125,3 +125,32 @@
   - Browser Verification: Tested `/products` route; cycled gallery angles via thumbnail rail; opened and verified Lightbox Zoom modal; switched variants (`Rhodium Silver`); toggled to Boutique Grid; cycled in-card gallery dots; opened and closed Atelier Quick View modal.
 - **Next Dependency-Ready Node:** Node 8 — Checkout, Client-to-Server Order Confirmation, Transactional Reservations & Shipping.
 
+## Node 8 — Checkout, Client-to-Server Order Confirmation, Transactional Reservations & Shipping
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-20
+- **Deliverables:**
+  - Order & checkout engine (`src/lib/server/orders.js`) enforcing:
+    - Server-side totals validation in minor currency units (`paise`, currency `INR`).
+    - Zero-overselling gate: Atomic inventory reservations (`createReservation`) returning HTTP 409 Conflict when available stock is insufficient.
+    - Idempotency key deduplication.
+    - Payment webhook signature verification (HMAC SHA-256) and event deduplication.
+    - State transitions: `payment.succeeded` -> `PAID` / `PENDING_PICKING`; `payment.failed` -> `FAILED` releasing reservations.
+    - Courier dispatch (`dispatchOrder`): consumes reservations into signed physical deductions (`DISPATCH`), assigns tracking numbers.
+    - Returns & inspection workflow (`requestOrderReturn`, `inspectAndResolveReturn`): bounds check (`return <= shipped`), quarantine state, disposition execution (`SELLABLE_RESTOCK` / `DAMAGED_SCRAP`) and refund processing.
+  - Server API routes: `POST /api/checkout`, `POST /api/payments/webhook`, `GET /api/orders`, `GET /api/orders/[id]`, `POST /api/orders/[id]/dispatch`, `POST /api/orders/[id]/return`, and `POST /api/orders/[id]/inspect-return`.
+  - Storefront checkout experience (`src/app/(storefront)/checkout/page.js`):
+    - 2-Column luxury checkout with shipping address validation and payment method selection.
+    - Order summary with live line items, subtotal, and complimentary courier calculation.
+    - Confirmed order screen displaying human-readable order number (`NSK-2026-XXXX`), `PAID (Verified)` badge, `PENDING_PICKING` fulfillment status, allocated pieces, and courier destination.
+    - Cart Proceed to Checkout button connected directly to `/checkout`.
+  - Backoffice Orders Queue (`src/app/dashboard/page.js` Tab 5):
+    - Live orders table connected to `GET /api/orders`.
+    - Interactive "Dispatch Order" modal consuming reservations and generating courier tracking.
+    - Interactive "Inspect Return" modal executing disposition (`SELLABLE_RESTOCK` / `DAMAGED_SCRAP`).
+- **Validation:**
+  - `npm test` — PASS (227/227 tests passing across RBAC, inventory, reviews, storefront, and checkout suites).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - Browser Verification: Completed live checkout for *Aurelia Filigree Chandelier Drops*, verified order confirmation screen with `PAID` and `PENDING_PICKING` statuses; opened backoffice dashboard Tab 5, confirmed courier dispatch for `NSK-2026-1081` via BlueDart Express, verified fulfillment state updated to `DISPATCHED` with tracking `BLUEDART-NSK-3288587`.
+- **Next Dependency-Ready Node:** Node 9 — Suppliers, Purchase Approvals & Partial Receipts.
+
+

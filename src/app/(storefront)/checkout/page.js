@@ -86,7 +86,7 @@ export default function CheckoutPage() {
           country: 'India'
         },
         items: cart.map((item) => ({
-          sku: item.variant.sku,
+          sku: item.sku || item.variant?.sku,
           quantity: item.quantity
         })),
         paymentMethod: formData.paymentMethod,
@@ -717,26 +717,26 @@ export default function CheckoutPage() {
 
               {/* Items List */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px', maxHeight: '340px', overflowY: 'auto' }}>
-                {cart.map((item) => (
-                  <div key={item.variant.sku} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                {cart.map((item, idx) => (
+                  <div key={item.sku || idx} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                     <div style={{ width: '56px', height: '56px', flexShrink: 0, borderRadius: 'var(--radius-xs)', overflow: 'hidden', border: '1px solid var(--color-border)', backgroundColor: '#FAF8F6' }}>
                       <PlaceholderImage
-                        src={(item.product.images && item.product.images[0]?.url) || '/images/categories/earrings.svg'}
-                        alt={item.product.name}
+                        src={item.image || (item.product?.images && item.product.images[0]?.url) || '/images/categories/earrings.svg'}
+                        alt={item.name || item.product?.name || 'Jewellery piece'}
                         aspectRatio="1 / 1"
-                        category={item.product.categoryName}
+                        category={item.categoryName}
                       />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: '0.86rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {item.product.name}
+                        {item.name || item.product?.name}
                       </div>
                       <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
-                        Qty: {item.quantity} • {item.variant.colour || item.variant.size}
+                        Qty: {item.quantity} • {item.colour || item.size || 'Standard'}
                       </div>
                     </div>
                     <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-burgundy)', whiteSpace: 'nowrap' }}>
-                      {formatCurrency(item.product.priceMinor * item.quantity, 'INR')}
+                      {formatCurrency((item.priceMinor || item.product?.priceMinor || 0) * item.quantity, 'INR')}
                     </div>
                   </div>
                 ))}
