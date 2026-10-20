@@ -185,6 +185,7 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - Browser Verification: Navigated to `/dashboard?tab=suppliers`, verified KPI cards and PO ledger; approved `PO-2026-0042` with status transition to `APPROVED`; received final shipment of 20 units for `PO-2026-0041` with status transition to `FULFILLED` (100% rcvd); visual evidence recorded in `supplier_dashboard_final_1792494351725.png`.
 - **Next Dependency-Ready Node:** Node 10 — CRM, Wholesale / Retail Customer Segmentation & Sales Pipeline.
+- **Future Node Added:** Node 15 — WooCommerce-Style Advanced Product Editor, Media Studio & Variant Matrix (detailed in `docs/NODE-15.md`). Foundational live backend product editing (`/api/products` and modal in `/dashboard?tab=products`) has been successfully wired and verified.
 
 
 

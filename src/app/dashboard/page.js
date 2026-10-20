@@ -112,6 +112,15 @@ function DashboardContent() {
   const [returnSupplierLoading, setReturnSupplierLoading] = useState(false);
   const [returnSupplierFeedback, setReturnSupplierFeedback] = useState(null);
 
+  // WooCommerce-style Product Catalogue Editor State
+  const [liveProducts, setLiveProducts] = useState(PRODUCTS);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [editActiveSubTab, setEditActiveSubTab] = useState('general');
+  const [editFormData, setEditFormData] = useState({});
+  const [editLoading, setEditLoading] = useState(false);
+  const [editFeedback, setEditFeedback] = useState(null);
+
   const loadLiveInventory = async () => {
     try {
       setSummaryLoading(true);
@@ -187,12 +196,30 @@ function DashboardContent() {
     }
   };
 
+  const loadLiveProducts = async () => {
+    try {
+      setProductsLoading(true);
+      const res = await fetch('/api/products');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.products && data.products.length > 0) {
+          setLiveProducts(data.products);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load products:', err);
+    } finally {
+      setProductsLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadLiveInventory();
     loadLiveReviews();
     loadLiveOrders();
     loadLiveSuppliers();
     loadLivePOs();
+    loadLiveProducts();
   }, []);
 
   const handleRecordDecision = async (e) => {
@@ -471,6 +498,71 @@ function DashboardContent() {
     }
   };
 
+  const openProductEditor = (prod) => {
+    setEditingProduct(prod);
+    setEditFormData({
+      ...prod,
+      priceRupees: prod.priceMinor ? (prod.priceMinor / 100).toFixed(0) : '1999',
+      salePriceRupees: prod.salePriceMinor ? (prod.salePriceMinor / 100).toFixed(0) : '',
+      stockStatus: prod.lifecycle === 'archived' ? 'OUT_OF_STOCK' : 'IN_STOCK'
+    });
+    setEditActiveSubTab('general');
+    setEditFeedback(null);
+  };
+
+  const handleSaveProductEdit = async (e) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    setEditLoading(true);
+    setEditFeedback(null);
+    try {
+      const pricePaise = editFormData.priceRupees
+        ? Math.round(parseFloat(editFormData.priceRupees) * 100)
+        : editingProduct.priceMinor;
+
+      const payload = {
+        name: editFormData.name,
+        slug: editFormData.slug,
+        category: editFormData.category,
+        categoryName: editFormData.categoryName,
+        collectionType: editFormData.collectionType,
+        collectionName: editFormData.collectionName,
+        lifecycle: editFormData.lifecycle,
+        publishState: editFormData.publishState,
+        salesUnit: editFormData.salesUnit,
+        priceMinor: pricePaise,
+        description: editFormData.description,
+        story: editFormData.story,
+        materials: editFormData.materials,
+        dimensions: editFormData.dimensions,
+        weight: editFormData.weight,
+        care: editFormData.care
+      };
+
+      const res = await fetch(`/api/products/${editingProduct.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update product');
+
+      setEditFeedback({
+        type: 'success',
+        message: `✓ Product "${data.product.name}" (${data.product.code}) updated successfully!`
+      });
+      await loadLiveProducts();
+      setTimeout(() => {
+        setEditingProduct(null);
+        setEditFeedback(null);
+      }, 1500);
+    } catch (err) {
+      setEditFeedback({ type: 'error', message: err.message });
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   const showPlannedNotice = (actionName, nodeNumber) => {
     setActionNotice({
       title: `${actionName} (Planned)`,
@@ -731,16 +823,51 @@ function DashboardContent() {
             <div>
               <h3 style={{ fontSize: '1.15rem', margin: 0 }}>Design &amp; Variant Catalogue</h3>
               <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
-                Normalized options, SKUs, sales units and lifecycle status.
+                Full WooCommerce-style options: pricing, descriptions, artisanal stories, dimensions, care, and variant options.
               </span>
             </div>
-            <button
-              type="button"
-              onClick={() => showPlannedNotice('Create Design Draft', 4)}
-              className="btn btn-primary btn-sm"
-            >
-              + Create Design (Planned)
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  const newDraft = {
+                    id: `des-${Date.now().toString(36)}`,
+                    code: `NSK-NEW-${Math.floor(100 + Math.random() * 900)}`,
+                    name: 'New Artisanal Jewellery Design',
+                    slug: `new-design-${Date.now().toString(36)}`,
+                    category: 'earrings',
+                    categoryName: 'Earrings',
+                    collectionType: 'monthly_trend',
+                    collectionName: 'Autumn Trend Edit',
+                    lifecycle: 'active',
+                    publishState: 'published',
+                    salesUnit: 'pair',
+                    priceMinor: 249900,
+                    priceRupees: '2499',
+                    currency: 'INR',
+                    description: 'Handcrafted luxury piece with refined finishing and artisanal materials.',
+                    story: 'Centuries-old jewellery traditions handcrafted by regional master artisans.',
+                    materials: '18k Micron Gold Plating, Hypoallergenic Brass Alloy',
+                    dimensions: '5.0 cm length, 2.0 cm width',
+                    weight: '12g',
+                    care: 'Store in provided anti-tarnish pouch. Keep away from water and perfume.',
+                    variants: []
+                  };
+                  openProductEditor(newDraft);
+                }}
+                className="btn btn-primary btn-sm"
+              >
+                + New Product
+              </button>
+              <button
+                type="button"
+                onClick={loadLiveProducts}
+                disabled={productsLoading}
+                className="btn btn-outline btn-sm"
+              >
+                <RefreshCw size={12} className={productsLoading ? 'animate-spin' : ''} />
+              </button>
+            </div>
           </div>
 
           <table className="data-table">
@@ -751,36 +878,49 @@ function DashboardContent() {
                 <th>Collection Type</th>
                 <th>Variant SKUs</th>
                 <th>Sales Unit</th>
-                <th>Price</th>
-                <th>30-Day Review Date</th>
+                <th>Retail Price</th>
+                <th>30-Day Review</th>
                 <th>Lifecycle</th>
+                <th>Catalogue Action</th>
               </tr>
             </thead>
             <tbody>
-              {PRODUCTS.map((p) => (
+              {liveProducts.map((p) => (
                 <tr key={p.id}>
                   <td>
                     <strong>{p.name}</strong>
                     <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>{p.code}</div>
                   </td>
-                  <td>{p.categoryName}</td>
+                  <td>{p.categoryName || p.category}</td>
                   <td>
                     <span className="badge badge-gold">{p.collectionType}</span>
                   </td>
-                  <td>
-                    {p.variants.map((v) => (
-                      <div key={v.sku} style={{ fontSize: '0.74rem' }}>
-                        <code>{v.sku}</code> ({v.colour})
+                  <td style={{ fontSize: '0.74rem' }}>
+                    {p.variants?.map((v) => (
+                      <div key={v.sku}>
+                        <code>{v.sku}</code> ({v.colour || v.name})
                       </div>
                     ))}
                   </td>
                   <td>{p.salesUnit}</td>
-                  <td>{formatCurrency(p.priceMinor, p.currency)}</td>
-                  <td>{p.reviewDate || '—'}</td>
+                  <td>
+                    <strong>{formatCurrency(p.priceMinor, p.currency || 'INR')}</strong>
+                  </td>
+                  <td style={{ fontSize: '0.76rem' }}>{p.reviewDate || '—'}</td>
                   <td>
                     <span className={`badge ${p.lifecycle === 'active' ? 'badge-success' : p.lifecycle === 'clearance' ? 'badge-danger' : 'badge-warning'}`}>
                       {p.lifecycle}
                     </span>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      onClick={() => openProductEditor(p)}
+                      className="btn btn-outline btn-sm"
+                      style={{ fontSize: '0.72rem', padding: '4px 8px', borderColor: 'var(--color-burgundy)', color: 'var(--color-burgundy)' }}
+                    >
+                      Edit Options
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -3000,6 +3140,512 @@ function DashboardContent() {
                   style={{ minWidth: '170px' }}
                 >
                   {returnSupplierLoading ? 'Processing...' : 'Confirm Vendor Return'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Node 15 Foundation: WooCommerce-Style Product Editor Modal */}
+      {editingProduct && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="product-editor-modal-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(26, 10, 14, 0.7)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-sm)',
+              maxWidth: '820px',
+              width: '100%',
+              maxHeight: '90vh',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: '1px solid var(--color-border)',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: '16px 24px',
+                borderBottom: '1px solid var(--color-border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                backgroundColor: 'var(--color-surface)'
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 id="product-editor-modal-title" style={{ fontSize: '1.2rem', margin: 0, fontWeight: 600 }}>
+                    Product Editor — {editingProduct.code}
+                  </h3>
+                  <span className={`badge ${editingProduct.lifecycle === 'active' ? 'badge-success' : 'badge-gold'}`}>
+                    {editingProduct.lifecycle}
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                  WooCommerce-style options: general description, pricing, inventory, dimensions, materials and variations.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingProduct(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                aria-label="Close dialog"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Sub-tab Navigation */}
+            <div
+              style={{
+                display: 'flex',
+                gap: '2px',
+                borderBottom: '1px solid var(--color-border)',
+                backgroundColor: '#FAF8F6',
+                padding: '0 16px',
+                overflowX: 'auto'
+              }}
+            >
+              {[
+                { id: 'general', label: '🏷️ General & Story' },
+                { id: 'pricing', label: '💰 Pricing & Tax' },
+                { id: 'inventory', label: '📦 Inventory & SKU' },
+                { id: 'shipping', label: '🚚 Shipping & Dimensions' },
+                { id: 'materials', label: '✨ Materials & Care' },
+                { id: 'variations', label: '💎 Variations Matrix' },
+                { id: 'publishing', label: '📌 Publishing Status' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setEditActiveSubTab(tab.id)}
+                  style={{
+                    padding: '10px 14px',
+                    border: 'none',
+                    background: 'none',
+                    fontSize: '0.8rem',
+                    fontWeight: editActiveSubTab === tab.id ? 600 : 500,
+                    color: editActiveSubTab === tab.id ? 'var(--color-burgundy)' : 'var(--color-text-muted)',
+                    borderBottom: editActiveSubTab === tab.id ? '2px solid var(--color-burgundy)' : '2px solid transparent',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Modal Body Form */}
+            <form onSubmit={handleSaveProductEdit} style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+              {editFeedback && (
+                <div
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: '4px',
+                    backgroundColor: editFeedback.type === 'error' ? '#FEE2E2' : '#E8F5E9',
+                    color: editFeedback.type === 'error' ? '#991B1B' : '#1B5E20',
+                    fontSize: '0.85rem',
+                    marginBottom: '16px'
+                  }}
+                >
+                  {editFeedback.message}
+                </div>
+              )}
+
+              {/* Sub-tab 1: General */}
+              {editActiveSubTab === 'general' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                      Product Design Title
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.name || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                      style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Product Slug / URL Key
+                      </label>
+                      <input
+                        type="text"
+                        value={editFormData.slug || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, slug: e.target.value })}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Design Code / Internal Model ID
+                      </label>
+                      <input
+                        type="text"
+                        disabled
+                        value={editFormData.code || ''}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem', backgroundColor: '#F3F4F6' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                      Short Storefront Summary
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.description || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                      placeholder="e.g. Handcrafted 18k gold filigree chandelier earrings..."
+                      style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                      Full Artisanal Editorial Narrative &amp; Craft Story
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={editFormData.story || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, story: e.target.value })}
+                      placeholder="Detailed provenance, history, and craft techniques..."
+                      style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem', fontFamily: 'inherit' }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-tab 2: Pricing */}
+              {editActiveSubTab === 'pricing' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Regular Retail Price (₹ INR)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={editFormData.priceRupees || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, priceRupees: e.target.value })}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      />
+                      <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '4px', display: 'block' }}>
+                        Stored internally in paise integer units (e.g. ₹2,499 = 249,900 paise).
+                      </span>
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Sale Price (Optional ₹ INR)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={editFormData.salePriceRupees || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, salePriceRupees: e.target.value })}
+                        placeholder="Leave blank for regular price"
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ backgroundColor: '#FAF8F6', padding: '12px 16px', borderRadius: '4px', fontSize: '0.8rem' }}>
+                    <strong>GST / Tax Calculation:</strong> All Indian luxury jewelry prices displayed on storefront include 3% jewellery GST as standard per statutory compliance.
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-tab 3: Inventory */}
+              {editActiveSubTab === 'inventory' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Master Design SKU
+                      </label>
+                      <input
+                        type="text"
+                        value={editFormData.code || ''}
+                        disabled
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem', backgroundColor: '#F3F4F6' }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Catalogue Stock Status
+                      </label>
+                      <select
+                        value={editFormData.stockStatus || 'IN_STOCK'}
+                        onChange={(e) => setEditFormData({ ...editFormData, stockStatus: e.target.value })}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      >
+                        <option value="IN_STOCK">In Stock (Normal sales permitted)</option>
+                        <option value="OUT_OF_STOCK">Out of Stock (Shows Sold Out badge)</option>
+                        <option value="ON_BACKORDER">On Backorder (Made-to-Order Artisan Intake)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style={{ backgroundColor: '#FAF8F6', padding: '12px 16px', borderRadius: '4px', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+                    Physical batch stock quantities are tracked strictly in <strong>Tab 4: Inventory &amp; Ageing</strong> through signed ledger receipts to prevent overselling.
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-tab 4: Shipping */}
+              {editActiveSubTab === 'shipping' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Dimensions
+                      </label>
+                      <input
+                        type="text"
+                        value={editFormData.dimensions || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, dimensions: e.target.value })}
+                        placeholder="e.g. 7.2 cm drop length, 2.4 cm width"
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Piece / Pair Weight
+                      </label>
+                      <input
+                        type="text"
+                        value={editFormData.weight || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, weight: e.target.value })}
+                        placeholder="e.g. 14g per pair"
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Sales Packaging Unit
+                      </label>
+                      <select
+                        value={editFormData.salesUnit || 'piece'}
+                        onChange={(e) => setEditFormData({ ...editFormData, salesUnit: e.target.value })}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      >
+                        <option value="pair">Pair (Earrings standard)</option>
+                        <option value="piece">Piece (Ring / Necklace / Nath)</option>
+                        <option value="set">Set (Gift bundle / combo)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-tab 5: Materials */}
+              {editActiveSubTab === 'materials' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                      Artisanal Materials &amp; Plating
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.materials || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, materials: e.target.value })}
+                      placeholder="e.g. 18k Micron Gold Plating, Hypoallergenic Brass Alloy, Freshwater Pearls"
+                      style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                      Care Guidelines &amp; Anti-Tarnish Instructions
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={editFormData.care || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, care: e.target.value })}
+                      placeholder="e.g. Store in provided velvet pouch. Keep away from water and harsh chemicals."
+                      style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem', fontFamily: 'inherit' }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-tab 6: Variations */}
+              {editActiveSubTab === 'variations' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ fontWeight: 600, fontSize: '0.86rem' }}>Contracted Variant Options:</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {editFormData.variants?.map((v, idx) => (
+                      <div
+                        key={v.sku || idx}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '10px 14px',
+                          border: '1px solid var(--color-border)',
+                          borderRadius: '4px',
+                          backgroundColor: '#FAF8F6'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              width: '18px',
+                              height: '18px',
+                              borderRadius: '50%',
+                              backgroundColor: v.hex || '#D4AF37',
+                              border: '1px solid #CCC'
+                            }}
+                          />
+                          <div>
+                            <strong>{v.name || v.colour}</strong>
+                            <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
+                              SKU: <code>{v.sku}</code>
+                            </div>
+                          </div>
+                        </div>
+                        <span className="badge badge-gold">{v.colour}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-tab 7: Publishing */}
+              {editActiveSubTab === 'publishing' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Product Category
+                      </label>
+                      <select
+                        value={editFormData.category || 'earrings'}
+                        onChange={(e) => {
+                          const cat = e.target.value;
+                          setEditFormData({
+                            ...editFormData,
+                            category: cat,
+                            categoryName: cat.charAt(0).toUpperCase() + cat.slice(1)
+                          });
+                        }}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      >
+                        <option value="earrings">Earrings</option>
+                        <option value="rings">Rings</option>
+                        <option value="necklaces">Necklaces &amp; Pendants</option>
+                        <option value="hair-accessories">Hair Accessories</option>
+                        <option value="nose-rings">Nose Rings &amp; Pins</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Collection Dimension
+                      </label>
+                      <select
+                        value={editFormData.collectionType || 'monthly_trend'}
+                        onChange={(e) => setEditFormData({ ...editFormData, collectionType: e.target.value })}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      >
+                        <option value="monthly_trend">Monthly Trend Edit (30-Day Lifecycle)</option>
+                        <option value="permanent">Permanent Atelier Collection</option>
+                        <option value="limited_edition">Limited Edition Festive</option>
+                        <option value="trial">Experimental Trial Batch</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Lifecycle State
+                      </label>
+                      <select
+                        value={editFormData.lifecycle || 'active'}
+                        onChange={(e) => setEditFormData({ ...editFormData, lifecycle: e.target.value })}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      >
+                        <option value="active">Active (Available for purchase)</option>
+                        <option value="clearance">Clearance (Discounted sell-through)</option>
+                        <option value="draft">Draft (Private admin preview only)</option>
+                        <option value="archived">Archived (Discontinued historical)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Publishing Visibility
+                      </label>
+                      <select
+                        value={editFormData.publishState || 'published'}
+                        onChange={(e) => setEditFormData({ ...editFormData, publishState: e.target.value })}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      >
+                        <option value="published">Published (Visible on storefront)</option>
+                        <option value="hidden">Hidden (Accessible only by direct link)</option>
+                        <option value="draft">Draft (Unpublished)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Modal Action Buttons */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: '10px',
+                  paddingTop: '20px',
+                  marginTop: '20px',
+                  borderTop: '1px solid var(--color-border)'
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setEditingProduct(null)}
+                  className="btn btn-outline btn-sm"
+                  disabled={editLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-sm"
+                  disabled={editLoading}
+                  style={{ minWidth: '160px' }}
+                >
+                  {editLoading ? 'Saving...' : 'Update Product Details'}
                 </button>
               </div>
             </form>

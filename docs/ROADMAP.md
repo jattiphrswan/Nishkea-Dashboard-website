@@ -17,5 +17,7 @@ Each node follows prompt → implement → verify → fix → record. A node is 
 | 12 | grounded public AI assistant | 7,8 | live lookups, privacy, injection/fallback checks |
 | 13 | permission-scoped staff assistant, optional | 10,11,12 | private retrieval authorization checks |
 | 14 | production preparation and launch | 6–12 | release checklist, restore and launch approval scope |
+| 15 | WooCommerce-style product editor, media studio & variant matrix (Future Scope) | 4,7,9 | full product CRUD, attribute builder, gallery reorder, and live publishing validation |
 
-Catalogue UI can be developed with fixtures before Node 4 but is not considered connected until its gate passes. All operational dashboard modules remain essential planned scope, not placeholder completion.
+Catalogue UI can be developed with fixtures before Node 4 but is not considered connected until its gate passes. All operational dashboard modules remain essential planned scope, not placeholder completion. Node 15 provides full WooCommerce-parity backend product editing (general stories, integer pricing, tax classes, inventory limits, shipping dimensions, attributes/variations, and multi-angle media galleries).
+
