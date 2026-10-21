@@ -12,23 +12,28 @@ export const ROLE_PERMISSIONS = {
     'product:create', 'product:edit', 'product:publish', 'product:archive',
     'inventory:view', 'inventory:receive', 'inventory:adjust', 'inventory:transfer',
     'cost:view', 'order:view', 'order:dispatch', 'order:refund',
-    'review:decision', 'report:view', 'report:export', 'role:manage', 'audit:view'
+    'review:decision', 'report:view', 'report:export', 'role:manage', 'audit:view',
+    'crm:view', 'crm:edit', 'task:view', 'task:create', 'task:edit', 'task:assign', 'task:delete', 'support:view', 'support:edit'
   ],
   manager: [
     'product:create', 'product:edit', 'product:publish',
     'inventory:view', 'inventory:receive', 'inventory:adjust', 'inventory:transfer',
     'cost:view', 'order:view', 'order:dispatch', 'order:refund',
-    'review:decision', 'report:view', 'report:export', 'audit:view'
+    'review:decision', 'report:view', 'report:export', 'audit:view',
+    'crm:view', 'crm:edit', 'task:view', 'task:create', 'task:edit', 'task:assign', 'task:delete', 'support:view', 'support:edit'
   ],
   sales_support: [
-    'order:view', 'product:create'
+    'order:view', 'product:create',
+    'crm:view', 'crm:edit', 'task:view', 'task:create', 'task:edit', 'support:view', 'support:edit'
   ],
   inventory_staff: [
     'inventory:view', 'inventory:receive', 'inventory:adjust', 'inventory:transfer',
-    'order:view', 'order:dispatch'
+    'order:view', 'order:dispatch',
+    'task:view', 'task:edit'
   ],
   accounts_staff: [
-    'cost:view', 'order:view', 'order:refund', 'report:view', 'report:export'
+    'cost:view', 'order:view', 'order:refund', 'report:view', 'report:export',
+    'task:view', 'task:edit'
   ]
 };
 
