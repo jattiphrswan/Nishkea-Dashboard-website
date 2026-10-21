@@ -286,5 +286,35 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - `npm run build` — PASS (53 routes compiled with zero errors).
   - Browser Verification: Chromium live inspection verified loaded KPI stat cards, reactive sub-ledger tabs, modals, and report tables (`live_finance_tab_1792583661615.png`, `live_reports_tab_1792583693038.png`).
-- **Next Dependency-Ready Node:** Node 13 — Polish, Production Readiness, Security Hardening & Pre-Launch Verification.
+- **Next Dependency-Ready Node:** Node 13 — Grounded Public AI Assistant (Complete).
+
+## Node 13 — Grounded Public AI Assistant
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-21
+- **Deliverables:**
+  - Grounded AI Assistant domain service ([`src/lib/server/ai-assistant.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/lib/server/ai-assistant.js)):
+    - Real-time catalogue search filtered by category, material, colour, and integer minor budget (`maxPriceMinor`).
+    - Authoritative live stock lookup before claiming availability, querying transactional inventory balances (`getVariantStockSummary` / `computeAvailableStock`).
+    - Sizing ambiguity resolution: Ambiguous inquiries query ring designs offering that size and present real stock levels.
+    - Grounded jewellery care guidelines and US ring sizing specifications with millimeter inner diameters.
+    - Exact product deep links (`/products/${slug}`).
+    - Strict privacy isolation: Never exposes supplier costs, PO acquisition expenses, margins, or internal financials.
+    - Customer Order Tracking Privacy Gate: Inspecting order fulfillment or courier tracking numbers requires either an active client session cookie (`nishkea_customer_session`) or explicit verification against the registered checkout email.
+    - Prompt injection defenses (`ignore previous instructions`, `DAN mode`, `reveal your system prompt`).
+    - Transparent provisional policy disclosure: 7-day return window, isolating pierced earrings and nose ornaments for hygiene safety.
+    - Direct human escalation path: Quick booking link to private salons (`/contact`).
+    - Sliding-window rate limiting per session/IP (max 20 requests/min) and 500-char request bounding.
+  - API Boundary ([`src/app/api/chat/route.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/app/api/chat/route.js)):
+    - Rate-limiting headers, session ID tracking, customer session inspection, and non-leaking error responses.
+  - Elevated Luxury Chat Widget ([`src/components/chatbot/ChatWidget.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/components/chatbot/ChatWidget.js)):
+    - Upgraded to active Node 13 Grounded Maison Concierge.
+    - Interactive product preview cards (name, price, stock count, and direct link).
+    - Top header link to salon booking, contextual prompt pills, and human concierge fallback.
+- **Validation:**
+  - `npm test` — PASS (438/438 tests passing across all 10 test suites, including 22/22 in `tests/ai-assistant.test.mjs`).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - `npm run build` — PASS (53 routes compiled with zero errors).
+  - Browser Verification: Chromium live inspection verified widget launch, budget product discovery, size availability resolution, and prompt injection refusal (`concierge_opened_1792584653867.png`, `concierge_search_result_1792584668396.png`, `concierge_security_guardrail_1792584713528.png`).
+- **Next Dependency-Ready Node:** Node 14 / Node 15 — Production Preparation, Security Hardening & Launch Scope.
+
 

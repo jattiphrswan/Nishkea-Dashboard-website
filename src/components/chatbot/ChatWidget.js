@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { MessageSquare, X, Send, Sparkles, ShieldCheck, Loader2 } from 'lucide-react';
+import { MessageSquare, X, Send, Sparkles, ShieldCheck, Loader2, ArrowRight, ExternalLink, Calendar } from 'lucide-react';
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,11 +11,11 @@ export default function ChatWidget() {
     {
       id: 'msg-welcome',
       sender: 'bot',
-      text: "Welcome to NISHKÈA Concierge! I can assist you with jewellery care, ring sizing guidelines, return policies, or help you discover pieces from our 5 curated categories.",
+      text: "Welcome to NISHKÈA Maison Concierge. I am your grounded shopping assistant. I can help you discover pieces from our 5 curated categories, check live stock by size or metal, provide ring sizing and jewellery care guides, or track your dispatched order.",
       suggestions: [
-        "How do I care for gold-plated jewellery?",
-        "What ring sizes do you offer?",
-        "Are earrings sold as pairs?",
+        "Gold earrings under 3000",
+        "Is size 7 available?",
+        "How to care for jewellery",
         "What is your return policy?"
       ]
     }
@@ -73,11 +73,11 @@ export default function ChatWidget() {
         body: JSON.stringify({ message: query })
       });
 
-      if (!response.ok) {
-        throw new Error(`Server returned HTTP ${response.status}`);
-      }
-
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || `Server returned HTTP ${response.status}`);
+      }
 
       setMessages((prev) => [
         ...prev,
@@ -87,11 +87,12 @@ export default function ChatWidget() {
           text: data.reply,
           link: data.link,
           linkText: data.linkText,
+          product: data.product,
           suggestions: data.suggestions
         }
       ]);
-    } catch {
-      setError('Unable to reach concierge server. Please check your network or try again.');
+    } catch (err) {
+      setError(err.message || 'Unable to reach concierge server. Please check your network or try again.');
     } finally {
       setIsLoading(false);
     }
@@ -119,7 +120,7 @@ export default function ChatWidget() {
           className="chat-window"
           role="dialog"
           aria-modal="true"
-          aria-label="NISHKÈA Concierge Demo Assistant"
+          aria-label="NISHKÈA Concierge Assistant"
         >
           {/* Header */}
           <div className="chat-header">
@@ -144,20 +145,42 @@ export default function ChatWidget() {
                 </h4>
                 <span style={{ fontSize: '0.68rem', color: '#E7DDE0', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <ShieldCheck size={11} color="var(--color-gold)" />
-                  Grounded Demo Assistant
+                  Grounded Maison Assistant
                 </span>
               </div>
             </div>
 
-            <button
-              type="button"
-              className="btn-icon"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close chat window"
-              style={{ color: '#FFFFFF' }}
-            >
-              <X size={18} />
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Link
+                href="/contact"
+                onClick={() => setIsOpen(false)}
+                title="Book Private Consultation"
+                style={{
+                  color: '#FFFFFF',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  backgroundColor: 'rgba(255,255,255,0.12)',
+                  fontSize: '0.68rem',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <Calendar size={12} />
+                <span>Salons</span>
+              </Link>
+
+              <button
+                type="button"
+                className="btn-icon"
+                onClick={() => setIsOpen(false)}
+                aria-label="Close chat window"
+                style={{ color: '#FFFFFF' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
           </div>
 
           {/* Assistant Info Banner */}
@@ -167,10 +190,22 @@ export default function ChatWidget() {
               backgroundColor: '#FEF7EC',
               borderBottom: '1px solid #F5DEB3',
               fontSize: '0.72rem',
-              color: '#8C5311'
+              color: '#8C5311',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
             }}
           >
-            <strong>Node 2 Demo:</strong> Real AI models and live inventory will connect in later nodes.
+            <span>
+              <strong>Grounded Assistant:</strong> Live catalogue, inventory stock &amp; order tracking.
+            </span>
+            <Link
+              href="/contact"
+              onClick={() => setIsOpen(false)}
+              style={{ color: '#8C5311', fontWeight: 600, textDecoration: 'underline' }}
+            >
+              Human Concierge
+            </Link>
           </div>
 
           {/* Messages Body */}
@@ -182,18 +217,57 @@ export default function ChatWidget() {
                     msg.sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-bot'
                   }`}
                 >
-                  <p style={{ margin: 0, color: 'inherit' }}>{msg.text}</p>
+                  <p style={{ margin: 0, color: 'inherit', whiteSpace: 'pre-line' }}>{msg.text}</p>
 
-                  {/* Optional Deep Link */}
-                  {msg.link && (
+                  {/* Optional Product Preview Card */}
+                  {msg.product && (
+                    <div
+                      style={{
+                        marginTop: '10px',
+                        padding: '10px',
+                        backgroundColor: '#FAF7F2',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: '6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '10px'
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-charcoal)' }}>
+                          {msg.product.name}
+                        </div>
+                        <div style={{ fontSize: '0.74rem', color: 'var(--color-burgundy)', fontWeight: 600 }}>
+                          {msg.product.price}
+                          {msg.product.available !== undefined && (
+                            <span style={{ color: 'var(--color-text-muted)', fontWeight: 400, marginLeft: '6px' }}>
+                              ({msg.product.available} available)
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <Link
+                        href={msg.product.url}
+                        onClick={() => setIsOpen(false)}
+                        className="btn btn-primary btn-sm"
+                        style={{ fontSize: '0.7rem', padding: '4px 8px', whiteSpace: 'nowrap' }}
+                      >
+                        View Piece →
+                      </Link>
+                    </div>
+                  )}
+
+                  {/* Optional Deep Link Button */}
+                  {msg.link && !msg.product && (
                     <div style={{ marginTop: '8px' }}>
                       <Link
                         href={msg.link}
                         onClick={() => setIsOpen(false)}
                         className="btn btn-primary btn-sm"
-                        style={{ fontSize: '0.72rem', padding: '6px 10px' }}
+                        style={{ fontSize: '0.72rem', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                       >
-                        {msg.linkText || 'View Product'} →
+                        {msg.linkText || 'View Details'} <ArrowRight size={12} />
                       </Link>
                     </div>
                   )}
@@ -238,7 +312,9 @@ export default function ChatWidget() {
             {isLoading && (
               <div className="chat-bubble chat-bubble-bot" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Loader2 size={16} className="animate-spin" />
-                <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>Consulting brand catalogue...</span>
+                <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
+                  Consulting Maison catalogue &amp; inventory...
+                </span>
               </div>
             )}
 
@@ -246,43 +322,61 @@ export default function ChatWidget() {
               <div
                 style={{
                   padding: '8px 12px',
-                  backgroundColor: 'var(--color-status-danger-bg)',
-                  border: '1px solid var(--color-status-danger)',
-                  color: 'var(--color-status-danger)',
-                  borderRadius: '4px',
-                  fontSize: '0.76rem'
+                  backgroundColor: '#FDF2F2',
+                  border: '1px solid #FCA5A5',
+                  borderRadius: '6px',
+                  fontSize: '0.74rem',
+                  color: '#991B1B',
+                  marginTop: '8px'
                 }}
               >
-                {error}
+                <div>{error}</div>
+                <div style={{ marginTop: '6px' }}>
+                  <Link
+                    href="/contact"
+                    onClick={() => setIsOpen(false)}
+                    style={{ color: '#991B1B', textDecoration: 'underline', fontWeight: 600 }}
+                  >
+                    Need human assistance? Contact our private atelier →
+                  </Link>
+                </div>
               </div>
             )}
 
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Bar */}
+          {/* Input Footer */}
           <form
-            className="chat-input-bar"
             onSubmit={(e) => {
               e.preventDefault();
               handleSendMessage();
             }}
+            className="chat-footer"
           >
             <input
               ref={inputRef}
               type="text"
-              placeholder="Ask about care, ring size, or designs..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="Ask about pieces, sizing, care, or orders..."
+              maxLength={500}
               disabled={isLoading}
+              className="chat-input"
               aria-label="Ask concierge a question"
             />
             <button
               type="submit"
-              className="btn btn-primary btn-sm"
-              disabled={isLoading || !inputMessage.trim()}
-              aria-label="Send message"
-              style={{ padding: '0 12px' }}
+              disabled={!inputMessage.trim() || isLoading}
+              className="btn btn-primary"
+              style={{
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-xs)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              aria-label="Send message to concierge"
             >
               <Send size={16} />
             </button>
