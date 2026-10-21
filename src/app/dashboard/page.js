@@ -34,6 +34,10 @@ import {
   X,
   RefreshCw,
   Layers,
+  Upload,
+  Image as ImageIcon,
+  Trash2,
+  Star
 } from 'lucide-react';
 import CrmTab from '../../components/dashboard/CrmTab';
 import TasksTab from '../../components/dashboard/TasksTab';
@@ -121,6 +125,18 @@ function DashboardContent() {
   const [editFormData, setEditFormData] = useState({});
   const [editLoading, setEditLoading] = useState(false);
   const [editFeedback, setEditFeedback] = useState(null);
+  const [availableImages, setAvailableImages] = useState([]);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [customImageUrl, setCustomImageUrl] = useState('');
+
+  useEffect(() => {
+    fetch('/api/upload')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) setAvailableImages(d.images);
+      })
+      .catch(() => {});
+  }, []);
 
   const loadLiveInventory = async () => {
     try {
@@ -511,6 +527,59 @@ function DashboardContent() {
     setEditFeedback(null);
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    setEditFeedback(null);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      const newImg = { id: `img-${Date.now()}`, url: data.url, alt: editFormData.name || 'Product Image' };
+      const currentImages = Array.isArray(editFormData.images) ? editFormData.images : [];
+      setEditFormData((prev) => ({ ...prev, images: [...currentImages, newImg] }));
+      setEditFeedback({ type: 'success', message: `✓ Uploaded ${file.name} successfully!` });
+      fetch('/api/upload').then((r) => r.json()).then((d) => d.success && setAvailableImages(d.images));
+    } catch (err) {
+      setEditFeedback({ type: 'error', message: err.message });
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleAddCustomImage = (e) => {
+    e.preventDefault();
+    if (!customImageUrl.trim()) return;
+    const newImg = { id: `img-${Date.now()}`, url: customImageUrl.trim(), alt: editFormData.name || 'Product Image' };
+    const currentImages = Array.isArray(editFormData.images) ? editFormData.images : [];
+    setEditFormData((prev) => ({ ...prev, images: [...currentImages, newImg] }));
+    setCustomImageUrl('');
+  };
+
+  const handleAddExistingImage = (imageUrl) => {
+    const currentImages = Array.isArray(editFormData.images) ? editFormData.images : [];
+    const already = currentImages.some((img) => (typeof img === 'string' ? img : img.url) === imageUrl);
+    if (already) return;
+    const newImg = { id: `img-${Date.now()}`, url: imageUrl, alt: editFormData.name || 'Product Image' };
+    setEditFormData((prev) => ({ ...prev, images: [...currentImages, newImg] }));
+  };
+
+  const handleRemoveImage = (indexToRemove) => {
+    const currentImages = Array.isArray(editFormData.images) ? editFormData.images : [];
+    const updated = currentImages.filter((_, idx) => idx !== indexToRemove);
+    setEditFormData((prev) => ({ ...prev, images: updated }));
+  };
+
+  const handleSetPrimaryImage = (indexToMove) => {
+    const currentImages = [...(Array.isArray(editFormData.images) ? editFormData.images : [])];
+    const [selected] = currentImages.splice(indexToMove, 1);
+    currentImages.unshift(selected);
+    setEditFormData((prev) => ({ ...prev, images: currentImages }));
+  };
+
   const handleSaveProductEdit = async (e) => {
     e.preventDefault();
     if (!editingProduct) return;
@@ -537,7 +606,8 @@ function DashboardContent() {
         materials: editFormData.materials,
         dimensions: editFormData.dimensions,
         weight: editFormData.weight,
-        care: editFormData.care
+        care: editFormData.care,
+        images: editFormData.images || []
       };
 
       const res = await fetch(`/api/products/${editingProduct.id}`, {
@@ -3201,6 +3271,7 @@ function DashboardContent() {
             >
               {[
                 { id: 'general', label: '🏷️ General & Story' },
+                { id: 'media', label: '🖼️ Media & Gallery' },
                 { id: 'pricing', label: '💰 Pricing & Tax' },
                 { id: 'inventory', label: '📦 Inventory & SKU' },
                 { id: 'shipping', label: '🚚 Shipping & Dimensions' },
@@ -3310,6 +3381,232 @@ function DashboardContent() {
                       placeholder="Detailed provenance, history, and craft techniques..."
                       style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem', fontFamily: 'inherit' }}
                     />
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-tab: Media & Gallery Studio */}
+              {editActiveSubTab === 'media' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div>
+                    <h4 style={{ fontSize: '0.98rem', fontWeight: 600, margin: '0 0 4px', color: 'var(--color-charcoal)' }}>
+                      Product Media &amp; Multi-Angle Gallery
+                    </h4>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 0 }}>
+                      The first image serves as the primary storefront cover photo. You can upload new photography, reorder, or pick from the atelier asset library.
+                    </p>
+                  </div>
+
+                  {/* Current Active Product Images */}
+                  <div style={{ border: '1px solid var(--color-border)', borderRadius: '4px', padding: '16px', backgroundColor: '#FAF7F2' }}>
+                    <div style={{ fontSize: '0.82rem', fontWeight: 600, marginBottom: '10px', color: 'var(--color-burgundy)' }}>
+                      Active Gallery Images ({Array.isArray(editFormData.images) ? editFormData.images.length : 0})
+                    </div>
+
+                    {!Array.isArray(editFormData.images) || editFormData.images.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '24px', color: 'var(--color-text-muted)', fontSize: '0.84rem' }}>
+                        No gallery images attached yet. Pick from the library below or upload an image file.
+                      </div>
+                    ) : (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '12px' }}>
+                        {editFormData.images.map((img, idx) => {
+                          const url = typeof img === 'string' ? img : img.url;
+                          const alt = typeof img === 'string' ? `Product angle ${idx + 1}` : (img.alt || `Product angle ${idx + 1}`);
+                          const isPrimary = idx === 0;
+
+                          return (
+                            <div
+                              key={idx}
+                              style={{
+                                border: isPrimary ? '2px solid var(--color-burgundy)' : '1px solid var(--color-border)',
+                                borderRadius: '4px',
+                                padding: '8px',
+                                backgroundColor: '#FFFFFF',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                position: 'relative'
+                              }}
+                            >
+                              {isPrimary && (
+                                <span
+                                  style={{
+                                    position: 'absolute',
+                                    top: '4px',
+                                    left: '4px',
+                                    backgroundColor: 'var(--color-burgundy)',
+                                    color: '#FFFFFF',
+                                    fontSize: '0.65rem',
+                                    padding: '2px 6px',
+                                    borderRadius: '2px',
+                                    fontWeight: 600,
+                                    zIndex: 2
+                                  }}
+                                >
+                                  Primary Cover
+                                </span>
+                              )}
+
+                              <div style={{ width: '100%', height: '110px', overflow: 'hidden', borderRadius: '3px', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F5F5F5' }}>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={url}
+                                  alt={alt}
+                                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                                />
+                              </div>
+
+                              <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', marginBottom: '6px' }}>
+                                {url.split('/').pop()}
+                              </div>
+
+                              <div style={{ display: 'flex', gap: '4px', width: '100%' }}>
+                                {!isPrimary && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSetPrimaryImage(idx)}
+                                    title="Make this the primary cover image"
+                                    style={{
+                                      flex: 1,
+                                      padding: '4px',
+                                      fontSize: '0.68rem',
+                                      border: '1px solid var(--color-border)',
+                                      borderRadius: '2px',
+                                      backgroundColor: '#FAF7F2',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    ★ Cover
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveImage(idx)}
+                                  title="Remove image from gallery"
+                                  style={{
+                                    flex: isPrimary ? 1 : 'none',
+                                    padding: '4px 8px',
+                                    fontSize: '0.68rem',
+                                    border: '1px solid #FCA5A5',
+                                    borderRadius: '2px',
+                                    backgroundColor: '#FEF2F2',
+                                    color: '#991B1B',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  <Trash2 size={11} />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Upload Image Section */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+                    <div style={{ border: '1px solid var(--color-border)', borderRadius: '4px', padding: '14px', backgroundColor: '#FFFFFF' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                        <Upload size={16} color="var(--color-burgundy)" />
+                        <strong style={{ fontSize: '0.84rem' }}>Upload from Computer</strong>
+                      </div>
+                      <p style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', margin: '0 0 10px' }}>
+                        Select a PNG, JPG, or WEBP file to upload directly to <code>/public/images/prodcuts/</code>.
+                      </p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        disabled={uploadingImage}
+                        onChange={handleImageUpload}
+                        style={{ fontSize: '0.78rem', width: '100%' }}
+                      />
+                      {uploadingImage && (
+                        <div style={{ fontSize: '0.76rem', color: 'var(--color-burgundy)', marginTop: '6px' }}>
+                          Uploading image to atelier storage...
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ border: '1px solid var(--color-border)', borderRadius: '4px', padding: '14px', backgroundColor: '#FFFFFF' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                        <ImageIcon size={16} color="var(--color-burgundy)" />
+                        <strong style={{ fontSize: '0.84rem' }}>Add Image by Path / URL</strong>
+                      </div>
+                      <p style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', margin: '0 0 10px' }}>
+                        Type a local path (e.g. <code>/images/prodcuts/ring-1.png</code>) or CDN URL.
+                      </p>
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        <input
+                          type="text"
+                          placeholder="/images/prodcuts/..."
+                          value={customImageUrl}
+                          onChange={(e) => setCustomImageUrl(e.target.value)}
+                          style={{ flex: 1, padding: '6px 8px', border: '1px solid var(--color-border)', borderRadius: '3px', fontSize: '0.78rem' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddCustomImage}
+                          className="btn btn-secondary btn-sm"
+                          style={{ fontSize: '0.76rem', padding: '6px 10px' }}
+                        >
+                          + Add
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Atelier Asset Library Picker */}
+                  <div style={{ border: '1px solid var(--color-border)', borderRadius: '4px', padding: '14px', backgroundColor: '#FFFFFF' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                      <div>
+                        <strong style={{ fontSize: '0.84rem' }}>Quick Pick from Atelier Asset Library</strong>
+                        <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', display: 'block' }}>
+                          Click any photo below to instantly add it to this product&apos;s gallery.
+                        </span>
+                      </div>
+                      <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
+                        {availableImages.length} available photos
+                      </span>
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(85px, 1fr))',
+                        gap: '8px',
+                        maxHeight: '180px',
+                        overflowY: 'auto',
+                        padding: '4px'
+                      }}
+                    >
+                      {availableImages.map((asset) => (
+                        <button
+                          key={asset.name}
+                          type="button"
+                          onClick={() => handleAddExistingImage(asset.url)}
+                          title={`Click to add ${asset.name}`}
+                          style={{
+                            border: '1px solid var(--color-border)',
+                            borderRadius: '3px',
+                            padding: '4px',
+                            background: '#FAF8F6',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center'
+                          }}
+                        >
+                          <div style={{ width: '100%', height: '65px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={asset.url} alt={asset.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                          </div>
+                          <span style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%', textAlign: 'center', marginTop: '2px' }}>
+                            {asset.name}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
