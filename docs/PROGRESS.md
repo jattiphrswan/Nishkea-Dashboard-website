@@ -184,8 +184,39 @@
   - `npm test` — PASS (276/276 tests passing across all 6 test suites, including 49/49 in `tests/suppliers.test.mjs`).
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - Browser Verification: Navigated to `/dashboard?tab=suppliers`, verified KPI cards and PO ledger; approved `PO-2026-0042` with status transition to `APPROVED`; received final shipment of 20 units for `PO-2026-0041` with status transition to `FULFILLED` (100% rcvd); visual evidence recorded in `supplier_dashboard_final_1792494351725.png`.
-- **Next Dependency-Ready Node:** Node 10 — CRM, Wholesale / Retail Customer Segmentation & Sales Pipeline.
+## Node 10 — CRM, Wholesale / Retail Customer Segmentation & Sales Pipeline
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-21
+- **Deliverables:**
+  - Relational database schema migration (`database/migrations/003_crm_and_tasks.sql`): `customers`, `crm_leads`, `crm_activities`, `support_tickets`, and recurrence columns on `tasks`.
+  - Core CRM domain service (`src/lib/server/crm.js`) enforcing:
+    - Customer profiles with Retail vs Wholesale segmentation, mandatory company names for wholesale, and explicit marketing consent stored separately.
+    - Duplicate customer detection by email and phone.
+    - Sales pipeline stages (`ENQUIRY` → `QUALIFIED` → `QUOTATION` → `WON` / `LOST`).
+    - Mandatory lost-reason enforcement invariant when transitioning to `LOST`.
+    - Follow-up date scheduling and real-time overdue tracking.
+    - Server-side RBAC scoping: `sales_support` scoped to assigned leads/tasks; `manager`/`owner` granted company-wide access.
+    - Automated idempotent task recurrence engine (`generateRecurringTasks` for `DAILY`, `WEEKLY`, `MONTHLY`) preventing duplicate task generation.
+    - Support ticket lifecycle management with order linking.
+  - REST API Routes:
+    - `GET /api/crm/customers`, `POST /api/crm/customers`
+    - `GET /api/crm/customers/[id]`
+    - `GET /api/crm/leads`, `POST /api/crm/leads`
+    - `GET /api/crm/leads/[id]`, `PATCH /api/crm/leads/[id]`
+    - `GET /api/crm/tasks`, `POST /api/crm/tasks`, `PATCH /api/crm/tasks`
+    - `POST /api/crm/tasks/recurrence`
+    - `GET /api/crm/support`, `POST /api/crm/support`
+  - Backoffice Dashboard UI (`src/app/dashboard/page.js`):
+    - Tab 7: Modular connected CRM component (`src/components/dashboard/CrmTab.js`) with KPI cards (pipeline value, client count, follow-ups), pipeline cards, client directory table, and modals for Register Customer, Create Lead, and Update Stage.
+    - Tab 8: Modular connected Task board component (`src/components/dashboard/TasksTab.js`) with priority indicators, status toggles, recurrence badges, and "Run Recurrence Engine" action.
+- **Validation:**
+  - `npm test` — PASS (328/328 tests passing across all 7 test suites, including 52/52 in `tests/crm.test.mjs`).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - `npm run build` — PASS (34 routes compiled with zero errors).
+  - Browser Verification: Chromium visual inspection verified CRM pipeline cards, client directory, lead modal, team tasks board, and recurrence engine generating scheduled occurrences; recording saved (`crm_tasks_verify_1792578488943.webp`).
+- **Next Dependency-Ready Node:** Node 11 — Payment/Expense Records, Balances & Business Financial Reports.
 - **Future Node Added:** Node 15 — WooCommerce-Style Advanced Product Editor, Media Studio & Variant Matrix (detailed in `docs/NODE-15.md`). Foundational live backend product editing (`/api/products` and modal in `/dashboard?tab=products`) has been successfully wired and verified.
+
 
 
 

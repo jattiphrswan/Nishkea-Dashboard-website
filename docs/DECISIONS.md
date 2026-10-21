@@ -17,3 +17,5 @@
 | D13 | Pure Vanilla CSS Design Tokens | ADOPTED | 2026-10-19 | CSS custom properties with `@media (prefers-reduced-motion: reduce)`. |
 | D14 | Safe LocalStorage Fallback | ADOPTED | 2026-10-19 | Browser storage wrapped in try/catch to protect SSR and private browsing. |
 | D15 | Inactive Mutation Disclosure | ADOPTED | 2026-10-19 | Unfinished backoffice actions show planned node status, not fake success. |
+| D16 | CRM Segmentation & Task Recurrence Idempotency | ADOPTED | 2026-10-21 | Retail vs Wholesale segmentation with explicit separate marketing consent; automated tasks evaluate interval and generate strictly once per scheduled occurrence. |
+
