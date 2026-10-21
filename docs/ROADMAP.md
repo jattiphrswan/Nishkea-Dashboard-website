@@ -13,11 +13,12 @@ Each node follows prompt → implement → verify → fix → record. A node is 
 | 8 | checkout, payments, shipping and returns | 5,7 | verified webhook and full order/return tests |
 | 9 | suppliers, purchase approvals and partial receipts | 5 | ordered/received/returned quantities reconcile |
 | 10 | CRM, tasks, team and support | 3,8 | scopes, follow-ups and task recurrence verified |
-| 11 | payment/expense records and business reports | 6,8,9 | balances and metric definitions reconcile |
-| 12 | grounded public AI assistant | 7,8 | live lookups, privacy, injection/fallback checks |
-| 13 | permission-scoped staff assistant, optional | 10,11,12 | private retrieval authorization checks |
-| 14 | production preparation and launch | 6–12 | release checklist, restore and launch approval scope |
-| 15 | WooCommerce-style product editor, media studio & variant matrix (Future Scope) | 4,7,9 | full product CRUD, attribute builder, gallery reorder, and live publishing validation |
+| 11 | client accounts, self-service portal, tracking, password security & contact enquiries | 3,8,10 | client session isolation, tracking stepper, password verification gate, contact CRM lead sync |
+| 12 | payment/expense records and business reports | 6,8,9 | balances and metric definitions reconcile |
+| 13 | grounded public AI assistant | 7,8,11 | live lookups, privacy, injection/fallback checks |
+| 14 | permission-scoped staff assistant, optional | 10,12,13 | private retrieval authorization checks |
+| 15 | production preparation and launch | 6–13 | release checklist, restore and launch approval scope |
+| 16 | WooCommerce-style product editor, media studio & variant matrix (Future Scope) | 4,7,9 | full product CRUD, attribute builder, gallery reorder, and live publishing validation |
 
 Catalogue UI can be developed with fixtures before Node 4 but is not considered connected until its gate passes. All operational dashboard modules remain essential planned scope, not placeholder completion. Node 15 provides full WooCommerce-parity backend product editing (general stories, integer pricing, tax classes, inventory limits, shipping dimensions, attributes/variations, and multi-angle media galleries).
 

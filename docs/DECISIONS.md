@@ -18,4 +18,5 @@
 | D14 | Safe LocalStorage Fallback | ADOPTED | 2026-10-19 | Browser storage wrapped in try/catch to protect SSR and private browsing. |
 | D15 | Inactive Mutation Disclosure | ADOPTED | 2026-10-19 | Unfinished backoffice actions show planned node status, not fake success. |
 | D16 | CRM Segmentation & Task Recurrence Idempotency | ADOPTED | 2026-10-21 | Retail vs Wholesale segmentation with explicit separate marketing consent; automated tasks evaluate interval and generate strictly once per scheduled occurrence. |
+| D17 | Client Session Isolation & PBKDF2 Password Gate | ADOPTED | 2026-10-21 | Dedicated `nishkea_customer_session` cookie isolated from staff auth; client password rotation strictly requires verifying valid current password before updating PBKDF2 hash. Storefront inquiries auto-create leads in CRM pipeline. |
 

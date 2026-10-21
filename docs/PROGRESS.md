@@ -214,9 +214,37 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - `npm run build` — PASS (34 routes compiled with zero errors).
   - Browser Verification: Chromium visual inspection verified CRM pipeline cards, client directory, lead modal, team tasks board, and recurrence engine generating scheduled occurrences; recording saved (`crm_tasks_verify_1792578488943.webp`).
-- **Next Dependency-Ready Node:** Node 11 — Payment/Expense Records, Balances & Business Financial Reports.
+- **Next Dependency-Ready Node:** Node 11 — Client Storefront Accounts, Self-Service Portal, Order Tracking & Contact Enquiries (Complete).
+
+## Node 11 — Client Storefront Accounts, Self-Service Portal, Order Tracking & Contact Enquiries
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-21
+- **Deliverables:**
+  - Relational database schema migration (`database/migrations/004_customer_accounts.sql`): extended `customers` with salted PBKDF2 hashes and delivery addresses; created `customer_sessions` and `contact_inquiries`.
+  - Client auth and tracking domain engine (`src/lib/server/customer-auth.js`):
+    - Client registration & login with salted PBKDF2 SHA-512 hashing.
+    - Dedicated client session cookie (`nishkea_customer_session`) isolated from staff sessions.
+    - Profile and delivery shipping address updates synchronized to CRM directory.
+    - Password update gate: mandates verification of current password before permitting password rotation.
+    - Itemized order history and BlueDart Express courier shipment tracking.
+    - Storefront contact inquiry dispatch linked directly into the CRM pipeline.
+  - REST API Routes:
+    - `POST /api/account/register`
+    - `POST /api/account/login`
+    - `POST /api/account/logout`
+    - `GET, PUT /api/account/me`
+    - `PUT /api/account/password`
+    - `GET /api/account/orders`
+    - `POST /api/contact`
+  - Storefront Pages:
+    - `/contact` ([`src/app/(storefront)/contact/page.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/app/%28storefront%29/contact/page.js)): Private consultation booking form with CRM lead auto-generation, Mumbai & Jaipur showroom cards.
+    - `/account/login` ([`src/app/(storefront)/account/login/page.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/app/%28storefront%29/account/login/page.js)): Luxury client login with 1-click test credentials and staff login bridge.
+    - `/account` ([`src/app/(storefront)/account/page.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/app/%28storefront%29/account/page.js)): Client Atelier Portal with 4 tabs: *Orders & Tracking*, *Profile & Delivery Address*, *Password & Security*, and *Concierge & Support*.
+  - Header Navigation: Updated `Contact` link to `/contact` and User icon to `/account`.
+- **Validation:**
+  - `npm test` — PASS (370/370 tests passing across all 8 test suites, including 42/42 in `tests/customer-account.test.mjs`).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - `npm run build` — PASS (55 routes compiled with zero errors).
+  - Browser Verification: Chromium visual inspection verified consultation submission on `/contact`, client login on `/account/login`, order tracking on `/account`, and address/security management; recording saved (`client_portal_verify_1792580545133.webp`).
+- **Next Dependency-Ready Node:** Node 12 — Payment/Expense Records, Balances & Business Financial Reports.
 - **Future Node Added:** Node 15 — WooCommerce-Style Advanced Product Editor, Media Studio & Variant Matrix (detailed in `docs/NODE-15.md`). Foundational live backend product editing (`/api/products` and modal in `/dashboard?tab=products`) has been successfully wired and verified.
-
-
-
-
