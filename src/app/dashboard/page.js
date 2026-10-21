@@ -34,8 +34,9 @@ import {
   X,
   RefreshCw,
   Layers,
-  ArrowDownLeft
 } from 'lucide-react';
+import CrmTab from '../../components/dashboard/CrmTab';
+import TasksTab from '../../components/dashboard/TasksTab';
 
 function DashboardContent() {
   const searchParams = useSearchParams();
@@ -1860,36 +1861,10 @@ function DashboardContent() {
       )}
 
       {/* TAB 7: CRM */}
-      {activeTab === 'crm' && (
-        <div className="table-container" style={{ padding: 'var(--space-8)', textAlign: 'center' }}>
-          <Users size={36} color="var(--color-burgundy)" style={{ margin: '0 auto 12px' }} />
-          <h3>Customers &amp; Client Relationship Management</h3>
-          <p style={{ maxWidth: '540px', margin: '8px auto 20px', fontSize: '0.88rem' }}>
-            Customer profiles, wholesale/retail segments, lead pipelines (Enquiry → Qualified → Quotation → Won/Lost), and interaction notes are planned for <strong>Node 10</strong>.
-          </p>
-          <span className="badge badge-demo">Planned — Node 10</span>
-        </div>
-      )}
+      {activeTab === 'crm' && <CrmTab />}
 
       {/* TAB 8: TASKS */}
-      {activeTab === 'tasks' && (
-        <div className="table-container" style={{ padding: 'var(--space-6)' }}>
-          <h3 style={{ fontSize: '1.15rem', marginBottom: '16px' }}>Team Task Board</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {DEMO_TASKS.map((t) => (
-              <div key={t.id} style={{ border: '1px solid var(--color-border)', padding: '16px', borderRadius: '4px', backgroundColor: '#FAF7F2' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <strong style={{ fontSize: '0.92rem' }}>{t.title}</strong>
-                  <span className={`badge ${t.priority === 'HIGH' ? 'badge-danger' : 'badge-warning'}`}>{t.priority}</span>
-                </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginTop: '6px' }}>
-                  Assignee: {t.assignedTo} | Due: {t.dueDate} | Linked Record: {t.linkedRecord}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {activeTab === 'tasks' && <TasksTab />}
 
       {/* TAB 9: FINANCE */}
       {activeTab === 'finance' && (
