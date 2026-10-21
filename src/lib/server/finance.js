@@ -711,13 +711,21 @@ export async function getBusinessPerformanceReports({ user = { roleId: 'manager'
 
   // 1. Period Sell-Through Rate Formula:
   // Net Units Sold / (Opening Stock + Eligible Receipts)
-  const totalUnitsDispatched = memoryMovements
+  const movementsDispatched = memoryMovements
     .filter((m) => m.type === 'DISPATCH_CONSUME' || m.quantity < 0)
     .reduce((sum, m) => sum + Math.abs(m.quantity), 0);
 
-  const totalUnitsReceived = memoryMovements
+  const movementsReceived = memoryMovements
     .filter((m) => m.type === 'RECEIPT' || m.quantity > 0)
     .reduce((sum, m) => sum + m.quantity, 0);
+
+  const totalUnitsReceived = movementsReceived > 0
+    ? movementsReceived
+    : memoryBatches.reduce((sum, b) => sum + (b.initialQuantity || 0), 0);
+
+  const totalUnitsDispatched = movementsDispatched > 0
+    ? movementsDispatched
+    : memoryBatches.reduce((sum, b) => sum + Math.max(0, (b.initialQuantity || 0) - (b.currentQuantity || 0)), 0);
 
   const sellThroughRatePercent = totalUnitsReceived > 0
     ? Number(((totalUnitsDispatched / totalUnitsReceived) * 100).toFixed(1))

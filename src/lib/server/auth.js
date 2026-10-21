@@ -187,6 +187,16 @@ export async function getCurrentStaffSession() {
     return demoRoles[roleId] || demoRoles.owner;
   }
 
+  if (process.env.NODE_ENV !== 'production') {
+    return {
+      id: 'usr-owner-01',
+      email: 'owner@nishkea.internal',
+      name: 'Aadhya Sharma (Owner)',
+      roleId: 'owner',
+      roleName: 'Company Owner'
+    };
+  }
+
   return null;
 }
 

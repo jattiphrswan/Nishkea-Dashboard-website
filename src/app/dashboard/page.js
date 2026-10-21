@@ -41,6 +41,8 @@ import {
 } from 'lucide-react';
 import CrmTab from '../../components/dashboard/CrmTab';
 import TasksTab from '../../components/dashboard/TasksTab';
+import FinanceTab from '../../components/dashboard/FinanceTab';
+import ReportsTab from '../../components/dashboard/ReportsTab';
 
 function DashboardContent() {
   const searchParams = useSearchParams();
@@ -1937,27 +1939,10 @@ function DashboardContent() {
       {activeTab === 'tasks' && <TasksTab />}
 
       {/* TAB 9: FINANCE */}
-      {activeTab === 'finance' && (
-        <div className="table-container" style={{ padding: 'var(--space-8)' }}>
-          <h3 style={{ fontSize: '1.15rem', marginBottom: '12px' }}>Commercial &amp; Financial Reconciliations</h3>
-          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '20px' }}>
-            Per AGENTS.md: Integer minor currency units (`price_minor`), explicit currency (INR), and single source of truth.
-          </p>
-          <div style={{ backgroundColor: '#FAF7F2', border: '1px solid var(--color-border)', padding: '16px', borderRadius: '4px', fontSize: '0.82rem' }}>
-            <strong>Gross Margin Formula Definition:</strong> Net Merchandise Revenue (excluding collected taxes) − Allocated Cost of Goods Sold. Shipping, payment fees, and overheads reported separately.
-          </div>
-        </div>
-      )}
+      {activeTab === 'finance' && <FinanceTab />}
 
       {/* TAB 10: REPORTS */}
-      {activeTab === 'reports' && (
-        <div className="table-container" style={{ padding: 'var(--space-8)' }}>
-          <h3 style={{ fontSize: '1.15rem', marginBottom: '12px' }}>Inventory &amp; Sales Performance Metrics</h3>
-          <div style={{ backgroundColor: '#FAF7F2', border: '1px solid var(--color-border)', padding: '16px', borderRadius: '4px', fontSize: '0.82rem', marginBottom: '16px' }}>
-            <strong>Period Sell-Through Rate Formula:</strong> Net Units Sold / (Opening Sellable Stock + Eligible Receipts in Period). Returns and damaged transfers isolated.
-          </div>
-        </div>
-      )}
+      {activeTab === 'reports' && <ReportsTab />}
 
       {/* TAB 11: SETTINGS */}
       {activeTab === 'settings' && (

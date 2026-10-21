@@ -246,5 +246,45 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - `npm run build` — PASS (55 routes compiled with zero errors).
   - Browser Verification: Chromium visual inspection verified consultation submission on `/contact`, client login on `/account/login`, order tracking on `/account`, and address/security management; recording saved (`client_portal_verify_1792580545133.webp`).
-- **Next Dependency-Ready Node:** Node 12 — Payment/Expense Records, Balances & Business Financial Reports.
+- **Next Dependency-Ready Node:** Node 12 — Payment/Expense Records, Balances & Business Financial Reports (Complete).
 - **Future Node Added:** Node 15 — WooCommerce-Style Advanced Product Editor, Media Studio & Variant Matrix (detailed in `docs/NODE-15.md`). Foundational live backend product editing (`/api/products` and modal in `/dashboard?tab=products`) has been successfully wired and verified.
+
+## Node 12 — Payment/Expense Records, Balances & Business Financial Reports
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-21
+- **Deliverables:**
+  - Relational database schema migration (`database/migrations/005_finance_and_reports.sql`): created `customer_payments`, `supplier_disbursements`, `operating_expenses`, and `refund_records`.
+  - Finance domain engine (`src/lib/server/finance.js`):
+    - Strict integer minor currency units (`paise`, INR) across all ledgers.
+    - Customer receipts with partial allocations and balance due calculations (never inferring payment from order status).
+    - Supplier disbursements with advance deposits, progress payments, and PO dues tracking.
+    - Operating overhead expenses with category validation, GST tax component breakdown, and approval status.
+    - Customer return refunds with gateway reversal IDs bounded by paid order balances.
+    - Commercial reconciliation formulas:
+      - `Net Merchandise Revenue` = `Gross Receipts − GST (3%) − Refunds`.
+      - `Allocated COGS` = Dispatched item unit batch acquisition costs (FIFO).
+      - `Gross Merchandise Profit` = `Net Revenue − Allocated COGS`.
+      - `Gross Margin %` = `(Gross Profit / Net Revenue) * 100`.
+      - `Net Operational Trading Surplus` = `Gross Margin − Approved Overheads`.
+      - Explicit disclaimer: Corporate income tax, depreciation, and legal write-offs deferred to statutory corporate tax filings.
+    - Audit-ready CSV reconciliation export for accountants (`GET /api/finance/export`).
+    - Business performance reports (`GET /api/finance/reports`): Sell-Through Rate formula ($\frac{\text{Net Units Sold}}{\text{Opening Stock} + \text{Eligible Receipts}}$), category profit contribution breakdown, and stock ageing valuation buckets.
+  - REST API Routes:
+    - `GET /api/finance/summary`
+    - `GET /api/finance/transactions`
+    - `POST /api/finance/payments/customer`
+    - `POST /api/finance/payments/supplier`
+    - `POST /api/finance/expenses`
+    - `POST /api/finance/refunds`
+    - `GET /api/finance/export`
+    - `GET /api/finance/reports`
+  - Dashboard UI Components (`src/app/dashboard/page.js`):
+    - Tab 9: Modular `FinanceTab` ([`src/components/dashboard/FinanceTab.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/components/dashboard/FinanceTab.js)) with 6 KPI stat cards, reconciliation formula box, 4 sub-ledger tabs, modals for receipts, disbursements, and expenses, and CSV export.
+    - Tab 10: Modular `ReportsTab` ([`src/components/dashboard/ReportsTab.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/components/dashboard/ReportsTab.js)) with 55.8% sell-through rate card, category sales contribution with share bars, and stock ageing valuation table with risk badges.
+- **Validation:**
+  - `npm test` — PASS (416/416 tests passing across all 9 test suites, including 46/46 in `tests/finance.test.mjs`).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - `npm run build` — PASS (53 routes compiled with zero errors).
+  - Browser Verification: Chromium live inspection verified loaded KPI stat cards, reactive sub-ledger tabs, modals, and report tables (`live_finance_tab_1792583661615.png`, `live_reports_tab_1792583693038.png`).
+- **Next Dependency-Ready Node:** Node 13 — Polish, Production Readiness, Security Hardening & Pre-Launch Verification.
+
