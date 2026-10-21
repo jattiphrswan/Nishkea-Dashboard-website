@@ -20,7 +20,7 @@ export default function Header() {
     { label: 'Shop', href: '/shop' },
     { label: 'Collections', href: '/shop?category=necklaces' },
     { label: 'About', href: '/shop#about' },
-    { label: 'Contact', href: '/dashboard/login' }
+    { label: 'Contact', href: '/contact' }
   ];
 
   return (
@@ -56,7 +56,7 @@ export default function Header() {
 
           {/* Right Action Icons: Profile, Wishlist, Cart with Counter */}
           <div className="header-panel-right">
-            <Link href="/dashboard/login" className="header-icon-link" title="Staff & Client Account" aria-label="Account">
+            <Link href="/account" className="header-icon-link" title="My Atelier Account & Orders" aria-label="Account">
               <User size={19} />
             </Link>
 
