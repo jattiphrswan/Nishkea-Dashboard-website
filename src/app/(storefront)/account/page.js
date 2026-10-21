@@ -181,53 +181,119 @@ export default function CustomerDashboardPage() {
         {/* Customer Header Banner */}
         <div
           style={{
-            backgroundColor: '#FFFFFF',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-sm)',
-            padding: '24px 30px',
-            marginBottom: '24px',
+            background: 'radial-gradient(ellipse at 85% 0%, rgba(212, 175, 55, 0.24) 0%, rgba(95, 20, 46, 0.98) 55%, #320713 100%)',
+            color: '#FFFFFF',
+            border: '1px solid rgba(212, 175, 55, 0.4)',
+            borderRadius: '12px',
+            padding: '28px 32px',
+            marginBottom: '26px',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             flexWrap: 'wrap',
-            gap: '16px',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.03)'
+            gap: '18px',
+            boxShadow: '0 16px 36px -10px rgba(50, 7, 19, 0.35)',
+            position: 'relative',
+            overflow: 'hidden'
           }}
         >
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Subtle Ambient Decorative Glow */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              top: '-60px',
+              right: '-60px',
+              width: '260px',
+              height: '260px',
+              background: 'radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, transparent 70%)',
+              pointerEvents: 'none',
+              zIndex: 0
+            }}
+          />
+
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
               <span
                 style={{
                   fontSize: '0.72rem',
-                  letterSpacing: '0.2em',
+                  letterSpacing: '0.22em',
                   textTransform: 'uppercase',
-                  color: 'var(--color-gold)',
-                  fontWeight: 600
+                  color: '#F2D396',
+                  fontWeight: 700
                 }}
               >
-                NISHKÈA ATELIER CLIENT PORTAL
+                NISHKÈA MAISON ATELIER &bull; CLIENT PORTAL
               </span>
-              <span className="badge badge-gold" style={{ fontSize: '0.68rem', padding: '2px 6px' }}>
+              <span
+                style={{
+                  fontSize: '0.68rem',
+                  padding: '2px 8px',
+                  borderRadius: '9999px',
+                  backgroundColor: 'rgba(212, 175, 55, 0.22)',
+                  border: '1px solid #E8CA88',
+                  color: '#FAF0DC',
+                  fontWeight: 700,
+                  letterSpacing: '0.04em'
+                }}
+              >
                 {customer?.segment || 'RETAIL'} VIP
               </span>
             </div>
-            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', margin: '4px 0 2px', color: 'var(--color-burgundy)' }}>
+            <h1
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: '1.85rem',
+                margin: '2px 0 4px',
+                color: '#FFFDF9',
+                background: 'linear-gradient(180deg, #FFFFFF 30%, #F5E6CC 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                filter: 'drop-shadow(0 2px 10px rgba(0, 0, 0, 0.35))'
+              }}
+            >
               Welcome, {customer?.name}
             </h1>
-            <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: 0 }}>
+            <p style={{ fontSize: '0.84rem', color: 'rgba(255, 248, 240, 0.88)', margin: 0, letterSpacing: '0.01em' }}>
               {customer?.email} &bull; {customer?.phone || 'No phone registered'}
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <Link href="/shop" className="btn btn-secondary btn-sm" style={{ fontSize: '0.8rem' }}>
-              Explore Atelier Shop
+          <div style={{ display: 'flex', gap: '10px', position: 'relative', zIndex: 1 }}>
+            <Link
+              href="/shop"
+              style={{
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                padding: '8px 16px',
+                borderRadius: '6px',
+                backgroundColor: '#FAF7F2',
+                color: 'var(--color-burgundy)',
+                border: '1px solid rgba(212, 175, 55, 0.5)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                textDecoration: 'none'
+              }}
+            >
+              Explore Shop
             </Link>
             <button
               type="button"
               onClick={handleLogout}
-              className="btn btn-outline btn-sm"
-              style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                padding: '8px 16px',
+                borderRadius: '6px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                color: '#FFFFFF',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                cursor: 'pointer'
+              }}
             >
               <LogOut size={14} /> Sign Out
             </button>

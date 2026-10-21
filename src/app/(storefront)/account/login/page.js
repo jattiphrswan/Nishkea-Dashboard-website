@@ -89,40 +89,61 @@ export default function CustomerLoginPage() {
   };
 
   return (
-    <div style={{ backgroundColor: 'var(--color-bg)', minHeight: '85vh', padding: '60px 20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div
+      style={{
+        backgroundColor: 'var(--color-bg)',
+        backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(182, 151, 99, 0.08) 0%, transparent 60%)',
+        minHeight: '85vh',
+        padding: 'clamp(40px, 6vw, 80px) 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    >
       <div
         style={{
           backgroundColor: '#FFFFFF',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-sm)',
-          maxWidth: '460px',
+          border: '1px solid rgba(182, 151, 99, 0.35)',
+          borderRadius: '12px',
+          maxWidth: '480px',
           width: '100%',
-          padding: 'clamp(24px, 5vw, 40px)',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.05)'
+          padding: 'clamp(28px, 5vw, 44px)',
+          boxShadow: '0 24px 50px -12px rgba(85, 19, 42, 0.12), 0 4px 16px rgba(0, 0, 0, 0.03)'
         }}
       >
         {/* Brand Header */}
-        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <span
+        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+          <div
             style={{
-              fontSize: '0.74rem',
-              letterSpacing: '0.25em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '0.72rem',
+              letterSpacing: '0.22em',
               textTransform: 'uppercase',
               color: 'var(--color-gold)',
-              fontWeight: 600,
-              display: 'block',
-              marginBottom: '6px'
+              fontWeight: 700,
+              marginBottom: '8px'
             }}
           >
-            NISHKÈA ATELIER CLIENTS
-          </span>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.65rem', margin: 0, fontWeight: 500, color: 'var(--color-burgundy)' }}>
-            {mode === 'login' ? 'Client Sign In' : 'Create Atelier Account'}
+            <Sparkles size={13} />
+            <span>TERONA NISHKÈA MAISON</span>
+          </div>
+          <h1
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: '1.85rem',
+              margin: '0 0 6px',
+              fontWeight: 500,
+              color: 'var(--color-burgundy)'
+            }}
+          >
+            {mode === 'login' ? 'Client Atelier Portal' : 'Create Atelier Account'}
           </h1>
-          <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '6px 0 0' }}>
+          <p style={{ fontSize: '0.86rem', color: 'var(--color-text-muted)', margin: 0, lineHeight: 1.5 }}>
             {mode === 'login'
-              ? 'Access your orders, track shipments, and manage your account.'
-              : 'Join the NISHKÈA client registry for bespoke privileges.'}
+              ? 'Access bespoke orders, track BlueDart shipments, and manage security.'
+              : 'Join the NISHKÈA client registry for exclusive bespoke privileges.'}
           </p>
         </div>
 
@@ -131,61 +152,63 @@ export default function CustomerLoginPage() {
           style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            backgroundColor: '#FAF7F2',
-            border: '1px solid var(--color-border)',
-            borderRadius: '4px',
-            padding: '3px',
-            marginBottom: '20px'
+            backgroundColor: '#F5EFEB',
+            border: '1px solid rgba(182, 151, 99, 0.25)',
+            borderRadius: '8px',
+            padding: '4px',
+            marginBottom: '24px'
           }}
         >
           <button
             type="button"
             onClick={() => { setMode('login'); setError(null); }}
             style={{
-              padding: '8px',
+              padding: '10px',
               border: 'none',
-              borderRadius: '3px',
+              borderRadius: '6px',
               backgroundColor: mode === 'login' ? '#FFFFFF' : 'transparent',
               color: mode === 'login' ? 'var(--color-burgundy)' : 'var(--color-text-muted)',
-              fontWeight: mode === 'login' ? 600 : 500,
-              fontSize: '0.82rem',
+              fontWeight: mode === 'login' ? 700 : 500,
+              fontSize: '0.84rem',
               cursor: 'pointer',
-              boxShadow: mode === 'login' ? '0 1px 3px rgba(0,0,0,0.06)' : 'none'
+              boxShadow: mode === 'login' ? '0 2px 6px rgba(85, 19, 42, 0.08)' : 'none',
+              transition: 'all 0.15s ease'
             }}
           >
-            Sign In
+            Client Sign In
           </button>
           <button
             type="button"
             onClick={() => { setMode('register'); setError(null); }}
             style={{
-              padding: '8px',
+              padding: '10px',
               border: 'none',
-              borderRadius: '3px',
+              borderRadius: '6px',
               backgroundColor: mode === 'register' ? '#FFFFFF' : 'transparent',
               color: mode === 'register' ? 'var(--color-burgundy)' : 'var(--color-text-muted)',
-              fontWeight: mode === 'register' ? 600 : 500,
-              fontSize: '0.82rem',
+              fontWeight: mode === 'register' ? 700 : 500,
+              fontSize: '0.84rem',
               cursor: 'pointer',
-              boxShadow: mode === 'register' ? '0 1px 3px rgba(0,0,0,0.06)' : 'none'
+              boxShadow: mode === 'register' ? '0 2px 6px rgba(85, 19, 42, 0.08)' : 'none',
+              transition: 'all 0.15s ease'
             }}
           >
-            Register
+            Create Account
           </button>
         </div>
 
         {error && (
-          <div style={{ padding: '10px 14px', backgroundColor: '#FEE2E2', color: '#991B1B', borderRadius: '4px', fontSize: '0.84rem', marginBottom: '16px' }}>
+          <div style={{ padding: '12px 14px', backgroundColor: '#FEE2E2', color: '#991B1B', borderRadius: '6px', fontSize: '0.86rem', marginBottom: '18px', border: '1px solid #FCA5A5' }}>
             {error}
           </div>
         )}
 
         {/* LOGIN FORM */}
         {mode === 'login' && (
-          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
-                Email Address
+              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px', color: 'var(--color-text-main)' }}>
+                Client Email Address
               </label>
               <input
                 type="email"
@@ -193,13 +216,29 @@ export default function CustomerLoginPage() {
                 placeholder="aditi.sharma@example.com"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.88rem' }}
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '6px',
+                  fontSize: '0.9rem',
+                  outline: 'none',
+                  backgroundColor: '#FCFCFC'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--color-gold)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(182, 151, 99, 0.15)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'var(--color-border)';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
-                Password
+              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px', color: 'var(--color-text-main)' }}>
+                Account Password
               </label>
               <input
                 type="password"
@@ -207,17 +246,33 @@ export default function CustomerLoginPage() {
                 placeholder="••••••••••••"
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.88rem' }}
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '6px',
+                  fontSize: '0.9rem',
+                  outline: 'none',
+                  backgroundColor: '#FCFCFC'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--color-gold)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(182, 151, 99, 0.15)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'var(--color-border)';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
 
             {/* Demo Credential Quick-Fill */}
             <div
               style={{
-                backgroundColor: '#FAF7F2',
-                border: '1px solid var(--color-border)',
-                borderRadius: '4px',
-                padding: '10px 12px',
+                backgroundColor: '#FAF5EE',
+                border: '1px solid rgba(182, 151, 99, 0.35)',
+                borderRadius: '8px',
+                padding: '12px 14px',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
