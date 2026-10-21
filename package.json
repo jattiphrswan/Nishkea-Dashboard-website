@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "node database/migrate.js",
-    "test": "node tests/permissions.test.mjs && node tests/inventory.test.mjs && node tests/reviews.test.mjs && node tests/storefront.test.mjs && node tests/checkout.test.mjs && node tests/suppliers.test.mjs && node tests/crm.test.mjs && node tests/customer-account.test.mjs",
+    "test": "node tests/permissions.test.mjs && node tests/inventory.test.mjs && node tests/reviews.test.mjs && node tests/storefront.test.mjs && node tests/checkout.test.mjs && node tests/suppliers.test.mjs && node tests/crm.test.mjs && node tests/customer-account.test.mjs && node tests/finance.test.mjs",
     "test:permissions": "node tests/permissions.test.mjs",
     "test:inventory": "node tests/inventory.test.mjs",
     "test:reviews": "node tests/reviews.test.mjs",
@@ -17,7 +17,8 @@
     "test:checkout": "node tests/checkout.test.mjs",
     "test:suppliers": "node tests/suppliers.test.mjs",
     "test:crm": "node tests/crm.test.mjs",
-    "test:customer": "node tests/customer-account.test.mjs"
+    "test:customer": "node tests/customer-account.test.mjs",
+    "test:finance": "node tests/finance.test.mjs"
   },
   "dependencies": {
     "dotenv": "^18.0.8",
