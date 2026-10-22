@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { CATEGORIES, PRODUCTS, HERO_GALLERY } from '../../data/fixtures';
 import ProductCard from '../../components/storefront/ProductCard';
+import EditorialShowcase from '../../components/storefront/EditorialShowcase';
 import PlaceholderImage from '../../components/ui/PlaceholderImage';
 import { ArrowRight, Gem, ShieldCheck, RefreshCw } from 'lucide-react';
 
@@ -75,6 +76,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Luxury Editorial Showcase (Reference Style Bento Grid) */}
+      <EditorialShowcase />
 
       {/* Core Categories with Uploaded Photography */}
       <section style={{ padding: 'var(--space-12) 0 var(--space-8)' }}>

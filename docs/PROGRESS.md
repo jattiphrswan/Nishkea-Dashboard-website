@@ -364,4 +364,21 @@
   - Browser Verification: Chromium visual inspection verified `/api/health` JSON payload and `/dashboard?tab=settings` parameters (`health_api_response_1792670084261.png`, `settings_tab_loaded_1792670129556.png`, `node_15_readiness_verification_1792670070365.webp`).
 - **Next Dependency-Ready Node:** Node 16 (Future Scope) — WooCommerce-Style Advanced Product Editor, Media Studio & Variant Matrix (detailed in `docs/NODE-16.md`).
 
+## Storefront Enhancement — Luxury Festive Editorial Bento Showcase
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-22
+- **Deliverables:**
+  - Designed and implemented a high-impact editorial bento grid showcase ([`src/components/storefront/EditorialShowcase.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/components/storefront/EditorialShowcase.js)) matching high-end CaratLane/Shaya festive campaign visual benchmarks:
+    - **Card 1 (Left Hero Portrait)**: Full-height (~640px) vertical portrait showcasing an Indian model in royal navy blue attire adorned in handcrafted 925 sterling silver and blue sapphire bridal necklace and matching cuffs against a moonlit mountain backdrop (`/images/editorial/bento-silver-campaign.jpg`). Features `SHIKHAR by NISHKÈA` branding, a frosted glass `Crafted in 925 Silver` hallmark badge, a bold `FLAT 40% OFF` festive callout, and an interactive `Explore Silver Edit ↗` CTA pill.
+    - **Card 2 (Top Right Landscape)**: Deep burgundy velvet pedestal showcasing 22K plain gold curb chains and lotus filigree stud earrings (`/images/editorial/bento-gold-curation.jpg`), with `Plain Gold Designs — New & Most-Loved Styles for the Festive Season` and direct link to `/shop?category=earrings`.
+    - **Card 3 (Bottom Right Landscape)**: Rich magenta architectural velvet blocks highlighting sparkling pavé set diamond bangles and open cuffs (`/images/editorial/bento-diamond-trendsetters.jpg`), with `Thursday trendsetters — Pavé set diamonds that sparkle from every angle` and direct link to `/shop?collection=monthly_trend`.
+  - Added pure Vanilla CSS design system tokens and micro-interactions in [`src/app/globals.css`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/app/globals.css):
+    - Smooth hover zoom (`scale(1.036)`), subtle gold hairline borders (`rgba(182, 151, 99, 0.22)`), elevation shadows, and responsive collapsing for mobile viewports (`@media (max-width: 992px)` and `@media (max-width: 580px)`).
+  - Integrated into storefront homepage layout immediately below Trust Values in [`src/app/(storefront)/page.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/app/(storefront)/page.js).
+- **Validation:**
+  - `npm test` — PASS (467/467 tests passing).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - Browser Verification: Chromium visual inspection verified responsive bento layout and hover micro-interactions (`festive_editorial_bento_1792671297331.png`, `hover_left_card_silver_1792671305745.png`, `hover_top_right_card_gold_1792671312828.png`).
+
+
 
