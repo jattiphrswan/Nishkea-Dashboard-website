@@ -380,5 +380,27 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - Browser Verification: Chromium visual inspection verified responsive bento layout and hover micro-interactions (`festive_editorial_bento_1792671297331.png`, `hover_left_card_silver_1792671305745.png`, `hover_top_right_card_gold_1792671312828.png`).
 
+## Storefront Enhancement — Transparent-to-Glass Header & Rubans-Style Category Drawer
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-22
+- **Deliverables:**
+  - **Dynamic Scroll Header with Glassmorphism** ([`src/components/storefront/Header.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/components/storefront/Header.js)):
+    - Transparent top state on homepage (`scrollY <= 25`): Seamlessly overlays the crimson silk hero banner with white atelier typography, official NISHKÈA vector brand mark, and hairline bottom border.
+    - Scrolled luxury glass state (`scrollY > 25` or inner pages): Transitions to a rich translucent burgundy tint (`rgba(35, 7, 16, 0.78)`), high-saturation backdrop blur (`backdrop-filter: blur(20px) saturate(180%)`), warm gold border (`rgba(182, 151, 99, 0.3)`), and soft elevation shadow (`box-shadow: 0 10px 32px rgba(0, 0, 0, 0.28)`).
+    - Integrated a desktop `Categories` menu button with icon micro-interactions alongside the mobile hamburger toggle.
+  - **Rubans-Style Luxury Category Sidebar Navigation Drawer** ([`src/components/storefront/CategoryDrawer.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/components/storefront/CategoryDrawer.js)):
+    - **Header Bar**: Cursive/serif `Nishkèa ATELIER` brand title and an accessible `✕` close button with 90° rotation on hover.
+    - **Segmented Filter Tabs**: `Demi Fine` | `Ethnic` with burgundy bottom active underline indicator.
+    - **Shop By Category List**: 6 curated categories per tab with rounded thumbnail imagery (combos, bracelets, necklaces, earrings, rings, anklets, jhumkas, temple jewelry, naths), style counters (`30 styles`, `190 styles`, etc.), and chevron navigation.
+    - **Discover Section**: 4-column visual grid showcasing curated muse photography for `American Diamond`, `Temple`, `Oxidised`, and `Western` edits.
+    - **Utility Quick Links**: Dedicated direct links for `Store Locator`, `Track Package`, `Contact Us`, `Return & Exchange Policy`, and `Atelier Operations Dashboard`.
+    - Slide-in smooth transition (`transform: translateX(-100%)` to `translateX(0)`), background scroll-lock, backdrop blur (`backdrop-filter: blur(6px)`), and `Escape` keyboard dismissal.
+  - Pure Vanilla CSS tokens and keyframe animations in [`src/app/globals.css`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/app/globals.css).
+- **Validation:**
+  - `npm test` — PASS (467/467 tests passing).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - Browser Verification: Chromium visual inspection verified transparent header floating over hero (`header_scroll_0_1792672064050.png`), scrolled glassmorphic state (`header_scroll_200_1792672070198.png`), open drawer with Demi Fine categories (`category_drawer_open_1792672096808.png`), Ethnic tab switch (`category_drawer_ethnic_1792672113062.png`), and clean dismissal (`drawer_dismissed_1792672130853.png`).
+
+
 
 

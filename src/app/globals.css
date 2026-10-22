@@ -658,14 +658,57 @@ button, input, select, textarea {
 
 /* Screenshot Reference Luxury Atelier Header */
 .site-header {
-  background-color: rgba(43, 6, 13, 0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 120;
   color: #FFFFFF;
+  transition: background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              backdrop-filter 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              -webkit-backdrop-filter 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Initially Transparent at top of homepage */
+.site-header.header-transparent {
+  background-color: transparent;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+/* Scrolled Luxury Frosted Glass */
+.site-header.header-scrolled-glass {
+  background-color: rgba(35, 7, 16, 0.78);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(182, 151, 99, 0.3);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.28);
+}
+
+.header-menu-trigger {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: var(--radius-sm);
+  color: #FFFFFF;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.header-menu-trigger:hover {
+  background: var(--color-burgundy);
+  border-color: var(--color-gold);
+  color: #FFFFFF;
+  transform: translateY(-1px);
 }
 
 .header-grid-layout {
@@ -788,6 +831,8 @@ button, input, select, textarea {
   display: flex;
   align-items: center;
   overflow: hidden;
+  margin-top: -64px;
+  padding-top: 64px;
 }
 
 @media (min-width: 992px) {
@@ -1948,5 +1993,319 @@ button, input, select, textarea {
     padding: 20px;
   }
 }
+
+/* ==========================================================================
+   RUBANS-STYLE LUXURY SIDEBAR CATEGORY DRAWER
+   ========================================================================== */
+.cat-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(18, 9, 14, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 250;
+  animation: fadeIn 220ms ease;
+  display: flex;
+}
+
+.cat-drawer-panel {
+  background: #FFFFFF;
+  width: 100%;
+  max-width: 440px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 8px 0 40px rgba(0, 0, 0, 0.28);
+  animation: slideInLeft 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  border-right: 1px solid var(--color-border);
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.cat-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: #FFFFFF;
+}
+
+.cat-drawer-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.cat-brand-script {
+  font-family: var(--font-serif);
+  font-size: 1.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-burgundy);
+  line-height: 1;
+}
+
+.cat-brand-sub {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  color: var(--color-gold);
+  font-weight: 700;
+}
+
+.cat-drawer-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  transition: all var(--transition-fast);
+}
+
+.cat-drawer-close-btn:hover {
+  background: var(--color-burgundy-light);
+  color: var(--color-burgundy);
+  transform: rotate(90deg);
+}
+
+/* Segmented Category Filter Tabs (Demi Fine | Ethnic) */
+.cat-drawer-tabs {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  background: #FFFFFF;
+}
+
+.cat-drawer-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 14px 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  position: relative;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.cat-drawer-tab.active {
+  color: var(--color-burgundy);
+  font-weight: 600;
+}
+
+.cat-drawer-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 20%;
+  right: 20%;
+  height: 2.5px;
+  background: var(--color-burgundy);
+  border-radius: 2px 2px 0 0;
+}
+
+.cat-tab-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--color-border);
+}
+
+/* Scrollable Drawer Content */
+.cat-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 32px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cat-drawer-section {
+  margin-bottom: 24px;
+}
+
+.cat-section-title {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  letter-spacing: -0.01em;
+  margin-bottom: 14px;
+}
+
+.cat-category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cat-category-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--color-text-main);
+  transition: all var(--transition-fast);
+}
+
+.cat-category-row:hover {
+  background: var(--color-burgundy-light);
+  transform: translateX(3px);
+}
+
+.cat-category-thumb {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #F4EBEF;
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.cat-category-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cat-category-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  line-height: 1.25;
+}
+
+.cat-category-styles {
+  font-size: 0.74rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.cat-chevron-icon {
+  color: #9C8F96;
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.cat-category-row:hover .cat-chevron-icon {
+  transform: translateX(3px);
+  color: var(--color-burgundy);
+}
+
+/* Discover Section */
+.cat-discover-section {
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.cat-discover-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.cat-discover-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  text-align: center;
+  transition: transform var(--transition-fast);
+}
+
+.cat-discover-card:hover {
+  transform: translateY(-2px);
+}
+
+.cat-discover-media {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #F4EBEF;
+  border: 1px solid var(--color-border);
+  margin-bottom: 6px;
+}
+
+.cat-discover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.cat-discover-card:hover .cat-discover-img {
+  transform: scale(1.08);
+}
+
+.cat-discover-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  line-height: 1.2;
+}
+
+/* Utility Links Footer */
+.cat-utility-section {
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cat-utility-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--color-text-main);
+  text-decoration: none;
+  padding: 6px 4px;
+  border-radius: var(--radius-xs);
+  transition: color var(--transition-fast);
+}
+
+.cat-utility-link:hover {
+  color: var(--color-burgundy);
+}
+
+.cat-util-icon {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.cat-utility-link:hover .cat-util-icon {
+  color: var(--color-burgundy);
+}
+
+.cat-util-staff {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--color-border);
+  font-size: 0.82rem;
+  color: var(--color-gold-hover);
+}
+
 
 
