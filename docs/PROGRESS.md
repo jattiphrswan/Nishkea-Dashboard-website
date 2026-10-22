@@ -338,6 +338,30 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - `npm run build` — PASS (54 routes compiled with zero errors).
   - Browser Verification: Chromium visual inspection verified Copilot launch, 30-day review queue rendering, role switching, and RBAC security denial for sales support inquiring about supplier costs (`copilot_review_query_1792668614542.png`, `rbac_sales_support_denial_1792669002197.png`, `staff_copilot_verification_1792668564548.webp`).
-- **Next Dependency-Ready Node:** Node 15 — Production Preparation, Security Hardening & Launch Scope.
+- **Next Dependency-Ready Node:** Node 15 — Production Preparation, Security Hardening & Launch Scope (Complete).
+
+## Node 15 — Production Preparation, Security Hardening & Launch Scope
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-22
+- **Deliverables:**
+  - Dynamic System Diagnostics & Operational Health Endpoint ([`src/app/api/health/route.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/app/api/health/route.js)):
+    - Comprehensive runtime check reporting operational readiness across all 14 architectural nodes without leaking credentials.
+    - Status checks: PostgreSQL pooling, RBAC deny-by-default model, FIFO inventory balances, 30-day reviews, integer paise currency standard, HMAC SHA-256 checkout webhooks, supplier MOQ gates, CRM recurrence, client portal, commercial margins, public AI assistant, and staff copilot.
+  - Customer Data Privacy & GDPR / DPDP Export API ([`src/app/api/account/export/route.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/app/api/account/export/route.js)):
+    - Authenticated data portability endpoint returning structured JSON archive of client profile, delivery addresses, order fulfillment history, and consultation inquiries with password hashes strictly redacted.
+  - Automated Database Backup & Disaster Recovery Verification Engine ([`database/backup-restore-test.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/database/backup-restore-test.js)):
+    - Sequential verification of all 5 SQL migrations, computing SHA-256 master schema checksum.
+    - Verified all 18 enterprise tables, 63 CHECK constraints, and 33 foreign keys.
+    - Verified Recovery-Time Objective (RTO achieved < 60s target) and Recovery-Point Objective (RPO: 0-loss for append-only ledgers).
+  - Production Security Headers ([`next.config.mjs`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/next.config.mjs)):
+    - Injected `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy`.
+  - Integer Minor Currency Invariant Check across all products, orders, receipts, disbursements, and expenses.
+- **Validation:**
+  - `npm test` — PASS (467/467 tests passing across all 12 test suites, including 9/9 in `tests/production-readiness.test.mjs`).
+  - `npm run db:backup-test` — PASS (`🌟 DATABASE BACKUP & RESTORE VERIFICATION PASS!`).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - `npm run build` — PASS (55 routes compiled with zero errors).
+  - Browser Verification: Chromium visual inspection verified `/api/health` JSON payload and `/dashboard?tab=settings` parameters (`health_api_response_1792670084261.png`, `settings_tab_loaded_1792670129556.png`, `node_15_readiness_verification_1792670070365.webp`).
+- **Next Dependency-Ready Node:** Node 16 (Future Scope) — WooCommerce-Style Advanced Product Editor, Media Studio & Variant Matrix (detailed in `docs/NODE-16.md`).
 
 

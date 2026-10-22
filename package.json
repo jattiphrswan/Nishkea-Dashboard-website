@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "node database/migrate.js",
-    "test": "node tests/permissions.test.mjs && node tests/inventory.test.mjs && node tests/reviews.test.mjs && node tests/storefront.test.mjs && node tests/checkout.test.mjs && node tests/suppliers.test.mjs && node tests/crm.test.mjs && node tests/customer-account.test.mjs && node tests/finance.test.mjs && node tests/ai-assistant.test.mjs && node tests/staff-assistant.test.mjs",
+    "db:backup-test": "node database/backup-restore-test.js",
+    "test": "node tests/permissions.test.mjs && node tests/inventory.test.mjs && node tests/reviews.test.mjs && node tests/storefront.test.mjs && node tests/checkout.test.mjs && node tests/suppliers.test.mjs && node tests/crm.test.mjs && node tests/customer-account.test.mjs && node tests/finance.test.mjs && node tests/ai-assistant.test.mjs && node tests/staff-assistant.test.mjs && node tests/production-readiness.test.mjs",
     "test:permissions": "node tests/permissions.test.mjs",
     "test:inventory": "node tests/inventory.test.mjs",
     "test:reviews": "node tests/reviews.test.mjs",
@@ -20,7 +21,8 @@
     "test:customer": "node tests/customer-account.test.mjs",
     "test:finance": "node tests/finance.test.mjs",
     "test:ai": "node tests/ai-assistant.test.mjs",
-    "test:staff-ai": "node tests/staff-assistant.test.mjs"
+    "test:staff-ai": "node tests/staff-assistant.test.mjs",
+    "test:readiness": "node tests/production-readiness.test.mjs"
   },
   "dependencies": {
     "dotenv": "^18.0.8",

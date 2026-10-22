@@ -372,3 +372,64 @@ export async function submitContactInquiry({
 
   return { success: true, inquiry };
 }
+
+/**
+ * GDPR / Privacy Customer Data Export — Node 15
+ * Redacts password hashes and internal tokens, returning comprehensive client record
+ */
+export async function exportCustomerData(customerId) {
+  const customer = memoryCustomerAccounts.find((c) => c.id === customerId);
+  if (!customer) throw new Error('Customer account not found.');
+
+  const orders = memoryOrders
+    .filter((o) => o.customerEmail?.toLowerCase() === customer.email.toLowerCase())
+    .map((o) => ({
+      orderNumber: o.orderNumber,
+      paymentStatus: o.paymentStatus,
+      fulfillmentStatus: o.fulfillmentStatus,
+      totalAmountMinor: o.totalAmountMinor,
+      currency: o.currency || 'INR',
+      items: o.items?.map((it) => ({
+        sku: it.sku,
+        name: it.name,
+        quantity: it.quantity,
+        priceMinor: it.priceMinor
+      })),
+      shippingAddress: o.shippingAddress,
+      dispatchTracking: o.dispatchTracking,
+      createdAt: o.createdAt
+    }));
+
+  const inquiries = memoryContactInquiries
+    .filter((i) => i.email?.toLowerCase() === customer.email.toLowerCase())
+    .map((i) => ({
+      inquiryType: i.inquiryType,
+      preferredLocation: i.preferredLocation,
+      message: i.message,
+      createdAt: i.createdAt
+    }));
+
+  return {
+    exportDate: new Date().toISOString(),
+    retrievalStandard: 'GDPR / India Digital Personal Data Protection (DPDP) Standard',
+    customer: {
+      id: customer.id,
+      name: customer.name,
+      email: customer.email,
+      phone: customer.phone,
+      segment: customer.segment,
+      deliveryAddress: customer.address,
+      createdAt: customer.createdAt,
+      updatedAt: customer.updatedAt
+    },
+    orders: {
+      count: orders.length,
+      history: orders
+    },
+    consultationInquiries: {
+      count: inquiries.length,
+      history: inquiries
+    },
+    privacyNotice: 'NISHKÈA Maison stores personal data strictly for order fulfillment, courier transit insurance, and bespoke private salon appointments. Financial card details are never stored locally.'
+  };
+}
