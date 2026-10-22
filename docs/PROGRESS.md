@@ -315,6 +315,29 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - `npm run build` — PASS (53 routes compiled with zero errors).
   - Browser Verification: Chromium live inspection verified widget launch, budget product discovery, size availability resolution, and prompt injection refusal (`concierge_opened_1792584653867.png`, `concierge_search_result_1792584668396.png`, `concierge_security_guardrail_1792584713528.png`).
-- **Next Dependency-Ready Node:** Node 14 / Node 15 — Production Preparation, Security Hardening & Launch Scope.
+- **Next Dependency-Ready Node:** Node 14 — Permission-Scoped Staff Assistant & Backoffice Operations Copilot (Complete).
+
+## Node 14 — Permission-Scoped Staff Assistant & Backoffice Operations Copilot
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-22
+- **Deliverables:**
+  - Staff Assistant domain service ([`src/lib/server/staff-assistant.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/lib/server/staff-assistant.js)):
+    - Role-Based Access Control (RBAC) scoping for Owner, Manager, Inventory Specialist, Sales Support, and Accounts roles.
+    - Allowlisted read tools: 30-day collection review queue evaluation, live physical vault stock summary, commercial finance and margins statement, role-scoped CRM leads and team tasks, and order fulfillment tracking.
+    - Proprietary supplier acquisition cost & margin isolation: strictly denies access to `sales_support` and `inventory_staff` with audit logging; allows access to `manager`, `owner`, and `accounts_staff`.
+    - Mutation prohibition gate: rejects natural language state changes (stock adjustments, refunds, purchase orders, price edits) and directs staff to authorized transactional backoffice forms.
+    - Security guardrails defending against prompt injections, with 500-char input bounding and sliding-window staff rate limiting (60 requests/min).
+  - API Boundary ([`src/app/api/dashboard/assistant/route.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/app/api/dashboard/assistant/route.js)):
+    - Server-side staff authentication check returning HTTP 401 Unauthorized for unauthenticated queries.
+  - Interactive Dashboard Operations Copilot ([`src/components/dashboard/StaffAssistantDrawer.js`](file:///c:/Users/SkyFish/OneDrive/project/nishkea/src/components/dashboard/StaffAssistantDrawer.js)):
+    - Drawer widget wired into `src/app/dashboard/page.js` with header button and bottom-right floating trigger.
+    - Role switcher dropdown for testing distinct staff personas (Owner, Manager, Sales Support, Inventory Specialist, Accounts).
+    - Response cards with security guardrail alerts and direct navigation links to relevant dashboard workspaces (`?tab=reviews`, `?tab=inventory`, `?tab=finance`, `?tab=orders`, `?tab=tasks`).
+- **Validation:**
+  - `npm test` — PASS (458/458 tests passing across all 11 test suites, including 20/20 in `tests/staff-assistant.test.mjs`).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - `npm run build` — PASS (54 routes compiled with zero errors).
+  - Browser Verification: Chromium visual inspection verified Copilot launch, 30-day review queue rendering, role switching, and RBAC security denial for sales support inquiring about supplier costs (`copilot_review_query_1792668614542.png`, `rbac_sales_support_denial_1792669002197.png`, `staff_copilot_verification_1792668564548.webp`).
+- **Next Dependency-Ready Node:** Node 15 — Production Preparation, Security Hardening & Launch Scope.
 
 

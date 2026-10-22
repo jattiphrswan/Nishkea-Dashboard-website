@@ -37,17 +37,20 @@ import {
   Upload,
   Image as ImageIcon,
   Trash2,
-  Star
+  Star,
+  Sparkles
 } from 'lucide-react';
 import CrmTab from '../../components/dashboard/CrmTab';
 import TasksTab from '../../components/dashboard/TasksTab';
 import FinanceTab from '../../components/dashboard/FinanceTab';
 import ReportsTab from '../../components/dashboard/ReportsTab';
+import StaffAssistantDrawer from '../../components/dashboard/StaffAssistantDrawer';
 
 function DashboardContent() {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'overview';
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [staffCopilotOpen, setStaffCopilotOpen] = useState(false);
   const [actionNotice, setActionNotice] = useState(null);
   const [receiptModal, setReceiptModal] = useState(false);
   const [receiptForm, setReceiptForm] = useState({
@@ -655,6 +658,26 @@ function DashboardContent() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            type="button"
+            onClick={() => setStaffCopilotOpen(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: '#1E0D14',
+              border: '1px solid #D4AF37',
+              color: '#D4AF37',
+              fontWeight: 600,
+              fontSize: '0.78rem',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+            }}
+          >
+            <Sparkles size={14} /> Operations Copilot
+          </button>
           <span className="badge badge-demo">Demo Dataset Active</span>
           <span className="badge badge-burgundy">Provisional Currency: INR (₹)</span>
         </div>
@@ -678,7 +701,7 @@ function DashboardContent() {
       >
         <ShieldAlert size={20} style={{ flexShrink: 0 }} />
         <div>
-          <strong>Node 9 Connected Engine:</strong> Staff authentication, RBAC authorization, transactional inventory ledger (FIFO goods receipts &amp; signed movements), 30-day collection lifecycle reviews, checkout orders &amp; courier dispatch, and artisan supplier directory with multi-tier PO approvals, FIFO goods receipts, and bounded vendor returns are actively connected to live API handlers.
+          <strong>Node 14 Connected Operations:</strong> Staff authentication, RBAC authorization, permission-scoped Operations Copilot with strict cost/margin isolation, transactional inventory ledger (FIFO goods receipts &amp; signed movements), 30-day collection reviews, checkout orders &amp; courier dispatch, artisan supplier directory with multi-tier PO approvals, CRM sales pipeline, and commercial financial reconciliations are actively connected.
         </div>
       </div>
 
@@ -3908,6 +3931,40 @@ function DashboardContent() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Node 14: Atelier Operations Copilot Drawer & Floating Trigger */}
+      <StaffAssistantDrawer
+        isOpen={staffCopilotOpen}
+        onClose={() => setStaffCopilotOpen(false)}
+      />
+
+      {!staffCopilotOpen && (
+        <button
+          type="button"
+          onClick={() => setStaffCopilotOpen(true)}
+          aria-label="Open Operations Copilot"
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            backgroundColor: '#1E0D14',
+            border: '1px solid #D4AF37',
+            color: '#D4AF37',
+            borderRadius: '50px',
+            padding: '10px 18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '0.84rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+            zIndex: 9999
+          }}
+        >
+          <Sparkles size={16} /> Operations Copilot
+        </button>
       )}
     </div>
   );
