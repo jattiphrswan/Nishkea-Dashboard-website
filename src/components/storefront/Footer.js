@@ -24,12 +24,14 @@ export default function Footer() {
           {/* Brand Col */}
           <div className="footer-col">
             <Link href="/" aria-label="NISHKÈA Home" style={{ display: 'inline-block', marginBottom: '18px' }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/brand/logo-white.png"
-                alt="NISHKÈA — IT SUITS YOU !"
-                style={{ height: '42px', width: 'auto', display: 'block', objectFit: 'contain' }}
-              />
+              <span className="footer-brand-badge">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/brand/logo.png"
+                  alt="NISHKÈA — IT SUITS YOU !"
+                  className="footer-brand-img"
+                />
+              </span>
             </Link>
             <p style={{ fontSize: '0.86rem', color: '#B8ACB2', maxWidth: '340px', marginBottom: '24px' }}>
               Handcrafted fashion jewellery and refined accessories. Designed with classic artisanal silhouettes for modern styling.

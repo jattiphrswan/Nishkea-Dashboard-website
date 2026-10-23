@@ -158,7 +158,7 @@ export default function CategoryDrawer({ isOpen, onClose }) {
             <img
               src="/images/brand/logo.png"
               alt="NISHKÈA — IT SUITS YOU !"
-              style={{ height: '32px', width: 'auto', display: 'block', objectFit: 'contain' }}
+              style={{ height: '42px', width: 'auto', display: 'block', objectFit: 'contain' }}
             />
           </Link>
           <button

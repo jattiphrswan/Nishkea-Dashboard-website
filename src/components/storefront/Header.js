@@ -72,17 +72,17 @@ export default function Header() {
               ))}
             </nav>
 
-            {/* Brand Logo (Official NISHKÈA Logo) */}
+            {/* Brand Logo (Official NISHKÈA Logo in Authentic Brand Colors) */}
             <div className="header-panel-center">
-              <Link href="/" aria-label="NISHKÈA Home" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Link href="/" aria-label="NISHKÈA Home" className="header-brand-link">
+                <span className="header-brand-badge">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/images/brand/logo-white.png"
+                    src="/images/brand/logo.png"
                     alt="NISHKÈA — IT SUITS YOU !"
-                    style={{ height: '38px', width: 'auto', display: 'block', objectFit: 'contain' }}
+                    className="header-brand-img"
                   />
-                </div>
+                </span>
               </Link>
             </div>
 
