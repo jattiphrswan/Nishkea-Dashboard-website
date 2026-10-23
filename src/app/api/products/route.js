@@ -8,8 +8,9 @@ export async function GET(request) {
     const category = searchParams.get('category') || undefined;
     const search = searchParams.get('search') || undefined;
     const lifecycle = searchParams.get('lifecycle') || undefined;
+    const publishState = searchParams.get('publishState') || undefined;
 
-    const products = getProductsList({ category, search, lifecycle });
+    const products = getProductsList({ category, search, lifecycle, publishState });
     return NextResponse.json({ success: true, products, count: products.length });
   } catch (err) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

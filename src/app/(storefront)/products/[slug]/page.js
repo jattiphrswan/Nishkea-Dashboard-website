@@ -27,7 +27,8 @@ export default function ProductDetailPage({ params }) {
   const resolvedParams = use(params);
   const slug = resolvedParams?.slug;
 
-  const product = PRODUCTS.find((p) => p.slug === slug);
+  const initialProduct = PRODUCTS.find((p) => p.slug === slug);
+  const [product, setProduct] = useState(initialProduct || null);
   const { addToCart, toggleWishlist, isInWishlist } = useStore();
 
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
@@ -36,6 +37,19 @@ export default function ProductDetailPage({ params }) {
   const [addedFeedback, setAddedFeedback] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [activeAccordion, setActiveAccordion] = useState('materials');
+
+  // Node 16: Immediate live update sync without server restart
+  React.useEffect(() => {
+    if (!slug) return;
+    fetch(`/api/products/${slug}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.product) {
+          setProduct(d.product);
+        }
+      })
+      .catch(() => {});
+  }, [slug]);
 
   if (!product) {
     return (
@@ -51,13 +65,14 @@ export default function ProductDetailPage({ params }) {
     );
   }
 
-  const currentVariant = product.variants[selectedVariantIndex] || product.variants[0];
+  const currentVariant = product.variants?.[selectedVariantIndex] || product.variants?.[0] || { sku: product.code, sellable: 0, reserved: 0 };
   const isWishlisted = isInWishlist(product.id);
   const relatedProducts = PRODUCTS.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 3);
-  const activeImage = product.images[selectedImageIndex] || product.images[0];
+  const activeImage = Array.isArray(product.images) && product.images[selectedImageIndex] ? product.images[selectedImageIndex] : (product.images?.[0] || product.featuredImage || '/images/prodcuts/aurelia-1.png');
 
-  const availableUnits = computeAvailableStock(currentVariant.sellable, currentVariant.reserved);
+  const availableUnits = computeAvailableStock(currentVariant.sellable || 0, currentVariant.reserved || 0);
   const isOutOfStock = availableUnits <= 0;
+  const maxBuyableUnits = product.soldIndividually ? 1 : Math.min(10, Math.max(1, availableUnits));
 
   const handleAddToCart = () => {
     if (isOutOfStock) return;
@@ -353,14 +368,20 @@ export default function ProductDetailPage({ params }) {
                 <button
                   type="button"
                   id="btn-qty-plus"
-                  disabled={isOutOfStock || quantity >= Math.min(10, availableUnits)}
-                  onClick={() => setQuantity((q) => Math.min(Math.min(10, availableUnits), q + 1))}
-                  style={{ width: '38px', height: '44px', border: 'none', background: 'none', cursor: isOutOfStock ? 'not-allowed' : 'pointer', fontSize: '1rem' }}
+                  disabled={isOutOfStock || quantity >= maxBuyableUnits}
+                  onClick={() => setQuantity((q) => Math.min(maxBuyableUnits, q + 1))}
+                  style={{ width: '38px', height: '44px', border: 'none', background: 'none', cursor: (isOutOfStock || quantity >= maxBuyableUnits) ? 'not-allowed' : 'pointer', fontSize: '1rem' }}
                   aria-label="Increase quantity"
                 >
                   +
                 </button>
               </div>
+
+              {product.soldIndividually && (
+                <span style={{ fontSize: '0.74rem', color: 'var(--color-gold)', fontWeight: 600 }}>
+                  Limited to 1 unit per client order
+                </span>
+              )}
 
               {/* Add to Bag Button */}
               <button

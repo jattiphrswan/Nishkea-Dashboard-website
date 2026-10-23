@@ -419,10 +419,23 @@ function AllProductsContent() {
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [sortBy, setSortBy] = useState(initialSort);
   const [viewMode, setViewMode] = useState(initialView);
+  const [liveProducts, setLiveProducts] = useState(PRODUCTS.filter((p) => p.publishState !== 'draft' && p.lifecycle !== 'archived'));
 
   // Modals state
   const [lightboxState, setLightboxState] = useState({ isOpen: false, product: null, imageIndex: 0 });
   const [quickViewProduct, setQuickViewProduct] = useState(null);
+
+  // Node 16: Immediate live catalogue sync without server restart
+  useEffect(() => {
+    fetch('/api/products')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.products) {
+          setLiveProducts(d.products.filter((p) => p.publishState !== 'draft' && p.lifecycle !== 'archived'));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Sync state if URL searchParams change
   useEffect(() => {
@@ -498,7 +511,7 @@ function AllProductsContent() {
 
   // Filter & sort catalogue items
   const filteredProducts = useMemo(() => {
-    let result = [...PRODUCTS];
+    let result = [...liveProducts];
 
     if (selectedCategory !== 'all') {
       result = result.filter((p) => p.category === selectedCategory);
@@ -545,7 +558,7 @@ function AllProductsContent() {
     }
 
     return result;
-  }, [selectedCategory, selectedCollection, selectedPrice, searchQuery, sortBy]);
+  }, [selectedCategory, selectedCollection, selectedPrice, searchQuery, sortBy, liveProducts]);
 
   const activeFiltersCount =
     (selectedCategory !== 'all' ? 1 : 0) +

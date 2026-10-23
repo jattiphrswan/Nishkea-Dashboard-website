@@ -401,6 +401,30 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - Browser Verification: Chromium visual inspection verified transparent header floating over hero (`header_scroll_0_1792672064050.png`), scrolled glassmorphic state (`header_scroll_200_1792672070198.png`), open drawer with Demi Fine categories (`category_drawer_open_1792672096808.png`), Ethnic tab switch (`category_drawer_ethnic_1792672113062.png`), and clean dismissal (`drawer_dismissed_1792672130853.png`).
 
-
-
-
+## Node 16 — WooCommerce-Style Advanced Product Editor, Media Studio & Variant Matrix
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-23
+- **Deliverables:**
+  - **WooCommerce Product Architecture Engine** ([`src/lib/server/products.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/lib/server/products.js)):
+    - Integrated multi-tab product schema: `productType` (`simple`, `variable`, `grouped`, `bundle`), `taxStatus` & `taxClass` (3% Precious Jewelry GST), `salePriceMinor` with calendar date scheduling (`saleStartDate`, `saleEndDate`), inventory safeguards (`lowStockThreshold`, `soldIndividually`), shipping & dimensions (`weightGrams`, `dimensionsMm`), materials & certification badges (`metalPurity`, `hallmarked`, `careInstructions`), linked products (`upsellIds` "Complete the Look", `crossSellIds`), and non-destructive soft-archive lifecycle (`lifecycle: 'archived'`, `publishState: 'draft'`).
+    - Automated Variation Matrix Generator (`generateVariantMatrix`): Combinatorial matrix across finishes (e.g. 18K Yellow Gold Vermeil, Rhodium Silver, Rose Gold) and sizes with automatic SKU generation, delta pricing, and stock controls.
+    - Duplicate & empty SKU protection (`validateVariants`).
+    - Full audit logging integration (`PRODUCT_CREATED`, `PRODUCT_UPDATED`, `PRODUCT_ARCHIVED`) via `logAuditEvent`.
+  - **CRUD & Lifecycle API Endpoints**:
+    - [`src/app/api/products/[id]/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/products/%5Bid%5D/route.js): Added `DELETE` route for soft-archiving with audit logging.
+    - [`src/app/api/products/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/products/route.js): Added `publishState` query filtering to support active vs. draft/archived views.
+  - **9-Subtab WooCommerce Editor in Backoffice Dashboard** ([`src/app/dashboard/page.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/dashboard/page.js)):
+    - Tab 2 (Products): Added direct "Archive" action button and active festival sale price badges.
+    - Modal Editor Subtabs: `General & Story`, `Media & Gallery`, `Pricing & Tax`, `Inventory & SKU`, `Shipping & Dimensions`, `Materials & Care`, `Variations Matrix`, `Linked Products`, `Publishing Status`.
+    - Variant Builder: Live variant SKU editor, delta price adjustments, stock counters, variant removal, and one-click "⚡ Auto-Generate Tri-Finish Matrix".
+    - Linked Products: Upsell ("Complete the Look") and Cross-sell checkbox selectors.
+    - Safe archiving: Soft-delete button in modal footer with confirmation dialog.
+  - **Storefront Live Sync Integration**:
+    - [`src/app/(storefront)/products/[slug]/page.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/%28storefront%29/products/%5Bslug%5D/page.js): Dynamically fetches from `/api/products/${slug}` on mount; respects `soldIndividually` maximum quantity cap; renders festival sale pricing.
+    - [`src/app/(storefront)/shop/page.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/%28storefront%29/shop/page.js) & [`src/app/(storefront)/products/page.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/%28storefront%29/products/page.js): Dynamic client synchronization against live product catalog on mount.
+  - **Automated Test Suite** ([`tests/products.test.mjs`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/tests/products.test.mjs)):
+    - 18 comprehensive unit tests covering CRUD, audit trail logging, duplicate SKU rejection, variation matrix generation, sale date constraints, minor currency integer enforcement, and soft-delete archive preservation.
+- **Validation:**
+  - `npm test` — PASS (485/485 tests passing across all 13 suites).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - `npm run build` — PASS (all 55 static & dynamic routes compiled in 11.1s).

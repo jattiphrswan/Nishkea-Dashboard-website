@@ -22,6 +22,19 @@ function ShopContent() {
   const [selectedPrice, setSelectedPrice] = useState(initialPrice);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [sortBy, setSortBy] = useState(initialSort);
+  const [liveProducts, setLiveProducts] = useState(PRODUCTS.filter((p) => p.publishState !== 'draft' && p.lifecycle !== 'archived'));
+
+  // Node 16: Immediate live catalogue sync without server restart
+  useEffect(() => {
+    fetch('/api/products')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.products) {
+          setLiveProducts(d.products.filter((p) => p.publishState !== 'draft' && p.lifecycle !== 'archived'));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Sync state if URL searchParams change externally (e.g. back button or header link)
   useEffect(() => {
@@ -87,7 +100,7 @@ function ShopContent() {
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
-    let result = [...PRODUCTS];
+    let result = [...liveProducts];
 
     // 1. Category filter
     if (selectedCategory !== 'all') {
@@ -142,7 +155,7 @@ function ShopContent() {
     }
 
     return result;
-  }, [selectedCategory, selectedCollection, selectedPrice, searchQuery, sortBy]);
+  }, [selectedCategory, selectedCollection, selectedPrice, searchQuery, sortBy, liveProducts]);
 
   const activeFilterCount =
     (selectedCategory !== 'all' ? 1 : 0) +

@@ -520,13 +520,24 @@ function DashboardContent() {
     }
   };
 
-  const openProductEditor = (prod) => {
-    setEditingProduct(prod);
+  const openProductEditor = (prod, isNew = false) => {
+    setEditingProduct({ ...prod, isNew });
     setEditFormData({
       ...prod,
+      isNew,
+      productType: prod.productType || 'variable',
       priceRupees: prod.priceMinor ? (prod.priceMinor / 100).toFixed(0) : '1999',
       salePriceRupees: prod.salePriceMinor ? (prod.salePriceMinor / 100).toFixed(0) : '',
-      stockStatus: prod.lifecycle === 'archived' ? 'OUT_OF_STOCK' : 'IN_STOCK'
+      saleStartDate: prod.saleStartDate || '',
+      saleEndDate: prod.saleEndDate || '',
+      taxClass: prod.taxClass || 'jewellery_gst_3',
+      hsnCode: prod.hsnCode || '7113',
+      stockStatus: prod.lifecycle === 'archived' ? 'OUT_OF_STOCK' : (prod.stockStatus || 'IN_STOCK'),
+      lowStockThreshold: prod.lowStockThreshold !== undefined ? prod.lowStockThreshold : 5,
+      soldIndividually: Boolean(prod.soldIndividually),
+      upsellIds: Array.isArray(prod.upsellIds) ? [...prod.upsellIds] : [],
+      crossSellIds: Array.isArray(prod.crossSellIds) ? [...prod.crossSellIds] : [],
+      variants: Array.isArray(prod.variants) ? JSON.parse(JSON.stringify(prod.variants)) : []
     });
     setEditActiveSubTab('general');
     setEditFeedback(null);
@@ -585,6 +596,25 @@ function DashboardContent() {
     setEditFormData((prev) => ({ ...prev, images: currentImages }));
   };
 
+  const handleArchiveProduct = async (idOrSlug) => {
+    if (!window.confirm(`Are you sure you want to soft-archive design '${idOrSlug}'? It will be unpublished while preserving historical order integrity.`)) {
+      return;
+    }
+    setEditLoading(true);
+    setEditFeedback(null);
+    try {
+      const res = await fetch(`/api/products/${idOrSlug}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to archive product');
+      await loadLiveProducts();
+      setEditingProduct(null);
+    } catch (err) {
+      alert(`Archive Error: ${err.message}`);
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   const handleSaveProductEdit = async (e) => {
     e.preventDefault();
     if (!editingProduct) return;
@@ -593,7 +623,11 @@ function DashboardContent() {
     try {
       const pricePaise = editFormData.priceRupees
         ? Math.round(parseFloat(editFormData.priceRupees) * 100)
-        : editingProduct.priceMinor;
+        : (editingProduct.priceMinor || 199900);
+
+      const salePricePaise = editFormData.salePriceRupees && editFormData.salePriceRupees.trim() !== ''
+        ? Math.round(parseFloat(editFormData.salePriceRupees) * 100)
+        : null;
 
       const payload = {
         name: editFormData.name,
@@ -602,21 +636,36 @@ function DashboardContent() {
         categoryName: editFormData.categoryName,
         collectionType: editFormData.collectionType,
         collectionName: editFormData.collectionName,
+        productType: editFormData.productType || 'variable',
         lifecycle: editFormData.lifecycle,
         publishState: editFormData.publishState,
         salesUnit: editFormData.salesUnit,
         priceMinor: pricePaise,
+        salePriceMinor: salePricePaise,
+        saleStartDate: editFormData.saleStartDate || null,
+        saleEndDate: editFormData.saleEndDate || null,
+        taxClass: editFormData.taxClass || 'jewellery_gst_3',
+        hsnCode: editFormData.hsnCode || '7113',
         description: editFormData.description,
         story: editFormData.story,
         materials: editFormData.materials,
         dimensions: editFormData.dimensions,
         weight: editFormData.weight,
         care: editFormData.care,
+        lowStockThreshold: parseInt(editFormData.lowStockThreshold || 5, 10),
+        soldIndividually: Boolean(editFormData.soldIndividually),
+        upsellIds: editFormData.upsellIds || [],
+        crossSellIds: editFormData.crossSellIds || [],
+        variants: editFormData.variants || [],
         images: editFormData.images || []
       };
 
-      const res = await fetch(`/api/products/${editingProduct.id}`, {
-        method: 'PUT',
+      const isNew = Boolean(editingProduct.isNew);
+      const url = isNew ? '/api/products' : `/api/products/${editingProduct.id}`;
+      const method = isNew ? 'POST' : 'PUT';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
@@ -625,7 +674,7 @@ function DashboardContent() {
 
       setEditFeedback({
         type: 'success',
-        message: `✓ Product "${data.product.name}" (${data.product.code}) updated successfully!`
+        message: `✓ Product "${data.product.name}" (${data.product.code}) ${isNew ? 'created' : 'updated'} successfully!`
       });
       await loadLiveProducts();
       setTimeout(() => {
@@ -935,12 +984,17 @@ function DashboardContent() {
                     categoryName: 'Earrings',
                     collectionType: 'monthly_trend',
                     collectionName: 'Autumn Trend Edit',
+                    productType: 'variable',
                     lifecycle: 'active',
                     publishState: 'published',
                     salesUnit: 'pair',
                     priceMinor: 249900,
                     priceRupees: '2499',
                     currency: 'INR',
+                    taxClass: 'jewellery_gst_3',
+                    hsnCode: '7113',
+                    lowStockThreshold: 5,
+                    soldIndividually: false,
                     description: 'Handcrafted luxury piece with refined finishing and artisanal materials.',
                     story: 'Centuries-old jewellery traditions handcrafted by regional master artisans.',
                     materials: '18k Micron Gold Plating, Hypoallergenic Brass Alloy',
@@ -949,7 +1003,7 @@ function DashboardContent() {
                     care: 'Store in provided anti-tarnish pouch. Keep away from water and perfume.',
                     variants: []
                   };
-                  openProductEditor(newDraft);
+                  openProductEditor(newDraft, true);
                 }}
                 className="btn btn-primary btn-sm"
               >
@@ -1001,22 +1055,40 @@ function DashboardContent() {
                   <td>{p.salesUnit}</td>
                   <td>
                     <strong>{formatCurrency(p.priceMinor, p.currency || 'INR')}</strong>
+                    {p.salePriceMinor && (
+                      <div style={{ fontSize: '0.72rem', color: 'var(--color-burgundy)' }}>
+                        Sale: {formatCurrency(p.salePriceMinor, p.currency || 'INR')}
+                      </div>
+                    )}
                   </td>
                   <td style={{ fontSize: '0.76rem' }}>{p.reviewDate || '—'}</td>
                   <td>
-                    <span className={`badge ${p.lifecycle === 'active' ? 'badge-success' : p.lifecycle === 'clearance' ? 'badge-danger' : 'badge-warning'}`}>
+                    <span className={`badge ${p.lifecycle === 'active' ? 'badge-success' : p.lifecycle === 'clearance' ? 'badge-danger' : p.lifecycle === 'archived' ? 'badge-muted' : 'badge-warning'}`}>
                       {p.lifecycle}
                     </span>
                   </td>
                   <td>
-                    <button
-                      type="button"
-                      onClick={() => openProductEditor(p)}
-                      className="btn btn-outline btn-sm"
-                      style={{ fontSize: '0.72rem', padding: '4px 8px', borderColor: 'var(--color-burgundy)', color: 'var(--color-burgundy)' }}
-                    >
-                      Edit Options
-                    </button>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button
+                        type="button"
+                        onClick={() => openProductEditor(p, false)}
+                        className="btn btn-outline btn-sm"
+                        style={{ fontSize: '0.72rem', padding: '4px 8px', borderColor: 'var(--color-burgundy)', color: 'var(--color-burgundy)' }}
+                      >
+                        Edit Options
+                      </button>
+                      {p.lifecycle !== 'archived' && (
+                        <button
+                          type="button"
+                          onClick={() => handleArchiveProduct(p.id)}
+                          className="btn btn-outline btn-sm"
+                          style={{ fontSize: '0.72rem', padding: '4px 8px', borderColor: '#DC2626', color: '#DC2626' }}
+                          title="Soft-archive product (unpublish while preserving orders)"
+                        >
+                          Archive
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -3285,6 +3357,7 @@ function DashboardContent() {
                 { id: 'shipping', label: '🚚 Shipping & Dimensions' },
                 { id: 'materials', label: '✨ Materials & Care' },
                 { id: 'variations', label: '💎 Variations Matrix' },
+                { id: 'linked', label: '🔗 Linked Products' },
                 { id: 'publishing', label: '📌 Publishing Status' }
               ].map((tab) => (
                 <button
@@ -3340,7 +3413,7 @@ function DashboardContent() {
                     />
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
                         Product Slug / URL Key
@@ -3362,6 +3435,19 @@ function DashboardContent() {
                         value={editFormData.code || ''}
                         style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem', backgroundColor: '#F3F4F6' }}
                       />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Product Structure Type
+                      </label>
+                      <select
+                        value={editFormData.productType || 'variable'}
+                        onChange={(e) => setEditFormData({ ...editFormData, productType: e.target.value })}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      >
+                        <option value="variable">Variable Product (Finishes &amp; Sizes)</option>
+                        <option value="simple">Simple Product (Single Edition)</option>
+                      </select>
                     </div>
                   </div>
 
@@ -3654,8 +3740,33 @@ function DashboardContent() {
                     </div>
                   </div>
 
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Sale Schedule: Start Date
+                      </label>
+                      <input
+                        type="date"
+                        value={editFormData.saleStartDate || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, saleStartDate: e.target.value })}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Sale Schedule: End Date
+                      </label>
+                      <input
+                        type="date"
+                        value={editFormData.saleEndDate || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, saleEndDate: e.target.value })}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                  </div>
+
                   <div style={{ backgroundColor: '#FAF8F6', padding: '12px 16px', borderRadius: '4px', fontSize: '0.8rem' }}>
-                    <strong>GST / Tax Calculation:</strong> All Indian luxury jewelry prices displayed on storefront include 3% jewellery GST as standard per statutory compliance.
+                    <strong>GST / Tax Compliance:</strong> Standard 3% Indian luxury jewellery GST applies per statutory compliance (HSN 7113 / 7117).
                   </div>
                 </div>
               )}
@@ -3689,6 +3800,32 @@ function DashboardContent() {
                         <option value="OUT_OF_STOCK">Out of Stock (Shows Sold Out badge)</option>
                         <option value="ON_BACKORDER">On Backorder (Made-to-Order Artisan Intake)</option>
                       </select>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Low Stock Alert Threshold (Units)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={editFormData.lowStockThreshold !== undefined ? editFormData.lowStockThreshold : 5}
+                        onChange={(e) => setEditFormData({ ...editFormData, lowStockThreshold: parseInt(e.target.value || 0, 10) })}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xs)', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', paddingTop: '24px' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={Boolean(editFormData.soldIndividually)}
+                          onChange={(e) => setEditFormData({ ...editFormData, soldIndividually: e.target.checked })}
+                          style={{ width: '16px', height: '16px', accentColor: 'var(--color-burgundy)' }}
+                        />
+                        Sold Individually (Max 1 piece per checkout for rare bridal pieces)
+                      </label>
                     </div>
                   </div>
 
@@ -3779,8 +3916,41 @@ function DashboardContent() {
 
               {/* Sub-tab 6: Variations */}
               {editActiveSubTab === 'variations' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  <div style={{ fontWeight: 600, fontSize: '0.86rem' }}>Contracted Variant Options:</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <div>
+                      <h4 style={{ margin: 0, fontSize: '0.94rem' }}>Artisanal Variations Matrix</h4>
+                      <p style={{ margin: '2px 0 0', fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
+                        Each variant must possess a distinct, unique SKU. Duplicates are strictly rejected.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const base = editFormData.code || 'NSK-VAR';
+                        const finishes = [
+                          { code: 'GLD', name: '18k Micron Gold', hex: '#D4AF37' },
+                          { code: 'SLV', name: 'Rhodium Silver', hex: '#C0C0C0' },
+                          { code: 'ROS', name: 'Rose Gold', hex: '#B76E79' }
+                        ];
+                        const newVars = finishes.map((f) => ({
+                          sku: `${base}-${f.code}`,
+                          name: f.name,
+                          colour: f.name,
+                          hex: f.hex,
+                          sellable: 0,
+                          reserved: 0
+                        }));
+                        setEditFormData({ ...editFormData, variants: newVars });
+                      }}
+                      className="btn btn-outline btn-sm"
+                      style={{ fontSize: '0.74rem' }}
+                    >
+                      ⚡ Auto-Generate Tri-Finish Matrix
+                    </button>
+                  </div>
+
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {editFormData.variants?.map((v, idx) => (
                       <div
@@ -3795,27 +3965,215 @@ function DashboardContent() {
                           backgroundColor: '#FAF8F6'
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
                           <span
                             style={{
                               display: 'inline-block',
-                              width: '18px',
-                              height: '18px',
+                              width: '20px',
+                              height: '20px',
                               borderRadius: '50%',
                               backgroundColor: v.hex || '#D4AF37',
-                              border: '1px solid #CCC'
+                              border: '1px solid #CCC',
+                              flexShrink: 0
                             }}
                           />
-                          <div>
-                            <strong>{v.name || v.colour}</strong>
-                            <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
-                              SKU: <code>{v.sku}</code>
+                          <div style={{ display: 'flex', gap: '12px', flex: 1, alignItems: 'center' }}>
+                            <div>
+                              <strong>{v.name || v.colour}</strong>
+                              <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
+                                SKU: <code>{v.sku}</code>
+                              </div>
                             </div>
+                            {v.size && <span className="badge badge-gold">{v.size}</span>}
                           </div>
                         </div>
-                        <span className="badge badge-gold">{v.colour}</span>
+
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <span className="badge badge-gold">{v.colour}</span>
+                          {editFormData.variants.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const filtered = editFormData.variants.filter((_, i) => i !== idx);
+                                setEditFormData({ ...editFormData, variants: filtered });
+                              }}
+                              className="btn btn-outline btn-sm"
+                              style={{ color: '#DC2626', borderColor: '#FCA5A5', padding: '2px 8px', fontSize: '0.7rem' }}
+                              title="Delete variant"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ))}
+                  </div>
+
+                  {/* Add Custom Variant */}
+                  <div style={{ border: '1px dashed var(--color-border)', padding: '12px', borderRadius: '4px', backgroundColor: '#FFFFFF' }}>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 600, marginBottom: '8px' }}>+ Add Custom Variant Option</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr auto', gap: '8px', alignItems: 'center' }}>
+                      <input
+                        type="text"
+                        placeholder="Variant SKU (e.g. NSK-EAR-001-KUN)"
+                        id="new-variant-sku"
+                        style={{ padding: '6px 8px', border: '1px solid var(--color-border)', borderRadius: '3px', fontSize: '0.78rem' }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Finish / Colour Name (e.g. Polki Kundan)"
+                        id="new-variant-name"
+                        style={{ padding: '6px 8px', border: '1px solid var(--color-border)', borderRadius: '3px', fontSize: '0.78rem' }}
+                      />
+                      <input
+                        type="color"
+                        defaultValue="#D4AF37"
+                        id="new-variant-hex"
+                        style={{ height: '32px', width: '100%', border: '1px solid var(--color-border)', borderRadius: '3px', cursor: 'pointer' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const skuInput = document.getElementById('new-variant-sku');
+                          const nameInput = document.getElementById('new-variant-name');
+                          const hexInput = document.getElementById('new-variant-hex');
+
+                          const sku = (skuInput?.value || '').trim().toUpperCase();
+                          const name = (nameInput?.value || '').trim();
+                          const hex = hexInput?.value || '#D4AF37';
+
+                          if (!sku || !name) {
+                            alert('Please enter both SKU and variant finish name');
+                            return;
+                          }
+
+                          const exists = editFormData.variants?.some((v) => v.sku === sku);
+                          if (exists) {
+                            alert(`Variant SKU '${sku}' already exists! Each variant SKU must be distinct.`);
+                            return;
+                          }
+
+                          const updatedVariants = [...(editFormData.variants || []), { sku, name, colour: name, hex, sellable: 0, reserved: 0 }];
+                          setEditFormData({ ...editFormData, variants: updatedVariants });
+                          if (skuInput) skuInput.value = '';
+                          if (nameInput) nameInput.value = '';
+                        }}
+                        className="btn btn-primary btn-sm"
+                        style={{ fontSize: '0.76rem', padding: '6px 12px' }}
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-tab 7: Linked Products (Upsells & Cross-Sells) */}
+              {editActiveSubTab === 'linked' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '0.94rem' }}>Linked Products (Upsells &amp; Cross-Sells)</h4>
+                    <p style={{ margin: '2px 0 0', fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
+                      Connect matching designs for &quot;Complete the Look&quot; upsells on product detail pages and complementary checkout pairings.
+                    </p>
+                  </div>
+
+                  {/* Upsells: Complete the Look */}
+                  <div style={{ border: '1px solid var(--color-border)', borderRadius: '4px', padding: '16px', backgroundColor: '#FFFFFF' }}>
+                    <div style={{ fontWeight: 600, fontSize: '0.84rem', color: 'var(--color-burgundy)', marginBottom: '8px' }}>
+                      👑 &quot;Complete the Look&quot; Upsells (Recommended matching jewellery pieces)
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '8px', maxHeight: '160px', overflowY: 'auto' }}>
+                      {liveProducts
+                        .filter((p) => p.id !== editFormData.id)
+                        .map((p) => {
+                          const isSelected = editFormData.upsellIds?.includes(p.id) || editFormData.upsellIds?.includes(p.code);
+                          return (
+                            <label
+                              key={p.id}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                fontSize: '0.78rem',
+                                padding: '6px 8px',
+                                border: isSelected ? '1px solid var(--color-burgundy)' : '1px solid var(--color-border)',
+                                borderRadius: '3px',
+                                backgroundColor: isSelected ? '#FAF5F7' : '#FAF8F6',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={Boolean(isSelected)}
+                                onChange={(e) => {
+                                  const current = editFormData.upsellIds || [];
+                                  const updated = e.target.checked
+                                    ? [...current, p.id]
+                                    : current.filter((id) => id !== p.id && id !== p.code);
+                                  setEditFormData({ ...editFormData, upsellIds: updated });
+                                }}
+                                style={{ accentColor: 'var(--color-burgundy)' }}
+                              />
+                              <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <strong>{p.name}</strong>
+                                <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '0.7rem' }}>
+                                  {p.code} • {formatCurrency(p.priceMinor, 'INR')}
+                                </span>
+                              </div>
+                            </label>
+                          );
+                        })}
+                    </div>
+                  </div>
+
+                  {/* Cross-Sells: Checkout Pairings */}
+                  <div style={{ border: '1px solid var(--color-border)', borderRadius: '4px', padding: '16px', backgroundColor: '#FFFFFF' }}>
+                    <div style={{ fontWeight: 600, fontSize: '0.84rem', color: 'var(--color-burgundy)', marginBottom: '8px' }}>
+                      🛍️ Checkout Cross-Sells (Suggested accessory add-ons)
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '8px', maxHeight: '160px', overflowY: 'auto' }}>
+                      {liveProducts
+                        .filter((p) => p.id !== editFormData.id)
+                        .map((p) => {
+                          const isSelected = editFormData.crossSellIds?.includes(p.id) || editFormData.crossSellIds?.includes(p.code);
+                          return (
+                            <label
+                              key={p.id}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                fontSize: '0.78rem',
+                                padding: '6px 8px',
+                                border: isSelected ? '1px solid var(--color-burgundy)' : '1px solid var(--color-border)',
+                                borderRadius: '3px',
+                                backgroundColor: isSelected ? '#FAF5F7' : '#FAF8F6',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={Boolean(isSelected)}
+                                onChange={(e) => {
+                                  const current = editFormData.crossSellIds || [];
+                                  const updated = e.target.checked
+                                    ? [...current, p.id]
+                                    : current.filter((id) => id !== p.id && id !== p.code);
+                                  setEditFormData({ ...editFormData, crossSellIds: updated });
+                                }}
+                                style={{ accentColor: 'var(--color-burgundy)' }}
+                              />
+                              <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <strong>{p.name}</strong>
+                                <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '0.7rem' }}>
+                                  {p.code} • {formatCurrency(p.priceMinor, 'INR')}
+                                </span>
+                              </div>
+                            </label>
+                          );
+                        })}
+                    </div>
                   </div>
                 </div>
               )}
@@ -3904,29 +4262,45 @@ function DashboardContent() {
               <div
                 style={{
                   display: 'flex',
-                  justifyContent: 'flex-end',
-                  gap: '10px',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                   paddingTop: '20px',
                   marginTop: '20px',
                   borderTop: '1px solid var(--color-border)'
                 }}
               >
-                <button
-                  type="button"
-                  onClick={() => setEditingProduct(null)}
-                  className="btn btn-outline btn-sm"
-                  disabled={editLoading}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary btn-sm"
-                  disabled={editLoading}
-                  style={{ minWidth: '160px' }}
-                >
-                  {editLoading ? 'Saving...' : 'Update Product Details'}
-                </button>
+                {!editingProduct.isNew && editingProduct.lifecycle !== 'archived' ? (
+                  <button
+                    type="button"
+                    onClick={() => handleArchiveProduct(editingProduct.id)}
+                    className="btn btn-outline btn-sm"
+                    style={{ borderColor: '#DC2626', color: '#DC2626' }}
+                    disabled={editLoading}
+                  >
+                    Archive Product (Soft-Delete)
+                  </button>
+                ) : (
+                  <div />
+                )}
+
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setEditingProduct(null)}
+                    className="btn btn-outline btn-sm"
+                    disabled={editLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-sm"
+                    disabled={editLoading}
+                    style={{ minWidth: '160px' }}
+                  >
+                    {editLoading ? 'Saving...' : editingProduct.isNew ? 'Create & Publish Design' : 'Update Product Details'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
