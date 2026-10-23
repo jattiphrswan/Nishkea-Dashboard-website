@@ -7,7 +7,7 @@ import ProductCard from '../../components/storefront/ProductCard';
 import EditorialShowcase from '../../components/storefront/EditorialShowcase';
 import PlaceholderImage from '../../components/ui/PlaceholderImage';
 import BannerCTA from '../../components/storefront/BannerCTA';
-import { ArrowRight, Gem, ShieldCheck, RefreshCw, Sparkles, Award } from 'lucide-react';
+import { ArrowRight, Gem, ShieldCheck, RefreshCw } from 'lucide-react';
 
 export default function HomePage() {
   const featured = PRODUCTS.slice(0, 4);
@@ -164,111 +164,6 @@ export default function HomePage() {
 
       {/* Limitless Adornment Luxury Capsule CTA Banner (Reference Match) */}
       <BannerCTA />
-
-      {/* Editorial Craftsmanship & Philosophy Sanctuary */}
-      <section className="philosophy-sanctuary-section" aria-label="The Philosophy of NISHKÈA">
-        <div className="philosophy-sanctuary-bg-glow" aria-hidden="true" />
-        
-        <div className="container-storefront">
-          <div className="philosophy-frame">
-            {/* Architectural Gold Corner Motifs */}
-            <span className="philosophy-corner philosophy-corner-tl" aria-hidden="true" />
-            <span className="philosophy-corner philosophy-corner-tr" aria-hidden="true" />
-            <span className="philosophy-corner philosophy-corner-bl" aria-hidden="true" />
-            <span className="philosophy-corner philosophy-corner-br" aria-hidden="true" />
-
-            {/* Poetic Philosophy Header */}
-            <div className="philosophy-header">
-              <div className="philosophy-ribbon">
-                <span>✦</span>
-                <span>MAISON FONDÉE 2024 • L&apos;ART DE LA JOAILLERIE</span>
-                <span>✦</span>
-              </div>
-              <h2 className="philosophy-title">
-                The Soul & <em>Philosophy</em> of NISHKÈA
-              </h2>
-              
-              <div className="philosophy-quote-wrapper">
-                <span className="philosophy-quote-mark" aria-hidden="true">“</span>
-                <p className="philosophy-quote-text">
-                  “Every jewel is an intimate dialogue between personal identity and timeless adornment. At NISHKÈA, luxury is not excess—it is the quiet perfection of proportion, the uncompromising purity of noble metals, and the devotion of master karigars who refuse haste.”
-                </p>
-              </div>
-
-              {/* Founder's Motto & Brand Provenance Seal */}
-              <div className="philosophy-signature-row">
-                <span className="philosophy-badge-seal">
-                  <Award size={13} /> BIS HALLMARKED ATELIER
-                </span>
-                <span className="philosophy-signature-script">
-                  “It Suits You.”
-                </span>
-                <span className="philosophy-badge-seal">
-                  <Sparkles size={13} /> 100% CONSCIOUS LUXURY
-                </span>
-              </div>
-            </div>
-
-            {/* 3 Pillars of Atelier Distinction */}
-            <div className="philosophy-pillars-grid">
-              {/* Pillar 1 */}
-              <div className="philosophy-pillar-card">
-                <div className="philosophy-pillar-icon-wrap">
-                  <ShieldCheck size={22} />
-                </div>
-                <span className="philosophy-pillar-pre">Noble Metallurgy</span>
-                <h3 className="philosophy-pillar-title">18K Vermeil & 925 Silver</h3>
-                <p className="philosophy-pillar-desc">
-                  Thick 2.5-micron layer of solid 18-karat gold over hypoallergenic 925 sterling silver. Every single design bears certified BIS hallmark assaying for authentic precious purity.
-                </p>
-                <div className="philosophy-pillar-tag">
-                  <span>✦ Certified Nickel & Cadmium Free</span>
-                </div>
-              </div>
-
-              {/* Pillar 2 */}
-              <div className="philosophy-pillar-card">
-                <div className="philosophy-pillar-icon-wrap">
-                  <Gem size={22} />
-                </div>
-                <span className="philosophy-pillar-pre">Karigar Savoir-Faire</span>
-                <h3 className="philosophy-pillar-title">Micro-Pavé Precision</h3>
-                <p className="philosophy-pillar-desc">
-                  Conflict-free AAA lab stones and natural gemstones hand-set under 40× magnification optical microscopes, ensuring maximum light refraction and heirloom prong security.
-                </p>
-                <div className="philosophy-pillar-tag">
-                  <span>✦ 40× Optical Claw Calibration</span>
-                </div>
-              </div>
-
-              {/* Pillar 3 */}
-              <div className="philosophy-pillar-card">
-                <div className="philosophy-pillar-icon-wrap">
-                  <RefreshCw size={22} />
-                </div>
-                <span className="philosophy-pillar-pre">Heirloom Endurance</span>
-                <h3 className="philosophy-pillar-title">Anti-Tarnish Molecular Shield</h3>
-                <p className="philosophy-pillar-desc">
-                  Infused with an invisible nano-protective barrier engineered to resist humidity, heat, perfume, and everyday movement—preserving mirror radiance without dulling.
-                </p>
-                <div className="philosophy-pillar-tag">
-                  <span>✦ Lifetime Atelier Care Program</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Actions Row */}
-            <div className="philosophy-actions-row">
-              <Link href="/shop" className="philosophy-cta-btn" id="philosophy-explore-atelier-btn">
-                Explore The Atelier Catalog <ArrowRight size={14} />
-              </Link>
-              <Link href="/contact" className="philosophy-outline-btn" id="philosophy-concierge-btn">
-                Consult With Atelier Concierge
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
