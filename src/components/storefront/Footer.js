@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { FaInstagram, FaPinterestP, FaFacebookF, FaWhatsapp, FaYoutube } from 'react-icons/fa';
+import { FiChevronRight } from 'react-icons/fi';
 
 export default function Footer() {
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -74,14 +75,18 @@ export default function Footer() {
                 />
                 <button
                   type="submit"
-                  className="btn btn-sm"
+                  className="btn btn-sm btn-primary"
                   style={{
-                    backgroundColor: 'var(--color-burgundy)',
-                    color: '#FFFFFF',
-                    border: '1px solid var(--color-burgundy)'
+                    padding: '4px 6px 4px 16px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px'
                   }}
                 >
-                  Join
+                  <span>JOIN</span>
+                  <span className="btn-icon-bubble" style={{ width: '22px', height: '22px' }}>
+                    <FiChevronRight size={12} strokeWidth={2.5} />
+                  </span>
                 </button>
               </div>
               {subscribed && (

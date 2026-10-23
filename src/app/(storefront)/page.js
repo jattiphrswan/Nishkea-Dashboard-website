@@ -7,7 +7,7 @@ import ProductCard from '../../components/storefront/ProductCard';
 import EditorialShowcase from '../../components/storefront/EditorialShowcase';
 import PlaceholderImage from '../../components/ui/PlaceholderImage';
 import BannerCTA from '../../components/storefront/BannerCTA';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronRight } from 'lucide-react';
 import { FaGem, FaSyncAlt, FaShieldAlt } from 'react-icons/fa';
 
 export default function HomePage() {
@@ -36,7 +36,10 @@ export default function HomePage() {
               Hand-set diamonds and 18K gold, composed by our atelier in Paris.
             </p>
             <Link href="/shop" className="hero-ref-btn" id="hero-discover-btn">
-              Discover the Collection <ArrowRight size={17} />
+              <span>BEGIN EXPERIENCE</span>
+              <span className="btn-icon-bubble">
+                <ChevronRight size={15} strokeWidth={2.5} />
+              </span>
             </Link>
           </div>
         </div>
@@ -119,7 +122,10 @@ export default function HomePage() {
               <h2 style={{ marginTop: '4px' }}>Featured Designs</h2>
             </div>
             <Link href="/shop" className="btn btn-outline btn-sm">
-              View All <ArrowRight size={14} />
+              <span>VIEW ALL</span>
+              <span className="btn-icon-bubble">
+                <ChevronRight size={12} strokeWidth={2.5} />
+              </span>
             </Link>
           </div>
 

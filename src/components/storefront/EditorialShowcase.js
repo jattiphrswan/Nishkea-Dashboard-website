@@ -47,7 +47,10 @@ export default function EditorialShowcase() {
                 </div>
               </div>
               <span className="editorial-cta-pill">
-                Explore Silver Edit <ArrowUpRight size={15} />
+                <span>EXPLORE SILVER EDIT</span>
+                <span className="btn-icon-bubble">
+                  <ArrowUpRight size={13} strokeWidth={2.5} />
+                </span>
               </span>
             </div>
           </Link>

@@ -176,64 +176,151 @@ button, input, select, textarea {
   padding: var(--space-6);
 }
 
-/* Common UI Components */
+/* Common UI Components — Global Luxury Pill Button System */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  padding: 12px 24px;
+  gap: 10px;
+  padding: 6px 8px 6px 20px;
   font-family: var(--font-sans);
-  font-size: 0.88rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-pill);
   cursor: pointer;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
-  border: 1px solid transparent;
+  transition: all var(--transition-normal);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 14px rgba(36, 27, 32, 0.06);
+  position: relative;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .btn:active {
   transform: translateY(1px);
 }
 
+/* Signature Iridescent Circular Icon Bubble */
+.btn-bubble,
+.btn-icon-bubble,
+.btn > svg {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: radial-gradient(circle at 35% 35%, #EAF0FD 0%, #FDEBF4 55%, #EDE9FE 100%);
+  color: #1A1A1A;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease;
+}
+
+.btn > svg {
+  padding: 6px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+}
+
+.btn:hover .btn-bubble,
+.btn:hover .btn-icon-bubble,
+.btn:hover > svg {
+  transform: translateX(3px);
+}
+
+/* Icon on left side variant */
+.btn.btn-icon-left {
+  padding: 6px 20px 6px 8px;
+}
+
+.btn.btn-icon-left:hover .btn-bubble,
+.btn.btn-icon-left:hover .btn-icon-bubble,
+.btn.btn-icon-left:hover > svg {
+  transform: translateX(-2px) scale(1.05);
+}
+
+/* Primary White Luxury Pill (Exact Match to User Reference) */
+.btn-white,
+.btn-pill-white {
+  background-color: #FFFFFF !important;
+  color: #1A1A1A !important;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+.btn-white:hover,
+.btn-pill-white:hover {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Primary Burgundy Luxury Pill */
 .btn-primary {
   background-color: var(--color-burgundy);
-  color: #FFFFFF;
+  color: #FFFFFF !important;
   border-color: var(--color-burgundy);
+}
+
+.btn-primary .btn-bubble,
+.btn-primary .btn-icon-bubble,
+.btn-primary > svg {
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.35) 0%, rgba(249, 245, 238, 0.2) 100%);
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .btn-primary:hover {
   background-color: var(--color-burgundy-deep);
   border-color: var(--color-burgundy-deep);
-  color: #FFFFFF;
+  color: #FFFFFF !important;
+  box-shadow: 0 8px 24px rgba(112, 26, 54, 0.35);
 }
 
 .btn-secondary {
-  background-color: transparent;
+  background-color: var(--color-burgundy-light);
   color: var(--color-burgundy);
-  border-color: var(--color-burgundy);
+  border-color: rgba(112, 26, 54, 0.15);
 }
 
 .btn-secondary:hover {
-  background-color: var(--color-burgundy-light);
+  background-color: var(--color-burgundy);
+  color: #FFFFFF;
 }
 
 .btn-outline {
-  background-color: transparent;
+  background-color: #FFFFFF;
   color: var(--color-text-main);
-  border-color: var(--color-border);
+  border: 1px solid var(--color-border);
 }
 
 .btn-outline:hover {
-  border-color: var(--color-text-main);
-  background-color: rgba(36, 27, 32, 0.03);
+  border-color: var(--color-gold);
+  color: var(--color-burgundy);
 }
 
 .btn-sm {
-  padding: 8px 16px;
-  font-size: 0.78rem;
+  padding: 4px 6px 4px 16px;
+  font-size: 0.74rem;
+  letter-spacing: 0.07em;
+}
+
+.btn-sm .btn-bubble,
+.btn-sm .btn-icon-bubble,
+.btn-sm > svg {
+  width: 24px;
+  height: 24px;
+  padding: 5px;
+}
+
+.btn-sm.btn-icon-left {
+  padding: 4px 16px 4px 6px;
 }
 
 .btn-icon {
@@ -891,26 +978,49 @@ button, input, select, textarea {
 .hero-ref-btn {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  background: #0E4437;
-  color: #FFFFFF !important;
+  justify-content: center;
+  gap: 14px;
+  background: #FFFFFF;
+  color: #1A1A1A !important;
   font-family: var(--font-sans);
-  font-size: 0.95rem;
-  font-weight: 500;
-  padding: 14px 30px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 8px 6px 26px;
   border-radius: var(--radius-pill);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
   transition: all var(--transition-normal);
   cursor: pointer;
   text-decoration: none;
 }
 
+.hero-ref-btn .btn-icon-bubble,
+.hero-ref-btn > svg {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: radial-gradient(circle at 35% 35%, #EAF0FD 0%, #FDEBF4 55%, #EDE9FE 100%);
+  color: #1A1A1A;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .hero-ref-btn:hover {
-  background: #135A49;
+  background: #FFFFFF;
+  color: #000000 !important;
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(14, 68, 55, 0.5);
-  color: #FFFFFF !important;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+}
+
+.hero-ref-btn:hover .btn-icon-bubble,
+.hero-ref-btn:hover > svg {
+  transform: translateX(4px);
 }
 
 .hero-ref-wave {
