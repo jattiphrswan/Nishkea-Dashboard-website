@@ -153,9 +153,13 @@ export default function CategoryDrawer({ isOpen, onClose }) {
       >
         {/* Top Header Bar with Brand & Close Button */}
         <div className="cat-drawer-header">
-          <Link href="/" onClick={onClose} className="cat-drawer-brand">
-            <span className="cat-brand-script">Nishkèa</span>
-            <span className="cat-brand-sub">ATELIER</span>
+          <Link href="/" onClick={onClose} className="cat-drawer-brand" aria-label="NISHKÈA Atelier Home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/brand/logo.png"
+              alt="NISHKÈA — IT SUITS YOU !"
+              style={{ height: '32px', width: 'auto', display: 'block', objectFit: 'contain' }}
+            />
           </Link>
           <button
             type="button"

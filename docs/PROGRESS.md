@@ -427,3 +427,27 @@
   - `npm test` — PASS (485/485 tests passing across all 13 suites).
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - `npm run build` — PASS (all 55 static & dynamic routes compiled in 11.1s).
+
+## Storefront Enhancement — Full-Width Theme-Aligned CTA Banner & Official Brand Logo Integration
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-23
+- **Deliverables:**
+  - **Full-Width Theme-Aligned "Adorn Without Limit" CTA Banner** ([`src/components/storefront/BannerCTA.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/storefront/BannerCTA.js), [`src/app/globals.css`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/globals.css)):
+    - Expanded from boxed fixed-width container to 100% viewport edge-to-edge layout with full bleed background.
+    - Inner content aligned within `container-storefront` grid bounds with dual hairline gold borders (`border-top` / `border-bottom: 1px solid rgba(182, 151, 99, 0.35)`).
+    - Replaced the placeholder ocean landscape with an opulent, high-resolution luxury jewelry panorama (`/images/editorial/cta-banner-bg.jpg`): rich crimson silk velvet draped with handcrafted polki/ruby diamond jewellery and radiant gold dust bokeh.
+    - Updated overlay to deep royal burgundy-noir gradient (`linear-gradient(90deg, rgba(26, 4, 12, 0.90) 0%, rgba(54, 10, 26, 0.65) 50%, rgba(20, 3, 10, 0.86) 100%)`).
+    - Styled with serif editorial headline (`Cormorant Garamond`), gold eyebrow badge (`ATELIER CONCIERGE • BESPOKE CURATION`), pill floating glass dock (`border-radius: 9999px`, frosted blur 20px, gold border), and burgundy gradient pill action button.
+  - **Official NISHKÈA Brand Logo Integration Across Storefront**:
+    - Extracted authentic brand mark from user asset with lossless PNG un-filtering (`scratch/make_transparent_logo_proper.js` handling PNG Up/Sub/Average/Paeth scanline filters) into anti-aliased transparent files:
+      - `public/images/brand/logo.png` & `logo-transparent.png`: Transparent burgundy emblem + typographic ligature wordmark + "IT SUITS YOU !" tagline.
+      - `public/images/brand/logo-white.png`: Transparent crisp white emblem + wordmark for dark headers, footers, and overlays.
+      - `public/images/brand/logo.svg` & `logo-white.svg`: Vector wrappers for universal high-res rendering.
+    - **Header** ([`src/components/storefront/Header.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/storefront/Header.js)): Implemented official white logo mark seamlessly across transparent hero and scrolled burgundy glass states.
+    - **Category Navigation Drawer** ([`src/components/storefront/CategoryDrawer.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/storefront/CategoryDrawer.js)): Replaced text font title with official burgundy logo PNG.
+    - **Site Footer** ([`src/components/storefront/Footer.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/storefront/Footer.js)): Replaced plain text headers with official white logo PNG over the dark noir footer background.
+- **Validation:**
+  - `npm test` — PASS (485/485 assertions passing).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - Browser Verification: Chromium visual inspection verified crisp white logo in header (`header_white_logo_1792756049731.png`), burgundy logo in navigation drawer (`drawer_burgundy_logo_1792756155934.png`), and edge-to-edge full-width CTA banner + footer white logo (`banner_and_footer_1792756218870.png`).
+

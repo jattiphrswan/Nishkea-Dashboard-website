@@ -15,22 +15,26 @@ export default function BannerCTA() {
 
   return (
     <section className="limitless-cta-section" aria-label="Explore Without Limit">
-      <div className="container-storefront">
-        <div className="limitless-cta-banner">
-          {/* Background Aerial Landscape Image */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/editorial/cta-banner-bg.jpg"
-            alt="Midnight ocean with gold foam crashing on diamond obsidian beach"
-            className="limitless-cta-bg"
-            loading="lazy"
-          />
+      <div className="limitless-cta-banner">
+        {/* Background Editorial Panorama */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/editorial/cta-banner-bg.jpg"
+          alt="Royal burgundy silk velvet draped with fine handcrafted jewellery and gold dust"
+          className="limitless-cta-bg"
+          loading="lazy"
+        />
 
-          {/* Dark Contrast Overlay */}
-          <div className="limitless-cta-overlay" aria-hidden="true" />
+        {/* Deep Royal Burgundy & Gold Contrast Overlay */}
+        <div className="limitless-cta-overlay" aria-hidden="true" />
 
+        {/* Inner Content Grid constrained to container */}
+        <div className="container-storefront limitless-cta-inner">
           {/* Left Column: Heading and Subtitle */}
           <div className="limitless-cta-left">
+            <span className="limitless-cta-eyebrow">
+              ATELIER CONCIERGE &bull; BESPOKE CURATION
+            </span>
             <h2 className="limitless-cta-title">
               Adorn without limit
             </h2>
@@ -45,7 +49,7 @@ export default function BannerCTA() {
               {/* White Input Card */}
               <div className="limitless-input-card">
                 <div className="limitless-input-header">
-                  <FiGlobe size={15} />
+                  <FiGlobe size={15} style={{ color: 'var(--color-gold)' }} />
                   <span>Your Silhouette</span>
                 </div>
                 <div className="limitless-select-wrap">
@@ -68,7 +72,7 @@ export default function BannerCTA() {
                 </div>
               </div>
 
-              {/* Black Action Pill Button */}
+              {/* Action Pill Button */}
               <button
                 type="submit"
                 className="limitless-action-btn"
@@ -87,3 +91,4 @@ export default function BannerCTA() {
     </section>
   );
 }
+

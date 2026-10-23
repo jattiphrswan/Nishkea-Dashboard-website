@@ -2717,22 +2717,35 @@ button, input, select, textarea {
    ========================================================================== */
 
 .limitless-cta-section {
-  padding: var(--space-12) 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   background: transparent;
+  overflow: hidden;
 }
 
 .limitless-cta-banner {
   position: relative;
-  border-radius: 28px;
+  width: 100%;
+  border-radius: 0;
   overflow: hidden;
-  min-height: 240px;
+  min-height: 290px;
+  display: flex;
+  align-items: center;
+  padding: 68px 0;
+  box-shadow: inset 0 2px 24px rgba(0, 0, 0, 0.4), 0 20px 50px rgba(0, 0, 0, 0.25);
+  border-top: 1px solid rgba(182, 151, 99, 0.35);
+  border-bottom: 1px solid rgba(182, 151, 99, 0.35);
+  isolation: isolate;
+}
+
+.limitless-cta-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 48px 56px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  isolation: isolate;
+  gap: 36px;
+  position: relative;
+  z-index: 1;
 }
 
 .limitless-cta-bg {
@@ -2741,8 +2754,9 @@ button, input, select, textarea {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   z-index: -2;
-  transition: transform 0.6s ease;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .limitless-cta-banner:hover .limitless-cta-bg {
@@ -2752,29 +2766,46 @@ button, input, select, textarea {
 .limitless-cta-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(12, 17, 27, 0.78) 0%, rgba(12, 17, 27, 0.45) 50%, rgba(12, 17, 27, 0.65) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(26, 4, 12, 0.90) 0%,
+    rgba(54, 10, 26, 0.65) 50%,
+    rgba(20, 3, 10, 0.86) 100%
+  );
   z-index: -1;
 }
 
 .limitless-cta-left {
-  max-width: 520px;
+  max-width: 540px;
   z-index: 1;
+}
+
+.limitless-cta-eyebrow {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--color-gold);
+  text-transform: uppercase;
+  margin-bottom: 8px;
 }
 
 .limitless-cta-title {
   color: #FFFFFF;
-  font-family: var(--font-sans);
-  font-size: clamp(2rem, 3.4vw, 2.85rem);
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  font-family: var(--font-serif);
+  font-size: clamp(2.3rem, 3.8vw, 3.25rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
   line-height: 1.15;
   margin: 0 0 12px 0;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
 }
 
 .limitless-cta-sub {
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 0.98rem;
-  line-height: 1.5;
+  color: rgba(250, 247, 242, 0.88);
+  font-size: 1.02rem;
+  line-height: 1.6;
   margin: 0;
   font-family: var(--font-sans);
 }
@@ -2786,37 +2817,37 @@ button, input, select, textarea {
 }
 
 .limitless-glass-dock {
-  background: rgba(255, 255, 255, 0.28);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 22px;
-  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(182, 151, 99, 0.45);
+  border-radius: 9999px;
+  padding: 8px 10px;
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35), 0 0 30px rgba(182, 151, 99, 0.15);
 }
 
 .limitless-input-card {
   background: #FFFFFF;
-  border-radius: 16px;
-  padding: 12px 16px;
+  border-radius: 9999px;
+  padding: 10px 22px 10px 18px;
   min-width: 250px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  gap: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
 .limitless-input-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: #1a1a1a;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
 }
 
 .limitless-select-wrap {
@@ -2831,8 +2862,8 @@ button, input, select, textarea {
   -webkit-appearance: none;
   background: #F1F2F4;
   border: 1px solid transparent;
-  border-radius: 8px;
-  padding: 8px 36px 8px 12px;
+  border-radius: 9999px;
+  padding: 8px 36px 8px 14px;
   font-size: 0.84rem;
   color: #2c2c2c;
   font-weight: 500;
@@ -2849,11 +2880,11 @@ button, input, select, textarea {
 
 .limitless-chevron-btn {
   position: absolute;
-  right: 8px;
+  right: 6px;
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #111111;
+  background: var(--color-burgundy);
   color: #FFFFFF;
   display: flex;
   align-items: center;
@@ -2862,32 +2893,33 @@ button, input, select, textarea {
 }
 
 .limitless-action-btn {
-  background: #111111;
+  background: linear-gradient(135deg, #701A36 0%, #4D0E22 100%);
   color: #FFFFFF;
-  border-radius: 16px;
-  padding: 14px 22px;
+  border-radius: 9999px;
+  padding: 12px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  border: none;
+  gap: 4px;
+  border: 1px solid rgba(182, 151, 99, 0.4);
   cursor: pointer;
-  min-width: 100px;
+  min-width: 105px;
   transition: all var(--transition-fast);
   text-decoration: none;
+  box-shadow: 0 4px 16px rgba(112, 26, 54, 0.4);
 }
 
 .limitless-action-btn:hover {
-  background: var(--color-burgundy);
+  background: linear-gradient(135deg, #8E2345 0%, #701A36 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 24px rgba(112, 26, 54, 0.55), 0 0 16px rgba(182, 151, 99, 0.3);
 }
 
 .limitless-action-label {
   font-size: 0.74rem;
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   white-space: nowrap;
 }
 
@@ -2899,10 +2931,12 @@ button, input, select, textarea {
 
 @media (max-width: 960px) {
   .limitless-cta-banner {
+    padding: 48px 0;
+  }
+  .limitless-cta-inner {
     flex-direction: column;
     align-items: flex-start;
     gap: 28px;
-    padding: 36px 28px;
   }
   .limitless-cta-right {
     width: 100%;
@@ -2910,16 +2944,19 @@ button, input, select, textarea {
   .limitless-glass-dock {
     width: 100%;
     flex-direction: column;
-    gap: 10px;
+    border-radius: 24px;
+    gap: 12px;
   }
   .limitless-input-card {
     width: 100%;
     min-width: 0;
+    border-radius: 18px;
   }
   .limitless-action-btn {
     width: 100%;
     flex-direction: row;
+    border-radius: 9999px;
     gap: 10px;
-    padding: 12px;
+    padding: 14px;
   }
 }
