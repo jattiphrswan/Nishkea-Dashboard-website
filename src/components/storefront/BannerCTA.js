@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Globe, Search, ChevronDown } from 'lucide-react';
+import { FiGlobe, FiSearch, FiChevronDown } from 'react-icons/fi';
 
 export default function BannerCTA() {
   const router = useRouter();
@@ -45,7 +45,7 @@ export default function BannerCTA() {
               {/* White Input Card */}
               <div className="limitless-input-card">
                 <div className="limitless-input-header">
-                  <Globe size={15} />
+                  <FiGlobe size={15} />
                   <span>Your Silhouette</span>
                 </div>
                 <div className="limitless-select-wrap">
@@ -63,7 +63,7 @@ export default function BannerCTA() {
                     <option value="accessories">Hair Adornments & Nose Rings</option>
                   </select>
                   <span className="limitless-chevron-btn" aria-hidden="true">
-                    <ChevronDown size={12} strokeWidth={2.5} />
+                    <FiChevronDown size={12} strokeWidth={2.5} />
                   </span>
                 </div>
               </div>
@@ -77,7 +77,7 @@ export default function BannerCTA() {
               >
                 <span className="limitless-action-label">Find piece</span>
                 <span className="limitless-action-icon">
-                  <Search size={20} strokeWidth={2.2} />
+                  <FiSearch size={20} strokeWidth={2.2} />
                 </span>
               </button>
             </div>

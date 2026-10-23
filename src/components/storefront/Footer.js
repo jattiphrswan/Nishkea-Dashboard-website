@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { FaInstagram, FaPinterestP, FaFacebookF, FaWhatsapp, FaYoutube } from 'react-icons/fa';
 
 export default function Footer() {
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -89,6 +90,30 @@ export default function Footer() {
                 </p>
               )}
             </form>
+
+            {/* Social Media Channels with react-icons */}
+            <div style={{ marginTop: '22px' }}>
+              <span style={{ fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-gold)', fontWeight: 600, display: 'block', marginBottom: '10px' }}>
+                Follow The Maison
+              </span>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on Instagram" style={{ color: '#FAF7F2', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
+                  <FaInstagram size={14} />
+                </a>
+                <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on Pinterest" style={{ color: '#FAF7F2', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
+                  <FaPinterestP size={14} />
+                </a>
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on Facebook" style={{ color: '#FAF7F2', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
+                  <FaFacebookF size={14} />
+                </a>
+                <a href="https://wa.me" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on WhatsApp" style={{ color: '#FAF7F2', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
+                  <FaWhatsapp size={14} />
+                </a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on YouTube" style={{ color: '#FAF7F2', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
+                  <FaYoutube size={14} />
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* Categories */}

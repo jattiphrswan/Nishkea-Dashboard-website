@@ -7,7 +7,8 @@ import ProductCard from '../../components/storefront/ProductCard';
 import EditorialShowcase from '../../components/storefront/EditorialShowcase';
 import PlaceholderImage from '../../components/ui/PlaceholderImage';
 import BannerCTA from '../../components/storefront/BannerCTA';
-import { ArrowRight, Gem, ShieldCheck, RefreshCw } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { FaGem, FaSyncAlt, FaShieldAlt } from 'react-icons/fa';
 
 export default function HomePage() {
   const featured = PRODUCTS.slice(0, 4);
@@ -60,17 +61,17 @@ export default function HomePage() {
         <div className="container-storefront">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', textAlign: 'center' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-              <Gem size={20} color="var(--color-burgundy)" />
+              <FaGem size={20} color="var(--color-burgundy)" />
               <strong style={{ fontSize: '0.82rem', letterSpacing: '0.06em' }}>159+ ATELIER DESIGNS</strong>
               <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>Solid 18K vermeil, silk and fine stones</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-              <RefreshCw size={20} color="var(--color-burgundy)" />
+              <FaSyncAlt size={19} color="var(--color-burgundy)" />
               <strong style={{ fontSize: '0.82rem', letterSpacing: '0.06em' }}>30-DAY TREND CYCLES</strong>
               <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>Curated monthly capsule edits</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-              <ShieldCheck size={20} color="var(--color-burgundy)" />
+              <FaShieldAlt size={20} color="var(--color-burgundy)" />
               <strong style={{ fontSize: '0.82rem', letterSpacing: '0.06em' }}>TRANSACTIONAL LEDGER</strong>
               <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>Live inventory with zero overselling</span>
             </div>
