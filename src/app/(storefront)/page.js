@@ -6,6 +6,7 @@ import { CATEGORIES, PRODUCTS, HERO_GALLERY } from '../../data/fixtures';
 import ProductCard from '../../components/storefront/ProductCard';
 import EditorialShowcase from '../../components/storefront/EditorialShowcase';
 import PlaceholderImage from '../../components/ui/PlaceholderImage';
+import BannerCTA from '../../components/storefront/BannerCTA';
 import { ArrowRight, Gem, ShieldCheck, RefreshCw, Sparkles, Award } from 'lucide-react';
 
 export default function HomePage() {
@@ -160,6 +161,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Limitless Adornment Luxury Capsule CTA Banner (Reference Match) */}
+      <BannerCTA />
 
       {/* Editorial Craftsmanship & Philosophy Sanctuary */}
       <section className="philosophy-sanctuary-section" aria-label="The Philosophy of NISHKÈA">
