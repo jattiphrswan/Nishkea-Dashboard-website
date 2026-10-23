@@ -50,19 +50,18 @@
 ## Node 5 — Operational Inventory Transactions, Reservation Ledger & Goods Receipt
 - **Status:** COMPLETE / PASS
 - **Date:** 2026-10-20
-- **Deliverables:**
-  - Core transactional inventory engine (`src/lib/server/inventory.js`) enforcing:
-    - Formula: `Available = Sellable On-Hand − Active Reservations`.
-    - Zero overselling rejection gate.
-    - FIFO batch allocation for ageing and supplier cost isolation.
-    - Append-only signed ledger movements (`RECEIPT`, `RESERVATION_ALLOCATION`, `DISPATCH_CONSUME`, `STOCK_ADJUSTMENT`).
-    - Idempotent reservation TTL expiry and release.
-  - Server-side inventory API routes (`/api/inventory/summary`, `/api/inventory/receipt`, `/api/inventory/reserve`, `/api/inventory/adjust`) with RBAC authorization checks.
-  - Live backoffice UI (`src/app/dashboard/page.js` TAB 4):
-    - Goods Receipt Modal dialog for warehouse batch intake.
-    - Active Batches Ledger with FIFO queue ordering and RBAC cost redaction.
-    - Recent Signed Movements ledger trail.
-    - SKU stock availability level gates.
+- **Architectural Deliverables:**
+  - **High-Integrity Transactional Engine** ([`src/lib/server/inventory.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/lib/server/inventory.js)):
+    - **Zero-Oversell Equation:** `Available Sellable Units = On-Hand Physical Stock − Active Cart Reservations`.
+    - **FIFO Batch Depletion:** First-In, First-Out queue dynamics isolating supplier landed costs and inventory ageing.
+    - **Immutable Append-Only Audit Trail:** Cryptographically signed movements (`RECEIPT`, `RESERVATION_ALLOCATION`, `DISPATCH_CONSUME`, `STOCK_ADJUSTMENT`).
+    - **TTL Expiration Engine:** High-frequency cart lock reservations with automatic release on timeout to prevent zombie inventory hoarding.
+  - **Protected Server-Side RPC & REST Gateways:**
+    - Full RBAC role authorization across `/api/inventory/summary`, `/api/inventory/receipt`, `/api/inventory/reserve`, `/api/inventory/adjust`.
+  - **Mission-Control Backoffice UI** ([`src/app/dashboard/page.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/dashboard/page.js) Tab 4):
+    - **Goods Receipt Intake Modal:** Rapid barcode and batch ingestion with automated quantity calculation.
+    - **Live Batch Ageing Matrix:** Real-time FIFO tiering with RBAC supplier cost masking for unauthorized roles.
+    - **Real-Time Signed Movements Feed:** Interactive filterable event trail with batch provenance and user attribution.
 - **Validation:**
   - `npm test` — PASS (26/26 tests passing: 16 permissions tests + 10 inventory engine tests).
   - Browser Verification: Live Chromium interaction posted batch `BATCH-202610-AUTUMN-RECEIPT` for 35 units, verified signed `+35` movement `MOV-#1`, updated sellable units on-hand to 152, screenshot captured (`inventory_goods_receipt_success_1792489532081.png`).
