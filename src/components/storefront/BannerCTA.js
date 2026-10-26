@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiGlobe, FiSearch, FiChevronDown } from 'react-icons/fi';
+import StarBorder from '../ui/StarBorder';
 
 export default function BannerCTA() {
   const router = useRouter();
@@ -72,9 +73,23 @@ export default function BannerCTA() {
                 </div>
               </div>
 
-              {/* Action Pill Button */}
-              <button
+              {/* Action Pill Button with Animated StarBorder */}
+              <StarBorder
+                as="button"
                 type="submit"
+                color="#E6C875"
+                trailColor="#FFFFFF"
+                duration={3.5}
+                direction="clockwise"
+                stars={1}
+                trailLength={0.3}
+                thickness={1.2}
+                radius={9999}
+                glow={0.7}
+                hover="lap"
+                sparkle={true}
+                clickPulse
+                theme="burgundy"
                 className="limitless-action-btn"
                 id="cta-find-btn"
                 aria-label="Find category"
@@ -83,7 +98,7 @@ export default function BannerCTA() {
                 <span className="limitless-action-icon">
                   <FiSearch size={20} strokeWidth={2.2} />
                 </span>
-              </button>
+              </StarBorder>
             </div>
           </form>
         </div>

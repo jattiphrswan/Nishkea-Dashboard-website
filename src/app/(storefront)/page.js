@@ -5,8 +5,11 @@ import Link from 'next/link';
 import { CATEGORIES, PRODUCTS, HERO_GALLERY } from '../../data/fixtures';
 import ProductCard from '../../components/storefront/ProductCard';
 import EditorialShowcase from '../../components/storefront/EditorialShowcase';
+import AtelierWheelShowcase from '../../components/storefront/AtelierWheelShowcase';
 import PlaceholderImage from '../../components/ui/PlaceholderImage';
 import BannerCTA from '../../components/storefront/BannerCTA';
+import StarBorder from '../../components/ui/StarBorder';
+import ScrollReveal from '../../components/ui/ScrollReveal';
 import { ArrowRight, ChevronRight } from 'lucide-react';
 import { FaGem, FaSyncAlt, FaShieldAlt } from 'react-icons/fa';
 
@@ -35,12 +38,31 @@ export default function HomePage() {
             <p className="hero-ref-sub">
               Hand-set diamonds and 18K gold, composed by our atelier in Paris.
             </p>
-            <Link href="/shop" className="hero-ref-btn" id="hero-discover-btn">
+            <StarBorder
+              as={Link}
+              href="/shop"
+              color="#ffffff"
+              trailColor="#ffffff"
+              duration={4}
+              direction="clockwise"
+              stars={1}
+              trailLength={0.3}
+              thickness={1.2}
+              radius={9999}
+              glow={0.65}
+              hover="lap"
+              sparkle={false}
+              clickPulse
+              theme="dark"
+              backgroundColor="rgba(12, 12, 15, 0.9)"
+              className="hero-ref-btn"
+              id="hero-discover-btn"
+            >
               <span>BEGIN EXPERIENCE</span>
               <span className="btn-icon-bubble">
                 <ChevronRight size={15} strokeWidth={2.5} />
               </span>
-            </Link>
+            </StarBorder>
           </div>
         </div>
 
@@ -60,117 +82,134 @@ export default function HomePage() {
       </section>
 
       {/* Trust Values */}
-      <section style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid var(--color-border)', padding: '20px 0' }}>
-        <div className="container-storefront">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', textAlign: 'center' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-              <FaGem size={20} color="var(--color-burgundy)" />
-              <strong style={{ fontSize: '0.82rem', letterSpacing: '0.06em' }}>159+ ATELIER DESIGNS</strong>
-              <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>Solid 18K vermeil, silk and fine stones</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-              <FaSyncAlt size={19} color="var(--color-burgundy)" />
-              <strong style={{ fontSize: '0.82rem', letterSpacing: '0.06em' }}>30-DAY TREND CYCLES</strong>
-              <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>Curated monthly capsule edits</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-              <FaShieldAlt size={20} color="var(--color-burgundy)" />
-              <strong style={{ fontSize: '0.82rem', letterSpacing: '0.06em' }}>TRANSACTIONAL LEDGER</strong>
-              <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>Live inventory with zero overselling</span>
+      <ScrollReveal direction="up" threshold={0.1}>
+        <section style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid var(--color-border)', padding: '20px 0' }}>
+          <div className="container-storefront">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', textAlign: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                <FaGem size={20} color="var(--color-burgundy)" />
+                <strong style={{ fontSize: '0.82rem', letterSpacing: '0.06em' }}>159+ ATELIER DESIGNS</strong>
+                <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>Solid 18K vermeil, silk and fine stones</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                <FaSyncAlt size={19} color="var(--color-burgundy)" />
+                <strong style={{ fontSize: '0.82rem', letterSpacing: '0.06em' }}>30-DAY TREND CYCLES</strong>
+                <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>Curated monthly capsule edits</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                <FaShieldAlt size={20} color="var(--color-burgundy)" />
+                <strong style={{ fontSize: '0.82rem', letterSpacing: '0.06em' }}>TRANSACTIONAL LEDGER</strong>
+                <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>Live inventory with zero overselling</span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       {/* Luxury Editorial Showcase (Reference Style Bento Grid) */}
-      <EditorialShowcase />
+      <ScrollReveal direction="up" threshold={0.1}>
+        <EditorialShowcase />
+      </ScrollReveal>
+
+      {/* 3D Interactive OptionWheel Showcase Section */}
+      <ScrollReveal direction="up" threshold={0.1}>
+        <AtelierWheelShowcase />
+      </ScrollReveal>
 
       {/* Core Categories with Uploaded Photography */}
-      <section style={{ padding: 'var(--space-12) 0 var(--space-8)' }}>
-        <div className="container-storefront">
-          <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-            <span style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-burgundy)', fontWeight: 600 }}>
-              Curated Silhouettes
-            </span>
-            <h2 style={{ marginTop: '6px' }}>Explore by Category</h2>
-          </div>
+      <ScrollReveal direction="up" threshold={0.1}>
+        <section style={{ padding: 'var(--space-12) 0 var(--space-8)' }}>
+          <div className="container-storefront">
+            <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
+              <span style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-burgundy)', fontWeight: 600 }}>
+                Curated Silhouettes
+              </span>
+              <h2 style={{ marginTop: '6px' }}>Explore by Category</h2>
+            </div>
 
-          <div className="category-grid">
-            {CATEGORIES.map((cat) => (
-              <Link key={cat.id} href={`/shop?category=${cat.slug}`} className="category-tile">
-                <div className="category-tile-media">
-                  <PlaceholderImage src={cat.image} alt={cat.name} category={cat.name} />
-                </div>
-                <div className="category-tile-info">
-                  <h3 className="category-tile-title">{cat.name}</h3>
-                  <span className="category-tile-count">{cat.estimatedDesigns}</span>
-                </div>
-              </Link>
-            ))}
+            <div className="category-grid">
+              {CATEGORIES.map((cat) => (
+                <Link key={cat.id} href={`/shop?category=${cat.slug}`} className="category-tile">
+                  <div className="category-tile-media">
+                    <PlaceholderImage src={cat.image} alt={cat.name} category={cat.name} />
+                  </div>
+                  <div className="category-tile-info">
+                    <h3 className="category-tile-title">{cat.name}</h3>
+                    <span className="category-tile-count">{cat.estimatedDesigns}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       {/* Featured Pieces */}
-      <section style={{ padding: 'var(--space-12) 0' }}>
-        <div className="container-storefront">
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 'var(--space-8)' }}>
-            <div>
-              <span style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-gold)', fontWeight: 600 }}>
-                Signature Collection
-              </span>
-              <h2 style={{ marginTop: '4px' }}>Featured Designs</h2>
+      <ScrollReveal direction="up" threshold={0.1}>
+        <section style={{ padding: 'var(--space-12) 0' }}>
+          <div className="container-storefront">
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 'var(--space-8)' }}>
+              <div>
+                <span style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-gold)', fontWeight: 600 }}>
+                  Signature Collection
+                </span>
+                <h2 style={{ marginTop: '4px' }}>Featured Designs</h2>
+              </div>
+              <Link href="/shop" className="btn btn-outline btn-sm">
+                <span>VIEW ALL</span>
+                <span className="btn-icon-bubble">
+                  <ChevronRight size={12} strokeWidth={2.5} />
+                </span>
+              </Link>
             </div>
-            <Link href="/shop" className="btn btn-outline btn-sm">
-              <span>VIEW ALL</span>
-              <span className="btn-icon-bubble">
-                <ChevronRight size={12} strokeWidth={2.5} />
-              </span>
-            </Link>
-          </div>
 
-          <div className="product-grid">
-            {featured.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            <div className="product-grid">
+              {featured.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       {/* Atelier Lookbook Gallery (Uploaded Hero Model Photos) */}
-      <section style={{ padding: 'var(--space-12) 0', backgroundColor: '#FFFFFF', borderTop: '1px solid var(--color-border)', borderBottom: '1px solid var(--color-border)' }}>
-        <div className="container-storefront">
-          <div style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <span style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-burgundy)', fontWeight: 600 }}>
-              Atelier Campaign
-            </span>
-            <h2 style={{ marginTop: '6px' }}>The Autumn Lookbook</h2>
-            <p style={{ maxWidth: '520px', margin: '8px auto 0', fontSize: '0.9rem' }}>
-              Styled on real muses in natural ambient light. Discover how 18k gold vermeil and Mulberry silk drape in everyday movement.
-            </p>
-          </div>
+      <ScrollReveal direction="up" threshold={0.1}>
+        <section style={{ padding: 'var(--space-12) 0', backgroundColor: '#FFFFFF', borderTop: '1px solid var(--color-border)', borderBottom: '1px solid var(--color-border)' }}>
+          <div className="container-storefront">
+            <div style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
+              <span style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-burgundy)', fontWeight: 600 }}>
+                Atelier Campaign
+              </span>
+              <h2 style={{ marginTop: '6px' }}>The Autumn Lookbook</h2>
+              <p style={{ maxWidth: '520px', margin: '8px auto 0', fontSize: '0.9rem' }}>
+                Styled on real muses in natural ambient light. Discover how 18k gold vermeil and Mulberry silk drape in everyday movement.
+              </p>
+            </div>
 
-          <div className="lookbook-grid">
-            {lookbook.map((item) => (
-              <Link key={item.id} href={item.link} className="lookbook-card">
-                <div className="lookbook-card-media">
-                  <PlaceholderImage src={item.image} alt={item.title} aspectRatio="4 / 5" priority />
-                </div>
-                <div className="lookbook-card-info">
-                  <span style={{ fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-burgundy)', fontWeight: 600 }}>
-                    {item.category}
-                  </span>
-                  <h4 className="lookbook-card-title">{item.title}</h4>
-                  <p className="lookbook-card-sub">{item.subtitle}</p>
-                </div>
-              </Link>
-            ))}
+            <div className="lookbook-grid">
+              {lookbook.map((item) => (
+                <Link key={item.id} href={item.link} className="lookbook-card">
+                  <div className="lookbook-card-media">
+                    <PlaceholderImage src={item.image} alt={item.title} aspectRatio="4 / 5" priority />
+                  </div>
+                  <div className="lookbook-card-info">
+                    <span style={{ fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-burgundy)', fontWeight: 600 }}>
+                      {item.category}
+                    </span>
+                    <h4 className="lookbook-card-title">{item.title}</h4>
+                    <p className="lookbook-card-sub">{item.subtitle}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       {/* Limitless Adornment Luxury Capsule CTA Banner (Reference Match) */}
-      <BannerCTA />
+      <ScrollReveal direction="scale" threshold={0.1}>
+        <BannerCTA />
+      </ScrollReveal>
     </div>
   );
 }

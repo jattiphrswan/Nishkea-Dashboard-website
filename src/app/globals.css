@@ -3030,3 +3030,410 @@ button, input, select, textarea {
     padding: 14px;
   }
 }
+
+/* ==========================================================================
+   LUXURY CURSOR & MAGNETIC POINTER FOLLOW EFFECT
+   ========================================================================== */
+
+.luxury-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  margin-left: -3.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #FFF8E7 0%, #D4AF37 70%, #9E7D23 100%);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.9), 0 0 20px rgba(182, 151, 99, 0.4);
+  pointer-events: none;
+  z-index: 99999;
+  opacity: 0;
+  transform: translate3d(-100px, -100px, 0);
+  transition: opacity 0.25s ease, transform 0.04s linear;
+  will-change: transform;
+}
+
+.luxury-cursor-dot.is-visible {
+  opacity: 1;
+}
+
+.luxury-cursor-dot.is-hover {
+  transform: scale(1.4);
+  background: #FFFFFF;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.95), 0 0 25px rgba(212, 175, 55, 0.7);
+}
+
+.luxury-cursor-dot.is-clicking {
+  transform: scale(0.7);
+}
+
+.luxury-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 36px;
+  height: 36px;
+  margin-top: -18px;
+  margin-left: -18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  background: transparent;
+  pointer-events: none;
+  z-index: 99998;
+  opacity: 0;
+  transform: translate3d(-100px, -100px, 0);
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              margin 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s ease,
+              background-color 0.25s ease,
+              box-shadow 0.25s ease,
+              opacity 0.3s ease;
+  will-change: transform, width, height;
+}
+
+.luxury-cursor-ring.is-visible {
+  opacity: 1;
+}
+
+.luxury-cursor-ring.is-hover {
+  width: 54px;
+  height: 54px;
+  margin-top: -27px;
+  margin-left: -27px;
+  border-color: rgba(230, 200, 117, 0.85);
+  background-color: rgba(182, 151, 99, 0.08);
+  box-shadow: 0 0 24px rgba(182, 151, 99, 0.35), inset 0 0 12px rgba(182, 151, 99, 0.15);
+}
+
+.luxury-cursor-ring.is-clicking {
+  width: 26px;
+  height: 26px;
+  margin-top: -13px;
+  margin-left: -13px;
+  border-color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .luxury-cursor-dot,
+  .luxury-cursor-ring {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   SCROLL REVEAL UTILITIES & SECTION ANIMATIONS
+   ========================================================================== */
+
+.scroll-reveal {
+  opacity: 0;
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal--up {
+  transform: translateY(32px);
+}
+
+.scroll-reveal--scale {
+  transform: scale(0.96) translateY(20px);
+}
+
+.scroll-reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ==========================================================================
+   ATELIER 3D OPTION WHEEL SHOWCASE SECTION
+   ========================================================================== */
+
+.atelier-wheel-section {
+  position: relative;
+  padding: var(--space-20) 0;
+  background: radial-gradient(ellipse at 50% 0%, #20050E 0%, #100206 50%, #080103 100%);
+  color: #FAF7F2;
+  overflow: hidden;
+  border-top: 1px solid rgba(182, 151, 99, 0.25);
+  border-bottom: 1px solid rgba(182, 151, 99, 0.25);
+}
+
+.atelier-wheel-ambient {
+  position: absolute;
+  top: -20%;
+  left: 10%;
+  width: 80%;
+  height: 140%;
+  background: radial-gradient(circle, rgba(120, 29, 57, 0.32) 0%, rgba(182, 151, 99, 0.12) 35%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.atelier-wheel-container {
+  position: relative;
+  z-index: 2;
+}
+
+.atelier-wheel-header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto var(--space-12);
+}
+
+.atelier-wheel-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.eyebrow-sparkle {
+  color: var(--color-gold);
+  animation: pulse-sparkle 2.2s infinite ease-in-out;
+}
+
+@keyframes pulse-sparkle {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.atelier-wheel-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+  line-height: 1.1;
+  color: #FFFFFF;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 0 0 14px;
+}
+
+.atelier-wheel-sub {
+  color: rgba(250, 247, 242, 0.65);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.atelier-wheel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.atelier-wheel-picker-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.atelier-wheel-picker-frame {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  background: rgba(26, 6, 14, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(182, 151, 99, 0.22);
+  border-radius: 28px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 0 40px rgba(120, 29, 57, 0.25);
+  overflow: hidden;
+}
+
+/* Subtle focal indicator line across wheel center */
+.atelier-wheel-active-indicator {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 64px;
+  margin-top: -32px;
+  background: linear-gradient(90deg, rgba(182, 151, 99, 0.16) 0%, rgba(120, 29, 57, 0.08) 50%, transparent 100%);
+  border-top: 1px solid rgba(182, 151, 99, 0.28);
+  border-bottom: 1px solid rgba(182, 151, 99, 0.28);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.atelier-wheel-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+  color: rgba(250, 247, 242, 0.48);
+  margin-top: 14px;
+  letter-spacing: 0.04em;
+}
+
+/* Spotlight Card (Right side) */
+.atelier-wheel-spotlight {
+  position: relative;
+}
+
+.spotlight-card {
+  position: relative;
+  background: rgba(26, 6, 14, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(182, 151, 99, 0.35);
+  border-radius: 28px;
+  padding: 32px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(182, 151, 99, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  transition: transform 0.35s ease, border-color 0.35s ease;
+}
+
+.spotlight-card:hover {
+  border-color: rgba(182, 151, 99, 0.55);
+}
+
+.spotlight-media-wrap {
+  position: relative;
+  width: 100%;
+  height: 290px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: radial-gradient(circle, #250712 0%, #120308 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.spotlight-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spotlight-card:hover .spotlight-img {
+  transform: scale(1.04);
+}
+
+.spotlight-media-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(18, 3, 8, 0.7) 100%);
+  pointer-events: none;
+}
+
+.spotlight-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(18, 3, 8, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #FAF7F2;
+  border: 1px solid rgba(182, 151, 99, 0.4);
+}
+
+.spotlight-price {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: rgba(120, 29, 57, 0.85);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.spotlight-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.spotlight-hallmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  font-weight: 600;
+}
+
+.spotlight-heading {
+  font-family: var(--font-serif);
+  font-size: 1.7rem;
+  line-height: 1.2;
+  color: #FFFFFF;
+  margin: 0;
+  font-weight: 600;
+}
+
+.spotlight-desc {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: rgba(250, 247, 242, 0.75);
+  margin: 0;
+}
+
+.spotlight-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.spotlight-star-btn {
+  font-size: 0.84rem;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.spotlight-star-btn-gold {
+  font-size: 0.84rem;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 960px) {
+  .atelier-wheel-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .atelier-wheel-picker-frame {
+    height: 380px;
+  }
+  .spotlight-card {
+    padding: 24px;
+  }
+  .spotlight-media-wrap {
+    height: 230px;
+  }
+}
+

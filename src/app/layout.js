@@ -1,6 +1,7 @@
 import './globals.css';
 import { StoreProvider } from '../context/StoreContext';
 import ChatWidget from '../components/chatbot/ChatWidget';
+import LuxuryCursor from '../components/ui/LuxuryCursor';
 
 export const viewport = {
   width: 'device-width',
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <StoreProvider>
+          <LuxuryCursor />
           {children}
           <ChatWidget />
         </StoreProvider>
