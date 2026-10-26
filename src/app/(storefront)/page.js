@@ -8,6 +8,7 @@ import EditorialShowcase from '../../components/storefront/EditorialShowcase';
 import AtelierWheelShowcase from '../../components/storefront/AtelierWheelShowcase';
 import PlaceholderImage from '../../components/ui/PlaceholderImage';
 import BannerCTA from '../../components/storefront/BannerCTA';
+import BorderGlow from '../../components/ui/BorderGlow';
 import StarBorder from '../../components/ui/StarBorder';
 import ScrollReveal from '../../components/ui/ScrollReveal';
 import { ArrowRight, ChevronRight } from 'lucide-react';
@@ -116,7 +117,7 @@ export default function HomePage() {
         <AtelierWheelShowcase />
       </ScrollReveal>
 
-      {/* Core Categories with Uploaded Photography */}
+      {/* Core Categories with Dynamic BorderGlow */}
       <ScrollReveal direction="up" threshold={0.1}>
         <section style={{ padding: 'var(--space-12) 0 var(--space-8)' }}>
           <div className="container-storefront">
@@ -129,7 +130,22 @@ export default function HomePage() {
 
             <div className="category-grid">
               {CATEGORIES.map((cat) => (
-                <Link key={cat.id} href={`/shop?category=${cat.slug}`} className="category-tile">
+                <BorderGlow
+                  as={Link}
+                  key={cat.id}
+                  href={`/shop?category=${cat.slug}`}
+                  className="category-tile"
+                  edgeSensitivity={26}
+                  glowColor="40 80 80"
+                  backgroundColor="#FFFFFF"
+                  borderRadius={18}
+                  glowRadius={36}
+                  glowIntensity={1}
+                  coneSpread={25}
+                  animated={false}
+                  colors={['#D4AF37', '#781D39', '#C084FC', '#F472B6', '#38BDF8']}
+                  fillOpacity={0.15}
+                >
                   <div className="category-tile-media">
                     <PlaceholderImage src={cat.image} alt={cat.name} category={cat.name} />
                   </div>
@@ -137,7 +153,7 @@ export default function HomePage() {
                     <h3 className="category-tile-title">{cat.name}</h3>
                     <span className="category-tile-count">{cat.estimatedDesigns}</span>
                   </div>
-                </Link>
+                </BorderGlow>
               ))}
             </div>
           </div>

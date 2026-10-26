@@ -467,4 +467,35 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - Browser Verification: Chromium visual inspection verified authentic logo in header badge (`top_header_logo_1792756921185.png`) and footer badge (`footer_logo_2_1792757131663.png`).
 
+## Storefront Motion & Micro-Interactions — StarBorder, 3D OptionWheel & Luxury Magnetic Cursor
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-26
+- **Deliverables:**
+  - **Dev Server Activation**: Launched Next.js development server on `http://localhost:3000` via daemon background task.
+  - **Animated `StarBorder` Component** ([`src/components/ui/StarBorder.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/ui/StarBorder.js), [`src/components/ui/StarBorder.css`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/ui/StarBorder.css)):
+    - Integrated React Bits canvas stardust ray tracer tracing outlines of buttons/cards with customizable glow, trail length, duration, click pulse, themes (`dark`, `light`, `gold`, `burgundy`), and hover states (`lap`, `brighten`, `reveal`).
+    - Upgraded Hero CTA button ("BEGIN EXPERIENCE") with animated stardust border and ivory text over burgundy/dark velvet capsule.
+    - Integrated with "Get started" button and "Explore Aura" actions in OptionWheel showcase.
+    - Integrated with "Find piece" CTA button in Limitless Adornment banner.
+  - **Interactive 3D `OptionWheel` Component** ([`src/components/ui/OptionWheel.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/ui/OptionWheel.js), [`src/components/ui/OptionWheel.css`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/ui/OptionWheel.css)):
+    - Integrated React Bits curved option picker with smooth rAF exponential smoothing, tilt physics, distance-based blur, and dragging/touch/scroll/arrow-key navigation.
+  - **Atelier Aesthetic Aura Showcase Section** ([`src/components/storefront/AtelierWheelShowcase.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/storefront/AtelierWheelShowcase.js)):
+    - 2-Column interactive stage pairing the 3D OptionWheel (8 jewelry aesthetic moods) with a glassmorphic spotlight showcase card rendering high-resolution product photography, hallmark certificates, pricing, and animated `StarBorder` action buttons.
+  - **Luxury Custom Mouse Pointer & Follower** ([`src/components/ui/LuxuryCursor.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/ui/LuxuryCursor.js), [`src/app/globals.css`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/globals.css)):
+    - Gold micro-dot cursor with spring lerp trailing aura ring follower.
+    - Magnetic expansion on interactive elements (links, buttons, `.star-border`, `.option-wheel__item`) and click pulse effect.
+    - Gracefully disabled on touch devices and respects `prefers-reduced-motion`.
+  - **Scroll Reveal Animations** ([`src/components/ui/ScrollReveal.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/ui/ScrollReveal.js)):
+    - Viewport enter transitions across storefront homepage sections with cubic-bezier easing.
+  - **Interactive Edge-Glow `BorderGlow` Component** ([`src/components/ui/BorderGlow.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/ui/BorderGlow.js), [`src/components/ui/BorderGlow.css`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/ui/BorderGlow.css)):
+    - Integrated React Bits edge-proximity mesh gradient border with conical cursor angle tracking, outer glow layer, customizable `edgeSensitivity`, `glowRadius`, `glowIntensity`, `coneSpread`, and multi-color gradients.
+    - Replaced the previous boxy 2px hover border on Category Tiles with smooth 18px rounded `BorderGlow` cards, illuminating borders toward the cursor with warm champagne and royal ruby starlight.
+    - Added direct re-export at [`src/components/storefront/BorderGlow.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/storefront/BorderGlow.js) for `import BorderGlow from './BorderGlow';`.
+- **Validation:**
+  - `npm test` — PASS (485/485 assertions passing across all 13 suites).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - Browser Verification: Verified live on `http://localhost:3000` with Chromium subagent visual recordings and screenshots (`hero_clean_final_1793010144272.png`, `option_wheel_selected_1793009755638.png`, `bottom_cta_1793009799182.png`, `category_border_glow_centered_1793011541783.png`).
+
+
+
 

@@ -704,11 +704,12 @@ button, input, select, textarea {
 .category-tile {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-xs);
+  border-radius: 18px;
   overflow: hidden;
   text-align: center;
   transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
   display: block;
+  text-decoration: none;
 }
 
 .category-tile:hover {
@@ -717,23 +718,41 @@ button, input, select, textarea {
   box-shadow: var(--shadow-sm);
 }
 
+.category-tile.border-glow-card {
+  border: 1px solid rgba(182, 151, 99, 0.22);
+  overflow: visible;
+  text-align: center;
+  display: block;
+  text-decoration: none;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.category-tile.border-glow-card:hover {
+  transform: translateY(-4px);
+  border-color: transparent;
+  box-shadow: 0 16px 36px rgba(120, 29, 57, 0.12), 0 4px 14px rgba(182, 151, 99, 0.15);
+}
+
 .category-tile-media {
   aspect-ratio: 1 / 1;
   background: var(--color-ivory);
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .category-tile-info {
   padding: var(--space-3) var(--space-2);
+  background: #FFFFFF;
 }
 
 .category-tile-title {
   font-family: var(--font-serif);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 600;
   color: var(--color-text-main);
+  margin-bottom: 2px;
 }
 
 .category-tile-count {
@@ -1066,6 +1085,19 @@ button, input, select, textarea {
   text-decoration: none;
 }
 
+.hero-ref-btn.star-border {
+  color: #FAF7F2 !important;
+  background: rgba(18, 4, 10, 0.85);
+  border: none;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  padding: 6px 8px 6px 26px;
+}
+
+.hero-ref-btn.star-border .btn-icon-bubble {
+  background: radial-gradient(circle at 35% 35%, #D4AF37 0%, #781D39 100%);
+  color: #FFFFFF;
+}
+
 .hero-ref-btn .btn-icon-bubble,
 .hero-ref-btn > svg {
   width: 36px;
@@ -1086,6 +1118,11 @@ button, input, select, textarea {
   color: #000000 !important;
   transform: translateY(-2px);
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+}
+
+.hero-ref-btn.star-border:hover {
+  background: rgba(28, 6, 16, 0.95);
+  transform: translateY(-2px);
 }
 
 .hero-ref-btn:hover .btn-icon-bubble,
