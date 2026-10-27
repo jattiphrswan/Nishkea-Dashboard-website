@@ -491,10 +491,12 @@
     - Integrated React Bits edge-proximity mesh gradient border with conical cursor angle tracking, outer glow layer, customizable `edgeSensitivity`, `glowRadius`, `glowIntensity`, `coneSpread`, and multi-color gradients.
     - Replaced the previous boxy 2px hover border on Category Tiles with smooth 18px rounded `BorderGlow` cards, illuminating borders toward the cursor with warm champagne and royal ruby starlight.
     - Added direct re-export at [`src/components/storefront/BorderGlow.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/storefront/BorderGlow.js) for `import BorderGlow from './BorderGlow';`.
+  - **Trust Values Strip Removal**: Removed the operational `159+ Atelier Designs / 30-Day Trend Cycles / Transactional Ledger` banner from the homepage layout in [`src/app/(storefront)/page.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/%28storefront%29/page.js), allowing the Hero organic wave to flow seamlessly into the Festive Editorial Bento Showcase.
 - **Validation:**
   - `npm test` — PASS (485/485 assertions passing across all 13 suites).
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
-  - Browser Verification: Verified live on `http://localhost:3000` with Chromium subagent visual recordings and screenshots (`hero_clean_final_1793010144272.png`, `option_wheel_selected_1793009755638.png`, `bottom_cta_1793009799182.png`, `category_border_glow_centered_1793011541783.png`).
+  - Browser Verification: Verified live on `http://localhost:3000` with Chromium subagent visual recordings and screenshots (`hero_clean_final_1793010144272.png`, `option_wheel_selected_1793009755638.png`, `bottom_cta_1793009799182.png`, `category_border_glow_centered_1793011541783.png`, `transition_hero_to_bento_1793014174947.png`).
+
 
 
 

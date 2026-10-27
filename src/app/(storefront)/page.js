@@ -11,8 +11,7 @@ import BannerCTA from '../../components/storefront/BannerCTA';
 import BorderGlow from '../../components/ui/BorderGlow';
 import StarBorder from '../../components/ui/StarBorder';
 import ScrollReveal from '../../components/ui/ScrollReveal';
-import { ArrowRight, ChevronRight } from 'lucide-react';
-import { FaGem, FaSyncAlt, FaShieldAlt } from 'react-icons/fa';
+import { ChevronRight } from 'lucide-react';
 
 export default function HomePage() {
   const featured = PRODUCTS.slice(0, 4);
@@ -81,31 +80,6 @@ export default function HomePage() {
           />
         </svg>
       </section>
-
-      {/* Trust Values */}
-      <ScrollReveal direction="up" threshold={0.1}>
-        <section style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid var(--color-border)', padding: '20px 0' }}>
-          <div className="container-storefront">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', textAlign: 'center' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                <FaGem size={20} color="var(--color-burgundy)" />
-                <strong style={{ fontSize: '0.82rem', letterSpacing: '0.06em' }}>159+ ATELIER DESIGNS</strong>
-                <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>Solid 18K vermeil, silk and fine stones</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                <FaSyncAlt size={19} color="var(--color-burgundy)" />
-                <strong style={{ fontSize: '0.82rem', letterSpacing: '0.06em' }}>30-DAY TREND CYCLES</strong>
-                <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>Curated monthly capsule edits</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                <FaShieldAlt size={20} color="var(--color-burgundy)" />
-                <strong style={{ fontSize: '0.82rem', letterSpacing: '0.06em' }}>TRANSACTIONAL LEDGER</strong>
-                <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>Live inventory with zero overselling</span>
-              </div>
-            </div>
-          </div>
-        </section>
-      </ScrollReveal>
 
       {/* Luxury Editorial Showcase (Reference Style Bento Grid) */}
       <ScrollReveal direction="up" threshold={0.1}>

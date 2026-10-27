@@ -10,21 +10,37 @@
   border: 0;
   border-radius: var(--star-border-radius, 12px);
   background: var(--star-border-surface, #0c0c0f);
-  color: var(--star-border-text, #fafafa);
+  color: var(--star-border-text, #fafafa) !important;
   font: inherit;
   font-weight: 500;
   line-height: 1.25;
-  text-decoration: none;
+  text-decoration: none !important;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.25s ease,
+              box-shadow 0.25s ease,
+              color 0.2s ease,
+              text-shadow 0.2s ease;
   user-select: none;
 }
 
-.star-border:hover {
-  transform: translateY(-1px);
+.star-border,
+a.star-border,
+button.star-border {
+  color: var(--star-border-text, #fafafa) !important;
 }
 
-.star-border:active {
+.star-border:hover,
+a.star-border:hover,
+button.star-border:hover {
+  transform: translateY(-2px);
+  color: #FFFFFF !important;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.65);
+}
+
+.star-border:active,
+a.star-border:active,
+button.star-border:active {
   transform: translateY(0.5px);
 }
 
