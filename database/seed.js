@@ -158,11 +158,18 @@ async function seed() {
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     console.error('❌ Seeding failed:', err.message);
-    process.exit(1);
+    if (require.main === module) {
+      process.exit(1);
+    }
+    throw err;
   } finally {
     client.release();
     await pool.end();
   }
 }
 
-seed();
+if (require.main === module) {
+  seed();
+}
+
+module.exports = { seed, hashPassword };

@@ -17,14 +17,20 @@ export function getDbPool() {
 
   if (!pool) {
     const isLocalhost = connectionString.includes('localhost') || connectionString.includes('127.0.0.1');
+    const maxConnections = parseInt(process.env.PG_MAX_CONNECTIONS || '10', 10);
 
-    pool = new Pool({
+    const poolConfig = {
       connectionString,
-      ssl: isLocalhost ? false : { rejectUnauthorized: false },
-      max: 10,
+      max: maxConnections,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000,
-    });
+      connectionTimeoutMillis: 8000,
+    };
+
+    if (!isLocalhost) {
+      poolConfig.ssl = { rejectUnauthorized: false };
+    }
+
+    pool = new Pool(poolConfig);
 
     pool.on('error', (err) => {
       console.error('[PostgreSQL Pool Error]:', err.message);
@@ -82,7 +88,7 @@ export async function withTransaction(callback) {
 }
 
 /**
- * Test database connectivity
+ * Test database connectivity with latency & schema telemetry
  */
 export async function testConnection() {
   const p = getDbPool();
@@ -93,17 +99,30 @@ export async function testConnection() {
     };
   }
 
+  const start = Date.now();
   try {
-    const res = await p.query('SELECT NOW() as current_time, version() as pg_version');
+    const res = await p.query(`
+      SELECT 
+        NOW() as current_time, 
+        version() as pg_version, 
+        current_database() as db_name,
+        (SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public') as table_count
+    `);
+    const latencyMs = Date.now() - start;
+
     return {
       connected: true,
       time: res.rows[0].current_time,
-      version: res.rows[0].pg_version
+      version: res.rows[0].pg_version,
+      database: res.rows[0].db_name,
+      tableCount: parseInt(res.rows[0].table_count, 10),
+      latencyMs
     };
   } catch (err) {
     return {
       connected: false,
-      error: err.message
+      error: err.message,
+      latencyMs: Date.now() - start
     };
   }
 }

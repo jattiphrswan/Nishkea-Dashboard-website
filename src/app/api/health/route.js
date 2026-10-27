@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { testConnection } from '../../../lib/server/db.js';
 
 /**
  * Health & Operational Monitoring Endpoint — Node 15 Production Readiness
@@ -8,6 +9,15 @@ import { NextResponse } from 'next/server';
  */
 export async function GET() {
   const isDbConfigured = Boolean(process.env.DATABASE_URL);
+  let dbTelemetry = null;
+
+  if (isDbConfigured) {
+    try {
+      dbTelemetry = await testConnection();
+    } catch {
+      dbTelemetry = { connected: false, error: 'Connection attempt failed' };
+    }
+  }
 
   const healthData = {
     status: 'healthy',
@@ -19,11 +29,18 @@ export async function GET() {
     uptimeSeconds: Math.floor(process.uptime()),
     systemDiagnostics: {
       node3_database: {
-        status: isDbConfigured ? 'CONNECTED' : 'STANDBY_LOCAL_MIGRATIONS_READY',
+        status: isDbConfigured
+          ? (dbTelemetry?.connected ? 'CONNECTED' : 'CONNECTION_ERROR')
+          : 'STANDBY_LOCAL_MIGRATIONS_READY',
         engine: 'PostgreSQL 16 Relational Storage',
         pooling: 'pg.Pool with SSL auto-negotiation',
         migrationsAvailable: 5,
-        authMethod: 'PBKDF2 Salted SHA-512 + HTTP-Only Session Tokens'
+        authMethod: 'PBKDF2 Salted SHA-512 + HTTP-Only Session Tokens',
+        ...(dbTelemetry?.connected ? {
+          latencyMs: dbTelemetry.latencyMs,
+          tableCount: dbTelemetry.tableCount,
+          database: dbTelemetry.database
+        } : {})
       },
       node3_permissions: {
         status: 'ACTIVE',

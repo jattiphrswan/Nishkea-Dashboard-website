@@ -497,6 +497,33 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - Browser Verification: Verified live on `http://localhost:3000` with Chromium subagent visual recordings and screenshots (`hero_clean_final_1793010144272.png`, `option_wheel_selected_1793009755638.png`, `bottom_cta_1793009799182.png`, `category_border_glow_centered_1793011541783.png`, `transition_hero_to_bento_1793014174947.png`).
 
+## Cloud Database & Production Deployment Configuration — Neon/Supabase & Vercel
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-27
+- **Deliverables:**
+  - **Enhanced PostgreSQL Client** ([`src/lib/server/db.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/lib/server/db.js)):
+    - Configured serverless connection pooling with `PG_MAX_CONNECTIONS` fallback to 10.
+    - SSL auto-negotiation supporting Neon Serverless (`?sslmode=require`) and Supabase Transaction Pooler.
+    - Enhanced `testConnection()` measuring live round-trip latency (`latencyMs`), PostgreSQL engine version, database name, and public table count.
+  - **Dynamic Runtime Diagnostics** ([`src/app/api/health/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/health/route.js)):
+    - Injected real-time database telemetry into `/api/health` reporting live connection status (`CONNECTED` / `STANDBY_LOCAL_MIGRATIONS_READY`), query ping latency, and table counts without leaking credentials.
+  - **Vercel Production Configuration** ([`vercel.json`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/vercel.json)):
+    - Configured Next.js framework build preset targeting Mumbai (`bom1`) and Singapore (`sin1`) edge regions for minimal Indian latency.
+  - **Automated Cloud Database Tooling**:
+    - [`database/setup-db.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/database/setup-db.js) (`npm run db:setup`): One-command automated runner applying migrations `001` through `005`, seeding RBAC roles/staff/categories, and verifying tables.
+    - [`database/verify-connection.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/database/verify-connection.js) (`npm run db:verify`): Connection and latency verification CLI with masked credentials and diagnostic checklist.
+    - Exportable [`database/migrate.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/database/migrate.js) and [`database/seed.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/database/seed.js) modules.
+  - **Production Environment Templates** ([`.env.example`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/.env.example)):
+    - Clean templates with configuration instructions for Neon, Supabase, and Vercel while strictly avoiding committed secrets.
+  - **Comprehensive Operations Guide** ([`docs/DEPLOYMENT.md`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/docs/DEPLOYMENT.md)):
+    - Step-by-step setup guide for Neon, Supabase, Vercel, and Docker hosts.
+- **Validation:**
+  - `npm run db:verify` — PASS (exits 0 with actionable checklist).
+  - `npm test` — PASS (485/485 assertions passing across all 13 suites).
+  - `npm run db:backup-test` — PASS (SHA-256 master schema checksum verified).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - `npm run build` — PASS (all 55 static & dynamic routes compiled).
+
 
 
 
