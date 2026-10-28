@@ -56,7 +56,7 @@ export default function StorefrontLayout({ children }) {
         </div>
       )}
 
-      <main style={{ flex: 1 }}>{children}</main>
+      <main style={{ flex: 1, position: 'relative', zIndex: 10 }}>{children}</main>
       <Footer />
     </div>
   );

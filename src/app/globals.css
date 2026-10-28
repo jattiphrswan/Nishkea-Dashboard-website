@@ -1224,6 +1224,8 @@ button, input, select, textarea {
 
 /* Footer */
 .site-footer {
+  position: relative;
+  z-index: 1;
   background-color: #241B20;
   color: #FAF7F2;
   padding-top: var(--space-16);
@@ -2836,6 +2838,8 @@ button, input, select, textarea {
    ========================================================================== */
 
 .limitless-cta-section {
+  position: relative;
+  z-index: 30;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -2845,6 +2849,7 @@ button, input, select, textarea {
 
 .limitless-cta-banner {
   position: relative;
+  z-index: 30;
   width: 100%;
   border-radius: 0;
   overflow: visible;
@@ -2855,8 +2860,6 @@ button, input, select, textarea {
   box-shadow: inset 0 2px 24px rgba(0, 0, 0, 0.45), 0 20px 50px rgba(0, 0, 0, 0.3);
   border-top: 1px solid rgba(212, 175, 55, 0.3);
   border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-  isolation: isolate;
-  z-index: 10;
 }
 
 .limitless-cta-bg-wrap {
@@ -2965,13 +2968,16 @@ button, input, select, textarea {
 }
 
 .limitless-cta-right {
-  z-index: 1;
+  position: relative;
+  z-index: 50;
   display: flex;
   align-items: center;
 }
 
 /* Haute Joaillerie Atelier Concierge Dock */
 .limitless-glass-dock {
+  position: relative;
+  z-index: 60;
   background: linear-gradient(
     135deg,
     rgba(34, 6, 17, 0.84) 0%,
@@ -3099,7 +3105,7 @@ button, input, select, textarea {
   box-shadow: 0 24px 55px rgba(0, 0, 0, 0.8),
               0 0 35px rgba(212, 175, 55, 0.2),
               inset 0 1px 1px rgba(255, 255, 255, 0.15);
-  z-index: 200;
+  z-index: 9999;
   animation: dropdownLuxuryOpen 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

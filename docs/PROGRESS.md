@@ -530,7 +530,9 @@
   - **Removed Footer Newsletter**: Cleaned up the footer first column, removing the newsletter form to present a focused, luxury brand statement and elegant circular social channels ("Follow The Maison").
   - **Bespoke Luxury React Dropdown**: Replaced native browser `<select>` popup with a frosted obsidian-ruby glass menu with 18K champagne gold hairline borders, serif typography, animated gold checkmark selection indicators, and click-outside/escape-key dismissal.
   - **Unclipped Dropdown Stacking**: Isolated banner background image scaling inside an inner overflow wrapper while setting banner container overflow to visible, ensuring the luxury dropdown menu floats over the banner and footer boundary with zero clipping.
+  - **Footer Stacking Context Elevation**: Removed `isolation: isolate` on the banner, removed the CSS transform on the banner parent wrapper, assigned `position: relative; z-index: 10` to `<main>`, and elevated `.atelier-dropdown-menu` to `z-index: 9999` so all dropdown options float completely in front of the footer.
 - **Validation:**
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - `npm test` — PASS (All 13 test suites passing).
-  - Browser Verification — Live Chromium visual confirmation of gap removal, newsletter cleanup, and custom dropdown interaction.
+  - Browser Verification — Live Chromium visual confirmation of gap removal, newsletter cleanup, and dropdown rendering fully over footer.
+

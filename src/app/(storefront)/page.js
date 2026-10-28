@@ -197,9 +197,7 @@ export default function HomePage() {
       </ScrollReveal>
 
       {/* Limitless Adornment Luxury Capsule CTA Banner (Reference Match) */}
-      <ScrollReveal direction="scale" threshold={0.1}>
-        <BannerCTA />
-      </ScrollReveal>
+      <BannerCTA />
     </div>
   );
 }
