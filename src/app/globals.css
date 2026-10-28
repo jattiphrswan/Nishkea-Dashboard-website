@@ -2848,13 +2848,13 @@ button, input, select, textarea {
   width: 100%;
   border-radius: 0;
   overflow: hidden;
-  min-height: 290px;
+  min-height: 280px;
   display: flex;
   align-items: center;
-  padding: 68px 0;
-  box-shadow: inset 0 2px 24px rgba(0, 0, 0, 0.4), 0 20px 50px rgba(0, 0, 0, 0.25);
-  border-top: 1px solid rgba(182, 151, 99, 0.35);
-  border-bottom: 1px solid rgba(182, 151, 99, 0.35);
+  padding: 64px 0;
+  box-shadow: inset 0 2px 24px rgba(0, 0, 0, 0.45), 0 20px 50px rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(212, 175, 55, 0.3);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
   isolation: isolate;
 }
 
@@ -2862,7 +2862,7 @@ button, input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 36px;
+  gap: 40px;
   position: relative;
   z-index: 1;
 }
@@ -2879,7 +2879,7 @@ button, input, select, textarea {
 }
 
 .limitless-cta-banner:hover .limitless-cta-bg {
-  transform: scale(1.03);
+  transform: scale(1.025);
 }
 
 .limitless-cta-overlay {
@@ -2887,16 +2887,41 @@ button, input, select, textarea {
   inset: 0;
   background: linear-gradient(
     90deg,
-    rgba(26, 4, 12, 0.90) 0%,
-    rgba(54, 10, 26, 0.65) 50%,
-    rgba(20, 3, 10, 0.86) 100%
+    rgba(22, 3, 10, 0.92) 0%,
+    rgba(46, 8, 22, 0.72) 48%,
+    rgba(18, 2, 8, 0.90) 100%
   );
   z-index: -1;
 }
 
 .limitless-cta-left {
-  max-width: 540px;
+  max-width: 520px;
   z-index: 1;
+}
+
+.limitless-cta-eyebrow-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.limitless-eyebrow-icon {
+  color: #D4AF37;
+  animation: pulseGoldGlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseGoldGlow {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.4));
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.8));
+  }
 }
 
 .limitless-cta-eyebrow {
@@ -2905,25 +2930,24 @@ button, input, select, textarea {
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.22em;
-  color: var(--color-gold);
+  color: #E6C875;
   text-transform: uppercase;
-  margin-bottom: 8px;
 }
 
 .limitless-cta-title {
-  color: #FFFFFF;
+  color: #FAF7F2;
   font-family: var(--font-serif);
-  font-size: clamp(2.3rem, 3.8vw, 3.25rem);
+  font-size: clamp(2.2rem, 3.6vw, 3.15rem);
   font-weight: 500;
   letter-spacing: 0.02em;
   line-height: 1.15;
   margin: 0 0 12px 0;
-  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
 }
 
 .limitless-cta-sub {
-  color: rgba(250, 247, 242, 0.88);
-  font-size: 1.02rem;
+  color: rgba(250, 247, 242, 0.85);
+  font-size: 1rem;
   line-height: 1.6;
   margin: 0;
   font-family: var(--font-sans);
@@ -2935,38 +2959,73 @@ button, input, select, textarea {
   align-items: center;
 }
 
+/* Haute Joaillerie Atelier Concierge Dock */
 .limitless-glass-dock {
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(182, 151, 99, 0.45);
+  background: linear-gradient(
+    135deg,
+    rgba(34, 6, 17, 0.84) 0%,
+    rgba(18, 3, 9, 0.92) 100%
+  );
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(226, 192, 115, 0.45);
   border-radius: 9999px;
-  padding: 8px 10px;
+  padding: 8px 8px 8px 24px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35), 0 0 30px rgba(182, 151, 99, 0.15);
+  box-shadow: 0 20px 48px -8px rgba(0, 0, 0, 0.65),
+              0 0 28px rgba(212, 175, 55, 0.14),
+              inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.limitless-input-card {
-  background: #FFFFFF;
-  border-radius: 9999px;
-  padding: 10px 22px 10px 18px;
+.limitless-glass-dock:hover,
+.limitless-glass-dock:focus-within {
+  border-color: rgba(226, 192, 115, 0.75);
+  box-shadow: 0 22px 54px -6px rgba(0, 0, 0, 0.75),
+              0 0 35px rgba(212, 175, 55, 0.25),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25);
+}
+
+.limitless-dock-field {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   min-width: 250px;
+}
+
+.limitless-dock-icon-halo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.22) 0%, rgba(212, 175, 55, 0.05) 70%, transparent 100%);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+}
+
+.limitless-dock-icon {
+  color: #E6C875;
+}
+
+.limitless-dock-content {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  gap: 2px;
+  flex: 1;
 }
 
-.limitless-input-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.78rem;
+.limitless-dock-label {
+  font-family: var(--font-sans);
+  font-size: 0.67rem;
   font-weight: 700;
-  color: #1a1a1a;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #D4AF37;
+  user-select: none;
 }
 
 .limitless-select-wrap {
@@ -2975,79 +3034,164 @@ button, input, select, textarea {
   align-items: center;
 }
 
-.limitless-select {
+.limitless-select-input {
   width: 100%;
   appearance: none;
   -webkit-appearance: none;
-  background: #F1F2F4;
-  border: 1px solid transparent;
-  border-radius: 9999px;
-  padding: 8px 36px 8px 14px;
-  font-size: 0.84rem;
-  color: #2c2c2c;
+  background: transparent;
+  border: none;
+  padding: 2px 26px 2px 0;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
   font-weight: 500;
+  color: #FAF7F2;
   cursor: pointer;
   outline: none;
-  transition: all var(--transition-fast);
+  letter-spacing: 0.01em;
+  transition: color var(--transition-fast);
 }
 
-.limitless-select:focus {
-  background: #FFFFFF;
-  border-color: var(--color-burgundy);
-  box-shadow: 0 0 0 2px rgba(112, 26, 54, 0.15);
+.limitless-select-input:hover,
+.limitless-select-input:focus {
+  color: #FFFFFF;
 }
 
-.limitless-chevron-btn {
+.limitless-select-input option {
+  background: #1C050E;
+  color: #FAF7F2;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  padding: 12px 14px;
+}
+
+.limitless-select-chevron {
   position: absolute;
-  right: 6px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--color-burgundy);
-  color: #FFFFFF;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  right: 4px;
+  color: #D4AF37;
   pointer-events: none;
+  transition: transform var(--transition-fast);
 }
 
+.limitless-select-input:focus ~ .limitless-select-chevron {
+  transform: rotate(180deg);
+}
+
+.limitless-dock-divider {
+  width: 1px;
+  height: 36px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(212, 175, 55, 0.35) 50%,
+    transparent 100%
+  );
+  margin: 0 10px 0 6px;
+  flex-shrink: 0;
+}
+
+/* Polished 18K Gold Haute Joaillerie Action Pill Button */
 .limitless-action-btn {
-  background: linear-gradient(135deg, #701A36 0%, #4D0E22 100%);
-  color: #FFFFFF;
-  border-radius: 9999px;
-  padding: 12px 24px;
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  border: 1px solid rgba(182, 151, 99, 0.4);
+  gap: 10px;
+  height: 48px;
+  padding: 0 20px 0 24px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 245, 215, 0.65);
+  background: linear-gradient(
+    135deg,
+    #FDE69E 0%,
+    #E4BC5E 30%,
+    #D4AF37 60%,
+    #9C740E 100%
+  );
+  color: #1A030A;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
-  min-width: 105px;
-  transition: all var(--transition-fast);
+  white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.42),
+              0 2px 6px rgba(0, 0, 0, 0.3),
+              inset 0 1px 2px rgba(255, 255, 255, 0.75);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  isolation: isolate;
   text-decoration: none;
-  box-shadow: 0 4px 16px rgba(112, 26, 54, 0.4);
+  flex-shrink: 0;
 }
 
 .limitless-action-btn:hover {
-  background: linear-gradient(135deg, #8E2345 0%, #701A36 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(112, 26, 54, 0.55), 0 0 16px rgba(182, 151, 99, 0.3);
+  transform: translateY(-2px) scale(1.02);
+  background: linear-gradient(
+    135deg,
+    #FFF0B8 0%,
+    #EDC96C 30%,
+    #DEB840 60%,
+    #B28615 100%
+  );
+  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.65),
+              0 0 20px rgba(253, 230, 158, 0.4),
+              inset 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.limitless-action-btn:active {
+  transform: translateY(0.5px) scale(0.98);
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.4);
+}
+
+.limitless-btn-shimmer {
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 100%
+  );
+  transform: skewX(-22deg);
+  pointer-events: none;
+  transition: none;
+}
+
+.limitless-action-btn:hover .limitless-btn-shimmer {
+  left: 160%;
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .limitless-action-label {
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   white-space: nowrap;
+  color: #1A030A;
 }
 
-.limitless-action-icon {
+.limitless-btn-icon-bubble {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(26, 3, 10, 0.14);
+  color: #1A030A;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease;
 }
 
+.limitless-action-btn:hover .limitless-btn-icon-bubble {
+  transform: translateX(2px) scale(1.08);
+  background: rgba(26, 3, 10, 0.22);
+}
+
+/* Responsive Breakpoints */
 @media (max-width: 960px) {
   .limitless-cta-banner {
     padding: 48px 0;
@@ -3064,19 +3208,19 @@ button, input, select, textarea {
     width: 100%;
     flex-direction: column;
     border-radius: 24px;
-    gap: 12px;
+    padding: 18px;
+    gap: 16px;
   }
-  .limitless-input-card {
+  .limitless-dock-field {
     width: 100%;
     min-width: 0;
-    border-radius: 18px;
+  }
+  .limitless-dock-divider {
+    display: none;
   }
   .limitless-action-btn {
     width: 100%;
-    flex-direction: row;
-    border-radius: 9999px;
-    gap: 10px;
-    padding: 14px;
+    height: 48px;
   }
 }
 

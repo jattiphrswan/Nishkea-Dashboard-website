@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FiGlobe, FiSearch, FiChevronDown } from 'react-icons/fi';
-import StarBorder from '../ui/StarBorder';
+import { FiSearch, FiChevronDown } from 'react-icons/fi';
+import { Sparkles } from 'lucide-react';
 
 export default function BannerCTA() {
   const router = useRouter();
@@ -33,9 +33,12 @@ export default function BannerCTA() {
         <div className="container-storefront limitless-cta-inner">
           {/* Left Column: Heading and Subtitle */}
           <div className="limitless-cta-left">
-            <span className="limitless-cta-eyebrow">
-              ATELIER CONCIERGE &bull; BESPOKE CURATION
-            </span>
+            <div className="limitless-cta-eyebrow-wrap">
+              <Sparkles size={13} className="limitless-eyebrow-icon" />
+              <span className="limitless-cta-eyebrow">
+                ATELIER CONCIERGE &bull; BESPOKE CURATION
+              </span>
+            </div>
             <h2 className="limitless-cta-title">
               Adorn without limit
             </h2>
@@ -44,61 +47,70 @@ export default function BannerCTA() {
             </p>
           </div>
 
-          {/* Right Column: Frosted Glass Floating Dock */}
+          {/* Right Column: Haute Joaillerie Concierge Dock */}
           <form className="limitless-cta-right" onSubmit={handleSearch}>
             <div className="limitless-glass-dock">
-              {/* White Input Card */}
-              <div className="limitless-input-card">
-                <div className="limitless-input-header">
-                  <FiGlobe size={15} style={{ color: 'var(--color-gold)' }} />
-                  <span>Your Silhouette</span>
-                </div>
-                <div className="limitless-select-wrap">
-                  <select
-                    className="limitless-select"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    id="cta-silhouette-select"
-                    aria-label="Select silhouette category"
+              {/* Silhouette Selection Field */}
+              <div className="limitless-dock-field">
+                <div className="limitless-dock-icon-halo">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="limitless-dock-icon"
+                    aria-hidden="true"
                   >
-                    <option value="necklaces">Necklaces & Pendants</option>
-                    <option value="earrings">Earrings & Jhumkas</option>
-                    <option value="rings">Solitaire & Cocktail Rings</option>
-                    <option value="bracelets">Bangles & Cuffs</option>
-                    <option value="accessories">Hair Adornments & Nose Rings</option>
-                  </select>
-                  <span className="limitless-chevron-btn" aria-hidden="true">
-                    <FiChevronDown size={12} strokeWidth={2.5} />
-                  </span>
+                    <path d="M6 3h12l4 6-10 12L2 9l4-6z" />
+                    <path d="M2 9h20" />
+                    <path d="M10 3l2 6-2 12" />
+                    <path d="M14 3l-2 6 2 12" />
+                  </svg>
+                </div>
+
+                <div className="limitless-dock-content">
+                  <label htmlFor="cta-silhouette-select" className="limitless-dock-label">
+                    Your Silhouette
+                  </label>
+                  <div className="limitless-select-wrap">
+                    <select
+                      className="limitless-select-input"
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      id="cta-silhouette-select"
+                      aria-label="Select silhouette category"
+                    >
+                      <option value="necklaces">Necklaces & Pendants</option>
+                      <option value="earrings">Earrings & Jhumkas</option>
+                      <option value="rings">Solitaire & Cocktail Rings</option>
+                      <option value="bracelets">Bangles & Cuffs</option>
+                      <option value="accessories">Hair Adornments & Nose Rings</option>
+                    </select>
+                    <FiChevronDown className="limitless-select-chevron" size={14} aria-hidden="true" />
+                  </div>
                 </div>
               </div>
 
-              {/* Action Pill Button with Animated StarBorder */}
-              <StarBorder
-                as="button"
+              {/* Architectural Hairline Divider */}
+              <div className="limitless-dock-divider" aria-hidden="true" />
+
+              {/* Radiant 18K Solid Gold Action Pill Button */}
+              <button
                 type="submit"
-                color="#E6C875"
-                trailColor="#FFFFFF"
-                duration={3.5}
-                direction="clockwise"
-                stars={1}
-                trailLength={0.3}
-                thickness={1.2}
-                radius={9999}
-                glow={0.7}
-                hover="lap"
-                sparkle={true}
-                clickPulse
-                theme="burgundy"
-                className="limitless-action-btn"
                 id="cta-find-btn"
-                aria-label="Find category"
+                className="limitless-action-btn"
+                aria-label="Find Curated Silhouette Piece"
               >
+                <span className="limitless-btn-shimmer" aria-hidden="true" />
                 <span className="limitless-action-label">Find piece</span>
-                <span className="limitless-action-icon">
-                  <FiSearch size={20} strokeWidth={2.2} />
+                <span className="limitless-btn-icon-bubble">
+                  <FiSearch size={14} strokeWidth={2.4} />
                 </span>
-              </StarBorder>
+              </button>
             </div>
           </form>
         </div>
@@ -106,4 +118,3 @@ export default function BannerCTA() {
     </section>
   );
 }
-
