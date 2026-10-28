@@ -3016,6 +3016,7 @@ button, input, select, textarea {
   flex-direction: column;
   gap: 2px;
   flex: 1;
+  position: relative;
 }
 
 .limitless-dock-label {
@@ -3028,52 +3029,148 @@ button, input, select, textarea {
   user-select: none;
 }
 
-.limitless-select-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.limitless-select-input {
-  width: 100%;
-  appearance: none;
-  -webkit-appearance: none;
+/* Custom Haute Joaillerie Atelier Dropdown */
+.atelier-dropdown-trigger {
   background: transparent;
   border: none;
-  padding: 2px 26px 2px 0;
+  padding: 2px 14px 2px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  width: 100%;
+  position: relative;
+}
+
+.atelier-dropdown-value {
   font-family: var(--font-serif);
   font-size: 1.05rem;
   font-weight: 500;
   color: #FAF7F2;
-  cursor: pointer;
-  outline: none;
   letter-spacing: 0.01em;
   transition: color var(--transition-fast);
+  white-space: nowrap;
 }
 
-.limitless-select-input:hover,
-.limitless-select-input:focus {
+.atelier-dropdown-trigger:hover .atelier-dropdown-value,
+.atelier-dropdown-trigger.active .atelier-dropdown-value {
   color: #FFFFFF;
 }
 
-.limitless-select-input option {
-  background: #1C050E;
-  color: #FAF7F2;
-  font-family: var(--font-sans);
-  font-size: 0.92rem;
-  padding: 12px 14px;
-}
-
-.limitless-select-chevron {
-  position: absolute;
-  right: 4px;
+.atelier-dropdown-chevron {
   color: #D4AF37;
-  pointer-events: none;
-  transition: transform var(--transition-fast);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-left: 10px;
+  flex-shrink: 0;
 }
 
-.limitless-select-input:focus ~ .limitless-select-chevron {
+.atelier-dropdown-chevron.open {
   transform: rotate(180deg);
+}
+
+.atelier-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: -14px;
+  min-width: 280px;
+  background: linear-gradient(
+    145deg,
+    rgba(32, 6, 17, 0.96) 0%,
+    rgba(18, 3, 9, 0.98) 100%
+  );
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(226, 192, 115, 0.45);
+  border-radius: 18px;
+  padding: 8px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.8),
+              0 0 35px rgba(212, 175, 55, 0.2),
+              inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  z-index: 200;
+  animation: dropdownLuxuryOpen 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropdownLuxuryOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.atelier-dropdown-header {
+  padding: 8px 12px 6px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  margin-bottom: 4px;
+}
+
+.atelier-dropdown-header-text {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #D4AF37;
+}
+
+.atelier-dropdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.atelier-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: #FAF7F2;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.atelier-dropdown-item:hover,
+.atelier-dropdown-item:focus {
+  background: linear-gradient(
+    90deg,
+    rgba(212, 175, 55, 0.18) 0%,
+    rgba(182, 151, 99, 0.08) 100%
+  );
+  color: #FFFFFF;
+  transform: translateX(3px);
+  border-color: rgba(212, 175, 55, 0.25);
+}
+
+.atelier-dropdown-item.selected {
+  background: rgba(212, 175, 55, 0.12);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-color: rgba(212, 175, 55, 0.35);
+}
+
+.atelier-item-label {
+  font-family: var(--font-serif);
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+}
+
+.atelier-item-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #E6C875;
+  filter: drop-shadow(0 0 4px rgba(230, 200, 117, 0.6));
 }
 
 .limitless-dock-divider {

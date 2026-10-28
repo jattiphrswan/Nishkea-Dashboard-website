@@ -1,18 +1,55 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FiSearch, FiChevronDown } from 'react-icons/fi';
+import { FiSearch, FiChevronDown, FiCheck } from 'react-icons/fi';
 import { Sparkles } from 'lucide-react';
+
+const SILHOUETTES = [
+  { value: 'necklaces', label: 'Necklaces & Pendants' },
+  { value: 'earrings', label: 'Earrings & Jhumkas' },
+  { value: 'rings', label: 'Solitaire & Cocktail Rings' },
+  { value: 'bracelets', label: 'Bangles & Cuffs' },
+  { value: 'accessories', label: 'Hair Adornments & Nose Rings' },
+];
 
 export default function BannerCTA() {
   const router = useRouter();
   const [category, setCategory] = useState('necklaces');
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown on outside click or Escape key
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  const handleSelect = (val) => {
+    setCategory(val);
+    setIsOpen(false);
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
     router.push(`/shop?category=${encodeURIComponent(category)}`);
   };
+
+  const currentLabel = SILHOUETTES.find((s) => s.value === category)?.label || 'Select Silhouette';
 
   return (
     <section className="limitless-cta-section" aria-label="Explore Without Limit">
@@ -49,8 +86,8 @@ export default function BannerCTA() {
 
           {/* Right Column: Haute Joaillerie Concierge Dock */}
           <form className="limitless-cta-right" onSubmit={handleSearch}>
-            <div className="limitless-glass-dock">
-              {/* Silhouette Selection Field */}
+            <div className="limitless-glass-dock" ref={dropdownRef}>
+              {/* Silhouette Selection Field with Custom Luxury Dropdown */}
               <div className="limitless-dock-field">
                 <div className="limitless-dock-icon-halo">
                   <svg
@@ -73,25 +110,59 @@ export default function BannerCTA() {
                 </div>
 
                 <div className="limitless-dock-content">
-                  <label htmlFor="cta-silhouette-select" className="limitless-dock-label">
-                    Your Silhouette
-                  </label>
-                  <div className="limitless-select-wrap">
-                    <select
-                      className="limitless-select-input"
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                      id="cta-silhouette-select"
-                      aria-label="Select silhouette category"
+                  <span className="limitless-dock-label">Your Silhouette</span>
+
+                  {/* Custom Luxury Dropdown Trigger */}
+                  <button
+                    type="button"
+                    className={`atelier-dropdown-trigger ${isOpen ? 'active' : ''}`}
+                    onClick={() => setIsOpen((prev) => !prev)}
+                    aria-haspopup="listbox"
+                    aria-expanded={isOpen}
+                    id="cta-silhouette-trigger"
+                  >
+                    <span className="atelier-dropdown-value">{currentLabel}</span>
+                    <FiChevronDown
+                      className={`atelier-dropdown-chevron ${isOpen ? 'open' : ''}`}
+                      size={14}
+                      aria-hidden="true"
+                    />
+                  </button>
+
+                  {/* Floating Luxury Glass Menu */}
+                  {isOpen && (
+                    <div
+                      className="atelier-dropdown-menu"
+                      role="listbox"
+                      aria-labelledby="cta-silhouette-trigger"
                     >
-                      <option value="necklaces">Necklaces & Pendants</option>
-                      <option value="earrings">Earrings & Jhumkas</option>
-                      <option value="rings">Solitaire & Cocktail Rings</option>
-                      <option value="bracelets">Bangles & Cuffs</option>
-                      <option value="accessories">Hair Adornments & Nose Rings</option>
-                    </select>
-                    <FiChevronDown className="limitless-select-chevron" size={14} aria-hidden="true" />
-                  </div>
+                      <div className="atelier-dropdown-header">
+                        <span className="atelier-dropdown-header-text">Curated Silhouettes</span>
+                      </div>
+                      <div className="atelier-dropdown-list">
+                        {SILHOUETTES.map((item) => {
+                          const isSelected = item.value === category;
+                          return (
+                            <button
+                              key={item.value}
+                              type="button"
+                              className={`atelier-dropdown-item ${isSelected ? 'selected' : ''}`}
+                              onClick={() => handleSelect(item.value)}
+                              role="option"
+                              aria-selected={isSelected}
+                            >
+                              <span className="atelier-item-label">{item.label}</span>
+                              {isSelected && (
+                                <span className="atelier-item-check" aria-hidden="true">
+                                  <FiCheck size={14} strokeWidth={2.6} />
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

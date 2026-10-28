@@ -1,22 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { FaInstagram, FaPinterestP, FaFacebookF, FaWhatsapp, FaYoutube } from 'react-icons/fa';
-import { FiChevronRight } from 'react-icons/fi';
 
 export default function Footer() {
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    if (newsletterEmail) {
-      setSubscribed(true);
-      setNewsletterEmail('');
-    }
-  };
-
   return (
     <footer className="site-footer" role="contentinfo">
       <div className="container-storefront">
@@ -33,75 +21,29 @@ export default function Footer() {
                 />
               </span>
             </Link>
-            <p style={{ fontSize: '0.86rem', color: '#B8ACB2', maxWidth: '340px', marginBottom: '24px' }}>
+            <p style={{ fontSize: '0.86rem', color: '#B8ACB2', maxWidth: '340px', marginBottom: '24px', lineHeight: 1.6 }}>
               Handcrafted fashion jewellery and refined accessories. Designed with classic artisanal silhouettes for modern styling.
             </p>
 
-            {/* Newsletter form */}
-            <form onSubmit={handleSubscribe} style={{ maxWidth: '340px' }}>
-              <span style={{ fontSize: '0.78rem', color: '#FAF7F2', fontWeight: 600, display: 'block', marginBottom: '8px' }}>
-                Receive New Edit Announcements
-              </span>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <input
-                  type="email"
-                  required
-                  placeholder="Enter your email"
-                  value={newsletterEmail}
-                  onChange={(e) => setNewsletterEmail(e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: '8px 12px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    color: '#FFFFFF',
-                    fontSize: '0.84rem',
-                    borderRadius: '2px'
-                  }}
-                  aria-label="Email address for newsletter"
-                />
-                <button
-                  type="submit"
-                  className="btn btn-sm btn-primary"
-                  style={{
-                    padding: '4px 6px 4px 16px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}
-                >
-                  <span>JOIN</span>
-                  <span className="btn-icon-bubble" style={{ width: '22px', height: '22px' }}>
-                    <FiChevronRight size={12} strokeWidth={2.5} />
-                  </span>
-                </button>
-              </div>
-              {subscribed && (
-                <p style={{ fontSize: '0.75rem', color: 'var(--color-gold)', marginTop: '8px' }}>
-                  Thank you for subscribing to our preview announcements.
-                </p>
-              )}
-            </form>
-
-            {/* Social Media Channels with react-icons */}
-            <div style={{ marginTop: '22px' }}>
-              <span style={{ fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-gold)', fontWeight: 600, display: 'block', marginBottom: '10px' }}>
+            {/* Social Media Channels */}
+            <div>
+              <span style={{ fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-gold)', fontWeight: 600, display: 'block', marginBottom: '12px' }}>
                 Follow The Maison
               </span>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on Instagram" style={{ color: '#FAF7F2', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on Instagram" style={{ color: '#FAF7F2', width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
                   <FaInstagram size={14} />
                 </a>
-                <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on Pinterest" style={{ color: '#FAF7F2', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
+                <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on Pinterest" style={{ color: '#FAF7F2', width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
                   <FaPinterestP size={14} />
                 </a>
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on Facebook" style={{ color: '#FAF7F2', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on Facebook" style={{ color: '#FAF7F2', width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
                   <FaFacebookF size={14} />
                 </a>
-                <a href="https://wa.me" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on WhatsApp" style={{ color: '#FAF7F2', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
+                <a href="https://wa.me" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on WhatsApp" style={{ color: '#FAF7F2', width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
                   <FaWhatsapp size={14} />
                 </a>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on YouTube" style={{ color: '#FAF7F2', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="Nishkea on YouTube" style={{ color: '#FAF7F2', width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', textDecoration: 'none' }}>
                   <FaYoutube size={14} />
                 </a>
               </div>

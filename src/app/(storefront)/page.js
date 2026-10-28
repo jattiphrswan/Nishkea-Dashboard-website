@@ -18,7 +18,7 @@ export default function HomePage() {
   const lookbook = HERO_GALLERY.slice(0, 8);
 
   return (
-    <div style={{ paddingBottom: 'var(--space-16)' }}>
+    <div style={{ paddingBottom: 0 }}>
       {/* Screenshot Reference Hero Section */}
       <section className="hero-ref-container" aria-label="TERONA & NISHKÈA Hero Campaign">
         {/* eslint-disable-next-line @next/next/no-img-element */}
