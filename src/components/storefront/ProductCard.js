@@ -142,12 +142,14 @@ export default function ProductCard({ product, onQuickView }) {
 
       {/* Product Details */}
       <div className="product-card-body">
-        <span className="product-card-category">{product.categoryName}</span>
-        <h3 className="product-card-title">
-          <Link href={`/products/${product.slug}`}>
-            {product.name}
-          </Link>
-        </h3>
+        <div className="product-card-info-top">
+          <span className="product-card-category">{product.categoryName}</span>
+          <h3 className="product-card-title">
+            <Link href={`/products/${product.slug}`}>
+              {product.name}
+            </Link>
+          </h3>
+        </div>
 
         <div className="product-card-meta">
           <span className="product-card-price">

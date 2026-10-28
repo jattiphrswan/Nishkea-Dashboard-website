@@ -536,3 +536,21 @@
   - `npm test` — PASS (All 13 test suites passing).
   - Browser Verification — Live Chromium visual confirmation of gap removal, newsletter cleanup, and dropdown rendering fully over footer.
 
+## Storefront Polish — Equal Height Grid Alignment & 3D Atelier Showcase Symmetry
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-28
+- **Deliverables:**
+  - **Product Cards Equal Height Grid** ([`src/app/globals.css`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/globals.css) & [`src/components/storefront/ProductCard.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/storefront/ProductCard.js)):
+    - Enforced `align-items: stretch` and `grid-auto-rows: 1fr` across all `.product-grid` breakpoints.
+    - Set `.product-card` to `height: 100%` and `.product-card-body` to flex column with `justify-content: space-between`.
+    - Wrapped category and title in `.product-card-info-top`, with normalized category height (`min-height: 1.25em`) and two-line clamped title height (`min-height: 2.7em`).
+    - Anchored `.product-card-meta` to `margin-top: auto`, creating a ruler-straight horizontal baseline across all 4 cards for prices, units, and card bottoms.
+  - **3D Atelier Curator Wheel & Spotlight Card Equal Height** ([`src/components/storefront/AtelierWheelShowcase.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/components/storefront/AtelierWheelShowcase.js)):
+    - Aligned `.atelier-wheel-grid` to `align-items: stretch` so both left and right columns expand to match each other's height.
+    - Moved the interaction hint inside `.atelier-wheel-picker-frame` with absolute bottom positioning, ensuring left and right outer cards share identical top and bottom boundaries.
+    - Matched both action buttons (`.spotlight-star-btn` and `.spotlight-star-btn-gold`) to identical 48px height, uniform horizontal padding, and pill curvature with `radius={24}` on StarBorder lights.
+- **Validation:**
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - `npm test` — PASS (All suites passing).
+  - Browser Verification — Verified in live Chromium browser with screenshots confirming identical heights for all 4 product cards and matching bounds for the 3D Atelier curator panels and buttons.
+

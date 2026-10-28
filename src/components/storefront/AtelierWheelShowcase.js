@@ -137,10 +137,10 @@ export default function AtelierWheelShowcase() {
                 textColor="rgba(250, 247, 242, 0.42)"
                 activeColor="#FAF7F2"
               />
-            </div>
-            <div className="atelier-wheel-hint">
-              <Compass size={13} />
-              <span>Scroll wheel, drag up/down, or use arrow keys to spin</span>
+              <div className="atelier-wheel-hint" aria-hidden="true">
+                <Compass size={13} />
+                <span>Scroll wheel, drag up/down, or use arrow keys to spin</span>
+              </div>
             </div>
           </div>
 
@@ -193,7 +193,7 @@ export default function AtelierWheelShowcase() {
                     stars={1}
                     trailLength={0.3}
                     thickness={1}
-                    radius={12}
+                    radius={24}
                     glow={0.6}
                     hover="lap"
                     sparkle={false}
@@ -215,7 +215,7 @@ export default function AtelierWheelShowcase() {
                     stars={2}
                     trailLength={0.35}
                     thickness={1.5}
-                    radius={12}
+                    radius={24}
                     glow={0.8}
                     hover="brighten"
                     sparkle={true}
