@@ -522,9 +522,15 @@
   - `npm test` — PASS (485/485 assertions passing across all 13 suites).
   - `npm run db:backup-test` — PASS (SHA-256 master schema checksum verified).
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
-  - `npm run build` — PASS (all 55 static & dynamic routes compiled).
-
-
-
-
-
+## Storefront Refinement — Atelier Concierge Haute Joaillerie Dock & Footer Alignment
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-28
+- **Deliverables:**
+  - **Eliminated Footer White Gap**: Adjusted bottom padding on storefront page layout so the rich crimson silk velvet banner (`BannerCTA`) directly and seamlessly abuts the dark chocolate footer (`.site-footer`).
+  - **Removed Footer Newsletter**: Cleaned up the footer first column, removing the newsletter form to present a focused, luxury brand statement and elegant circular social channels ("Follow The Maison").
+  - **Bespoke Luxury React Dropdown**: Replaced native browser `<select>` popup with a frosted obsidian-ruby glass menu with 18K champagne gold hairline borders, serif typography, animated gold checkmark selection indicators, and click-outside/escape-key dismissal.
+  - **Unclipped Dropdown Stacking**: Isolated banner background image scaling inside an inner overflow wrapper while setting banner container overflow to visible, ensuring the luxury dropdown menu floats over the banner and footer boundary with zero clipping.
+- **Validation:**
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - `npm test` — PASS (All 13 test suites passing).
+  - Browser Verification — Live Chromium visual confirmation of gap removal, newsletter cleanup, and custom dropdown interaction.

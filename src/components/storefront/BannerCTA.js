@@ -54,17 +54,18 @@ export default function BannerCTA() {
   return (
     <section className="limitless-cta-section" aria-label="Explore Without Limit">
       <div className="limitless-cta-banner">
-        {/* Background Editorial Panorama */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/editorial/cta-banner-bg.jpg"
-          alt="Royal burgundy silk velvet draped with fine handcrafted jewellery and gold dust"
-          className="limitless-cta-bg"
-          loading="lazy"
-        />
-
-        {/* Deep Royal Burgundy & Gold Contrast Overlay */}
-        <div className="limitless-cta-overlay" aria-hidden="true" />
+        {/* Background Editorial Panorama with contained overflow */}
+        <div className="limitless-cta-bg-wrap" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/editorial/cta-banner-bg.jpg"
+            alt="Royal burgundy silk velvet draped with fine handcrafted jewellery and gold dust"
+            className="limitless-cta-bg"
+            loading="lazy"
+          />
+          {/* Deep Royal Burgundy & Gold Contrast Overlay */}
+          <div className="limitless-cta-overlay" />
+        </div>
 
         {/* Inner Content Grid constrained to container */}
         <div className="container-storefront limitless-cta-inner">
