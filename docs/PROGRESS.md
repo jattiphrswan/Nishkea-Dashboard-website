@@ -554,3 +554,28 @@
   - `npm test` — PASS (All suites passing).
   - Browser Verification — Verified in live Chromium browser with screenshots confirming identical heights for all 4 product cards and matching bounds for the 3D Atelier curator panels and buttons.
 
+## Storefront Creative Redesign — Haute Joaillerie Atelier Curator Filter Suite
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-29
+- **Deliverables:**
+  - **Atelier Curator Glassmorphism Shell** ([`src/app/(storefront)/shop/page.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/%28storefront%29/shop/page.js), [`src/app/globals.css`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/globals.css)):
+    - Replaced the plain bordered box with an opulent glassmorphic curator suite (`.shop-curator-suite`) featuring warm ivory/silk gradients, 18K champagne gold hairline borders, 20px rounded corners, and deep elevation shadows.
+    - Top status bar featuring animated gold starlight badge `✦ ATELIER VAULT CURATOR ✦` alongside a pulsing real-time sync indicator (`Live Vault Synchronized • 11 Masterworks`).
+  - **Artisanal Category Rail**:
+    - Replaced generic flat pills with luxury capsule buttons (`.curator-cat-pill`) pairing tailored SVG jewellery silhouettes (All Designs, Earrings, Rings, Necklaces, Tiaras, Naths) with gold-rimmed live design counter badges.
+    - Active category styled with royal burgundy velvet gradient (`#781D39` to `#4D0F21`), gold hairline border, and stardust glow.
+  - **Curator's Search & Instant Stone Suggestions**:
+    - Architectural search field with gold magnifying icon and instant-clear button.
+    - Interactive "Curator's Picks" stone tags (`✨ Ruby Solitaire`, `✨ Polki Kundan`, `✨ 18K Vermeil`, `✨ Chandbali Pearl`, `✨ Artisan Filigree`) that populate searches with one click.
+  - **Bespoke Luxury Floating Dropdowns for Valuation & Sort**:
+    - Eliminated native browser `<select>` boxes.
+    - Engineered custom floating glass popover menus with gold chevrons, animated rotations, gold checkmark active indicators, option subtext (e.g. `Accessible Elegance`, `Haute Masterworks`), and click-outside/escape-key dismissal.
+  - **Dynamic Results Bar & Dual Grid Density Switcher**:
+    - Styled results counter with Cormorant Garamond serif and gold diamond bullet.
+    - Interactive Grid Density Toggle allowing users to switch between **Boutique Showcase (3 Columns)** and **Vault Gallery (4 Columns)** with active SVG icon states.
+    - Wax-seal removable filter chips with hover `✕` dismissal and animated counter-clockwise Reset All button.
+- **Validation:**
+  - `npm test` — PASS (485/485 assertions passing across all 13 suites).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - HTTP 200 OK verified on live dev server at `/shop?category=rings`.
+
