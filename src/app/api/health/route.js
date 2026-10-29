@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { testConnection } from '../../../lib/server/db.js';
+import { getActiveProvider } from '../../../lib/server/payments.js';
 
 /**
- * Health & Operational Monitoring Endpoint — Node 15 Production Readiness
+ * Health & Operational Monitoring Endpoint — Node 15 Production Readiness & Node 17 Payments
  *
- * Exposes comprehensive, live application readiness state across all 14 architectural nodes
+ * Exposes comprehensive, live application readiness state across all architectural nodes
  * without leaking sensitive credentials, secrets, or internal database connection strings.
  */
 export async function GET() {
@@ -18,6 +19,8 @@ export async function GET() {
       dbTelemetry = { connected: false, error: 'Connection attempt failed' };
     }
   }
+
+  const activePaymentProvider = getActiveProvider();
 
   const healthData = {
     status: 'healthy',
@@ -98,6 +101,15 @@ export async function GET() {
         service: 'Atelier Operations Copilot',
         rbacCostIsolation: 'Sales Support & Inventory Staff Prohibited from Cost Probes',
         mutationProhibition: 'Natural Language Mutations Prohibited'
+      },
+      node17_payment_gateway: {
+        status: 'ACTIVE',
+        activeProvider: activePaymentProvider,
+        currency: 'INR (Indian Rupee)',
+        minorUnitEnforcement: 'Integer Paise Standard',
+        cryptographicVerification: 'HMAC-SHA256 Constant-Time Equality',
+        supportedMethods: ['UPI_INSTANT', 'CREDIT_DEBIT_CARDS', 'NETBANKING', 'NO_COST_EMI'],
+        zeroOversellingGate: 'ENFORCED (Permanent Reservation Consumption on Payment Confirmation)'
       }
     },
     securityPolicies: {

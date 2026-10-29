@@ -530,7 +530,7 @@ export async function initiateGatewayRefund({
   reason = 'Customer Request',
   user = { id: 'staff-mgr-01', roleId: 'manager' }
 }) {
-  const perm = checkPermission(user, 'order:return_inspect');
+  const perm = checkPermission(user, 'order:refund');
   if (!perm.allowed) {
     throw new Error(perm.reason || 'Unauthorized to issue payment refunds.');
   }

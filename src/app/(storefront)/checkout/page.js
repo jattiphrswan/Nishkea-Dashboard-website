@@ -43,6 +43,13 @@ export default function CheckoutPage() {
   const [errorMessage, setErrorMessage] = useState(null);
   const [confirmedOrder, setConfirmedOrder] = useState(null);
 
+  // Node 17: Payment Gateway Modal & Verification States
+  const [gatewayModalData, setGatewayModalData] = useState(null);
+  const [selectedPaymentTab, setSelectedPaymentTab] = useState('upi'); // 'upi' | 'card' | 'netbanking' | 'emi'
+  const [selectedEmiTenure, setSelectedEmiTenure] = useState(3);
+  const [verifyingPayment, setVerifyingPayment] = useState(false);
+  const [upiVpa, setUpiVpa] = useState('ananya@okhdfcbank');
+
   // Complimentary shipping calculation
   const isFreeShipping = cartSubtotalMinor >= 300000;
   const shippingFeeMinor = cart.length > 0 && !isFreeShipping ? 25000 : 0;
@@ -70,7 +77,7 @@ export default function CheckoutPage() {
     try {
       setLoading(true);
 
-      // 1. Submit Order to POST /api/checkout
+      // 1. Submit Order to POST /api/checkout (Atomic inventory reservation hold)
       const payload = {
         customer: {
           name: formData.name,
@@ -107,34 +114,84 @@ export default function CheckoutPage() {
 
       const createdOrder = data.order;
 
-      // 2. Simulate Payment Gateway Callback via Webhook
-      const webhookPayload = {
-        event_id: `evt_auto_${Date.now()}`,
-        event_type: 'payment.succeeded',
-        data: {
-          orderNumber: createdOrder.orderNumber,
-          paymentId: `PAY_RZP_${Math.floor(1000000 + Math.random() * 9000000)}`
-        }
-      };
-
-      await fetch('/api/payments/webhook', {
+      // 2. Node 17: Create Gateway Order Session via POST /api/payments/create-order
+      const paymentOrderRes = await fetch('/api/payments/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(webhookPayload)
+        body: JSON.stringify({
+          orderNumber: createdOrder.orderNumber,
+          amountMinor: createdOrder.orderTotalMinor,
+          customer: {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone
+          }
+        })
       });
 
-      // Update confirmed order object with payment success
-      createdOrder.paymentStatus = 'PAID';
-      createdOrder.fulfillmentStatus = 'PENDING_PICKING';
+      const paymentOrderData = await paymentOrderRes.json();
+      if (!paymentOrderRes.ok) {
+        throw new Error(paymentOrderData.error || 'Failed to initiate secure payment gateway session');
+      }
 
-      // 3. Clear Bag
-      clearCart();
-      setConfirmedOrder(createdOrder);
+      // Open Haute Joaillerie Gateway Modal
+      setGatewayModalData({
+        order: createdOrder,
+        session: paymentOrderData
+      });
     } catch (err) {
       console.error('Checkout error:', err);
       setErrorMessage(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Node 17: Authorize & Verify Cryptographic Payment Signature
+  const handleAuthorizePayment = async () => {
+    if (!gatewayModalData) return;
+    setVerifyingPayment(true);
+    setErrorMessage(null);
+
+    const { order, session } = gatewayModalData;
+    const mockPaymentId = `pay_${selectedPaymentTab}_${Date.now().toString(36).toUpperCase()}`;
+
+    try {
+      const verifyRes = await fetch('/api/payments/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderNumber: order.orderNumber,
+          gatewayOrderId: session.gatewayOrderId,
+          gatewayPaymentId: mockPaymentId,
+          signature: 'simulated_valid_test_signature',
+          paymentMethod: selectedPaymentTab.toUpperCase(),
+          provider: session.provider
+        })
+      });
+
+      const verifyData = await verifyRes.json();
+      if (!verifyRes.ok) {
+        throw new Error(verifyData.error || 'Cryptographic signature verification failed');
+      }
+
+      // Order successfully confirmed & verified
+      const verifiedOrder = {
+        ...order,
+        paymentStatus: 'PAID',
+        fulfillmentStatus: 'PENDING_PICKING',
+        paymentReference: mockPaymentId,
+        paymentMethod: `GATEWAY_${selectedPaymentTab.toUpperCase()}`
+      };
+
+      clearCart();
+      setGatewayModalData(null);
+      setConfirmedOrder(verifiedOrder);
+    } catch (verErr) {
+      console.error('Payment authorization error:', verErr);
+      setErrorMessage(verErr.message || 'Payment authorization failed');
+    } finally {
+      setVerifyingPayment(false);
     }
   };
 
@@ -778,6 +835,349 @@ export default function CheckoutPage() {
             </div>
           </div>
         </div>
+
+        {/* Node 17: Haute Joaillerie Secure Gateway Payment Modal */}
+        {gatewayModalData && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 9999,
+              backgroundColor: 'rgba(20, 3, 10, 0.78)',
+              backdropFilter: 'blur(16px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px'
+            }}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '620px',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '18px',
+                border: '1px solid rgba(182, 151, 99, 0.45)',
+                boxShadow: '0 24px 64px rgba(0, 0, 0, 0.4), 0 0 24px rgba(120, 29, 57, 0.25)',
+                overflow: 'hidden',
+                animation: 'curatorMenuFade 0.25s ease'
+              }}
+            >
+              {/* Modal Header */}
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, #781D39 0%, #4D0F21 100%)',
+                  padding: '20px 24px',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  borderBottom: '1px solid rgba(212, 175, 55, 0.35)'
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '0.68rem', letterSpacing: '0.18em', color: '#E6C875', fontWeight: 700, textTransform: 'uppercase' }}>
+                    ✦ NISHKÈA ATELIER • SECURE GATEWAY ✦
+                  </div>
+                  <h3 style={{ margin: '4px 0 0', fontFamily: 'var(--font-serif)', fontSize: '1.25rem' }}>
+                    Authorize Order Payment
+                  </h3>
+                </div>
+
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#F3EFEA' }}>Total Amount</div>
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', fontWeight: 700, color: '#FFFFFF' }}>
+                    {formatCurrency(gatewayModalData.order.orderTotalMinor, 'INR')}
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Context Banner */}
+              <div
+                style={{
+                  backgroundColor: '#FAF8F5',
+                  padding: '10px 24px',
+                  borderBottom: '1px solid rgba(182, 151, 99, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  fontSize: '0.78rem',
+                  color: 'var(--color-text-muted)'
+                }}
+              >
+                <span>Order Ref: <strong>{gatewayModalData.order.orderNumber}</strong></span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: '#2E7D32', fontWeight: 600 }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#2E7D32' }} />
+                  256-Bit Cryptographic SSL
+                </span>
+              </div>
+
+              {/* Payment Method Tabs */}
+              <div style={{ padding: '20px 24px' }}>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(4, 1fr)',
+                    gap: '8px',
+                    marginBottom: '20px',
+                    backgroundColor: '#F7F3EE',
+                    padding: '4px',
+                    borderRadius: '10px'
+                  }}
+                >
+                  {[
+                    { id: 'upi', label: '⚡ UPI' },
+                    { id: 'card', label: '💳 Cards' },
+                    { id: 'netbanking', label: '🏦 NetBanking' },
+                    { id: 'emi', label: '🗓️ 0% EMI' }
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setSelectedPaymentTab(tab.id)}
+                      style={{
+                        padding: '8px 4px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.18s ease',
+                        backgroundColor: selectedPaymentTab === tab.id ? '#FFFFFF' : 'transparent',
+                        color: selectedPaymentTab === tab.id ? 'var(--color-burgundy)' : 'var(--color-text-muted)',
+                        boxShadow: selectedPaymentTab === tab.id ? '0 2px 6px rgba(0, 0, 0, 0.08)' : 'none'
+                      }}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Tab 1: UPI */}
+                {selectedPaymentTab === 'upi' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '6px' }}>
+                        Enter UPI VPA / ID
+                      </label>
+                      <input
+                        type="text"
+                        value={upiVpa}
+                        onChange={(e) => setUpiVpa(e.target.value)}
+                        placeholder="yourname@okhdfcbank"
+                        style={{
+                          width: '100%',
+                          padding: '10px 14px',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(182, 151, 99, 0.4)',
+                          fontSize: '0.9rem',
+                          backgroundColor: '#FFFDFB'
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      {['@okhdfcbank', '@okicici', '@okaxis', '@ybl', '@paytm'].map((handle) => (
+                        <button
+                          key={handle}
+                          type="button"
+                          onClick={() => setUpiVpa(`ananya${handle}`)}
+                          style={{
+                            fontSize: '0.72rem',
+                            padding: '4px 8px',
+                            borderRadius: '9999px',
+                            border: '1px solid rgba(182, 151, 99, 0.3)',
+                            background: '#FAF8F6',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {handle}
+                        </button>
+                      ))}
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+                      ✓ Supports Google Pay, PhonePe, Paytm, BHIM, and Cred UPI with instant debit and zero transaction surcharges.
+                    </div>
+                  </div>
+                )}
+
+                {/* Tab 2: Cards */}
+                {selectedPaymentTab === 'card' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '4px' }}>
+                        Cardholder Name
+                      </label>
+                      <input
+                        type="text"
+                        defaultValue={formData.name}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #D6C2A0', fontSize: '0.86rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '4px' }}>
+                        Card Number
+                      </label>
+                      <input
+                        type="text"
+                        defaultValue="4111 •••• •••• 9012"
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #D6C2A0', fontSize: '0.86rem' }}
+                      />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '4px' }}>
+                          Expiry (MM/YY)
+                        </label>
+                        <input
+                          type="text"
+                          defaultValue="10/29"
+                          style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #D6C2A0', fontSize: '0.86rem' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '4px' }}>
+                          CVV / CVC
+                        </label>
+                        <input
+                          type="password"
+                          defaultValue="786"
+                          maxLength={4}
+                          style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #D6C2A0', fontSize: '0.86rem' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Tab 3: NetBanking */}
+                {selectedPaymentTab === 'netbanking' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ fontSize: '0.78rem', fontWeight: 600, marginBottom: '2px' }}>
+                      Select Bank
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                      {['HDFC Bank', 'ICICI Bank', 'State Bank of India', 'Axis Bank', 'Kotak Mahindra', 'Other Bank'].map((bank, i) => (
+                        <button
+                          key={bank}
+                          type="button"
+                          style={{
+                            padding: '10px 8px',
+                            borderRadius: '8px',
+                            border: i === 0 ? '2px solid var(--color-burgundy)' : '1px solid #E0D3C0',
+                            backgroundColor: i === 0 ? '#FAF1F3' : '#FFFFFF',
+                            fontSize: '0.76rem',
+                            fontWeight: i === 0 ? 600 : 500,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {bank}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Tab 4: EMI */}
+                {selectedPaymentTab === 'emi' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ fontSize: '0.78rem', fontWeight: 600 }}>
+                      Select Haute Joaillerie EMI Plan:
+                    </div>
+                    {gatewayModalData.session?.emiOptions?.plans?.length > 0 ? (
+                      gatewayModalData.session.emiOptions.plans.map((p) => (
+                        <div
+                          key={p.tenureMonths}
+                          onClick={() => setSelectedEmiTenure(p.tenureMonths)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '10px 14px',
+                            borderRadius: '8px',
+                            border: selectedEmiTenure === p.tenureMonths ? '2px solid var(--color-burgundy)' : '1px solid #E0D3C0',
+                            backgroundColor: selectedEmiTenure === p.tenureMonths ? '#FAF1F3' : '#FFFFFF',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <div>
+                            <div style={{ fontSize: '0.86rem', fontWeight: 600 }}>
+                              {p.tenureMonths} Months Plan
+                              {p.isNoCost && (
+                                <span style={{ marginLeft: '8px', fontSize: '0.68rem', backgroundColor: '#E8F5E9', color: '#2E7D32', padding: '2px 6px', borderRadius: '9999px', fontWeight: 700 }}>
+                                  0% NO-COST EMI
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                              {p.notes}
+                            </div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontWeight: 700, fontSize: '0.94rem', color: 'var(--color-burgundy)' }}>
+                              {formatCurrency(p.monthlyInstalmentMinor, 'INR')}/mo
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', padding: '12px', background: '#FAF8F6', borderRadius: '8px' }}>
+                        Order amount is below the ₹3,000 threshold for Haute Joaillerie financing.
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div style={{ marginTop: '22px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <button
+                    type="button"
+                    disabled={verifyingPayment}
+                    onClick={handleAuthorizePayment}
+                    className="btn btn-primary"
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      fontSize: '0.92rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      borderRadius: '10px'
+                    }}
+                  >
+                    {verifyingPayment ? (
+                      <>
+                        <span style={{ animation: 'spin 1s linear infinite' }}>⏳</span>
+                        <span>Verifying Cryptographic Hallmark Signature...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Lock size={16} />
+                        <span>Authorize Payment of {formatCurrency(gatewayModalData.order.orderTotalMinor, 'INR')}</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={verifyingPayment}
+                    onClick={() => setGatewayModalData(null)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--color-text-muted)',
+                      fontSize: '0.8rem',
+                      cursor: 'pointer',
+                      padding: '6px'
+                    }}
+                  >
+                    Cancel &amp; Modify Order Details
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
 # NISHKÈA — Haute Joaillerie & Artisanal Accessories Storefront + Operations Suite
 
-**Current Status:** Application Architecture & All Core Nodes (1 through 16) **COMPLETE & PASS**.
-**Test Suite:** 13 Suites / 485 Unit & Integration Assertions Passing (`npm test`).
-**Production Build:** 55 Static & Dynamic App Router Pages Compiled Successfully (`npm run build`).
+**Current Status:** Application Architecture & All Core Nodes (1 through 17) **COMPLETE & PASS**.
+**Test Suite:** 14 Suites / 525 Unit & Integration Assertions Passing (`npm test`).
+**Production Build:** 59 Static & Dynamic App Router Pages Compiled Successfully (`npm run build`).
 
 NISHKÈA is a luxury animated jewellery and accessories storefront paired with an enterprise backoffice operations centre built with **Next.js 15 (App Router)**, **React 19**, and vanilla **JavaScript** (strictly `.js` / `.jsx`, no TypeScript).
 

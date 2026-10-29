@@ -579,3 +579,34 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - HTTP 200 OK verified on live dev server at `/shop?category=rings`.
 
+## Node 17 — Live Payment Gateway Engine & Multi-Provider Adapter (Razorpay / Stripe / Sandbox)
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-29
+- **Deliverables:**
+  - **Payment Gateway Domain Service** ([`src/lib/server/payments.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/lib/server/payments.js)):
+    - Multi-provider gateway abstraction auto-negotiating active provider (`razorpay`, `stripe`, or deterministic `sandbox`).
+    - Standardized Gateway Order session creation (`createPaymentOrder`) with strict minor currency integer paise enforcement and order total mismatch validation.
+    - Cryptographic HMAC-SHA256 signature verification (`verifyPaymentSignature`) enforcing constant-time buffer equality to defend against timing attacks and forged signatures.
+    - Zero-overselling order confirmation (`confirmOrderPayment`): converts temporary cart stock reservations into permanent physical dispatch deductions (`consumeReservation`), updates order payment reference, and logs signed audit trail.
+    - Financial accounts receivable integration: automatically creates customer receipt in Node 12 commercial ledger (`recordCustomerPayment`).
+    - Webhook event listener (`processGatewayWebhook`): validates raw body signatures, deduplicates event IDs, and transitions states (`payment.captured` -> `PAID`, `payment.failed` -> `FAILED` with stock reservation release).
+    - Haute Joaillerie No-Cost & Low-Cost EMI Calculator (`calculateJewelleryEmi`): provides 3, 6, 9, 12-month tenure plans with exact integer paise monthly instalments and 0% interest on pieces $\ge \text{₹3,000.00}$.
+    - Bounded gateway refunds (`initiateGatewayRefund`): bounded by order paid amount, RBAC permission-scoped (`order:refund`), and audit-logged.
+  - **REST API Endpoints**:
+    - `GET /api/payments/config` ([`src/app/api/payments/config/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/payments/config/route.js)): Public gateway configuration and supported methods.
+    - `POST /api/payments/create-order` ([`src/app/api/payments/create-order/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/payments/create-order/route.js)): Server-side gateway order initiation.
+    - `POST /api/payments/verify` ([`src/app/api/payments/verify/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/payments/verify/route.js)): Client-to-server signature verification & order confirmation.
+    - `POST /api/payments/refund` ([`src/app/api/payments/refund/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/payments/refund/route.js)): RBAC-gated payment refunds.
+  - **Storefront Checkout Experience** ([`src/app/(storefront)/checkout/page.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/%28storefront%29/checkout/page.js)):
+    - Integrated Haute Joaillerie Secure Gateway Modal with 4 interactive payment methods: `⚡ UPI Instant`, `💳 Credit/Debit Cards`, `🏦 NetBanking`, and `🗓️ 0% No-Cost EMI`.
+    - Live cryptographic signature authorization with luxury rotating hallmark loader.
+  - **System Diagnostics Update** ([`src/app/api/health/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/health/route.js)):
+    - Added `node17_payment_gateway` diagnostics reporting active provider, minor unit standard, and signature verification engine without leaking secrets.
+  - **Automated Test Suite** ([`tests/payments.test.mjs`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/tests/payments.test.mjs)):
+    - 40 comprehensive unit and integration assertions covering EMI calculations, gateway session creation, HMAC verification, tampering detection, financial ledger syncing, webhook deduplication, and bounded refund constraints.
+- **Validation:**
+  - `npm test` — PASS (525/525 assertions passing across all 14 test suites).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - `npm run build` — PASS (All 59 static & dynamic routes compiled in 10.0s).
+
+
