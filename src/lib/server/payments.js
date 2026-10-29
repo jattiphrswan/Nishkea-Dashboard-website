@@ -16,6 +16,7 @@ import { memoryOrders } from './orders.js';
 import { consumeReservation, releaseReservation } from './inventory.js';
 import { recordCustomerPayment } from './finance.js';
 import { logAuditEvent, checkPermission } from './permissions.js';
+import { notifyOrderConfirmed } from './notifications.js';
 
 export const GATEWAY_CONFIG = {
   razorpayKeyId: process.env.RAZORPAY_KEY_ID || '',
@@ -357,6 +358,13 @@ export async function confirmOrderPayment({
       paymentMethod
     }
   });
+
+  // 8. Node 18: Automated Omnichannel Notification (WhatsApp + Email)
+  try {
+    await notifyOrderConfirmed(order);
+  } catch (notifErr) {
+    console.warn(`Order confirmation notification notice for ${orderNumber}: ${notifErr.message}`);
+  }
 
   return {
     success: true,

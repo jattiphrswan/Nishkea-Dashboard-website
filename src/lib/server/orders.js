@@ -22,6 +22,7 @@ import {
   consumeReservation
 } from './inventory.js';
 import { logAuditEvent } from './permissions.js';
+import { notifyOrderDispatched } from './notifications.js';
 
 export const CHECKOUT_CONFIG = {
   freeShippingThresholdMinor: 300000, // ₹3,000.00 in paise
@@ -461,6 +462,13 @@ export async function dispatchOrder({
     resourceId: order.id,
     metadata: { orderNumber: order.orderNumber, tracking }
   });
+
+  // Node 18: Automated Courier In-Transit Notification (WhatsApp + Email + SMS)
+  try {
+    await notifyOrderDispatched(order, tracking);
+  } catch (dispatchNotifErr) {
+    console.warn(`Dispatch notification notice for ${order.orderNumber}: ${dispatchNotifErr.message}`);
+  }
 
   return {
     success: true,
