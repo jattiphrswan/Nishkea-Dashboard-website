@@ -46,3 +46,4 @@ The engine provides multi-channel failover:
 3. Supplier acquisition costs and internal margin ledgers are strictly absent from all rendered notification payloads.
 4. Dispatched notifications log delivery timestamps, channel breakdowns, and message IDs.
 5. All test suites (`npm test`) pass cleanly.
+
