@@ -609,4 +609,32 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - `npm run build` — PASS (All 59 static & dynamic routes compiled in 10.0s).
 
+## Node 18 — Automated Omnichannel Notifications Engine (WhatsApp Cloud API & Luxury Transactional Emails)
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-10-29
+- **Deliverables:**
+  - **Omnichannel Notifications Domain Service** ([`src/lib/server/notifications.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/lib/server/notifications.js)):
+    - Multi-channel delivery engine coordinating WhatsApp Business Cloud API (`messages` graph endpoint with Bearer auth), responsive luxury HTML5 transactional email, and SMS fallback simulator.
+    - Bespoke Haute Joaillerie typography and layouts: royal burgundy velvet (`#781D39`), 18K champagne gold borders (`#D4AF37`), itemized jewellery piece table, packaging advisory (tamper-evident seal notice), and showroom provenance.
+    - Strict privacy & supplier cost isolation: sanitizes all customer-facing alerts, stripping wholesale acquisition costs, supplier PO numbers, and internal gross margin metrics before rendering.
+    - Idempotency & duplicate protection: memory and persistent hash deduplication preventing duplicate customer alerts across distributed retries.
+    - Append-only notification ledger with signed delivery receipts, timestamps, and audit log integration.
+    - High-level lifecycle triggers: `notifyOrderConfirmed` (triggered upon payment confirmation) and `notifyOrderDispatched` (triggered upon courier fulfillment with BlueDart / Delhivery / Sequel Logistics tracking links).
+  - **Payment & Order Lifecycle Integration**:
+    - [`src/lib/server/payments.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/lib/server/payments.js): `confirmOrderPayment` invokes `notifyOrderConfirmed` upon successful signature verification.
+    - [`src/lib/server/orders.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/lib/server/orders.js): `dispatchOrder` automatically dispatches omnichannel courier tracking alerts (`notifyOrderDispatched`) with tracking numbers.
+  - **REST API Endpoints**:
+    - `POST /api/notifications/send` ([`src/app/api/notifications/send/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/notifications/send/route.js)): Direct notification dispatcher gated by `customer:communicate` RBAC grant.
+    - `GET /api/notifications/log` ([`src/app/api/notifications/log/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/notifications/log/route.js)): Operations notification audit ledger gated by `audit:view` RBAC grant.
+    - `GET /api/notifications/test` ([`src/app/api/notifications/test/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/notifications/test/route.js)): Diagnostic route previewing WhatsApp and HTML email templates.
+  - **System Diagnostics Update** ([`src/app/api/health/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/health/route.js)):
+    - Added `node18_notifications` diagnostics reporting active channel statuses, delivery modes, and template registries without leaking credentials.
+  - **Automated Test Suite** ([`tests/notifications.test.mjs`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/tests/notifications.test.mjs)):
+    - 34 comprehensive tests verifying WhatsApp formatting, rupee minor currency conversion, supplier cost redaction, HTML doctype, email luxury styling, idempotency deduplication, RBAC log access control, and end-to-end payment/dispatch trigger integrations.
+- **Validation:**
+  - `npm test` — PASS (559/559 assertions passing across all 15 test suites).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - `npm run build` — PASS (All 62 static & dynamic routes compiled in 7.6s).
+
+
 

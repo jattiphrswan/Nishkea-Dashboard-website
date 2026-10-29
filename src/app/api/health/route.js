@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { testConnection } from '../../../lib/server/db.js';
 import { getActiveProvider } from '../../../lib/server/payments.js';
+import { getNotificationChannels } from '../../../lib/server/notifications.js';
 
 /**
- * Health & Operational Monitoring Endpoint — Node 15 Production Readiness & Node 17 Payments
+ * Health & Operational Monitoring Endpoint — Node 15 Production Readiness, Node 17 Payments & Node 18 Notifications
  *
  * Exposes comprehensive, live application readiness state across all architectural nodes
  * without leaking sensitive credentials, secrets, or internal database connection strings.
@@ -110,6 +111,12 @@ export async function GET() {
         cryptographicVerification: 'HMAC-SHA256 Constant-Time Equality',
         supportedMethods: ['UPI_INSTANT', 'CREDIT_DEBIT_CARDS', 'NETBANKING', 'NO_COST_EMI'],
         zeroOversellingGate: 'ENFORCED (Permanent Reservation Consumption on Payment Confirmation)'
+      },
+      node18_notifications: {
+        status: 'ACTIVE',
+        channels: getNotificationChannels(),
+        triggers: ['ORDER_CONFIRMED', 'ORDER_DISPATCHED', 'CONSULTATION_BOOKED', 'RETURN_INSPECTED'],
+        idempotencyEnforcement: 'ENFORCED (Zero Duplicate Client Alerts)'
       }
     },
     securityPolicies: {
