@@ -66,3 +66,4 @@ This engine connects the Node 8 Order Engine (`src/lib/server/orders.js`), the N
 4. Payment failure releases stock reservations back to available inventory.
 5. All 13 existing test suites plus the new Node 17 payment test suite pass cleanly (`npm test`).
 6. Production build (`npm run build`) and ESLint (`npm run lint`) pass with zero errors.
+
