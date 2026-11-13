@@ -1,8 +1,8 @@
 # NISHKÈA — Haute Joaillerie & Artisanal Accessories Storefront + Operations Suite
 
-**Current Status:** Application Architecture & All Core Nodes (1 through 18) **COMPLETE & PASS**.
-**Test Suite:** 15 Suites / 559 Unit & Integration Assertions Passing (`npm test`).
-**Production Build:** 62 Static & Dynamic App Router Pages Compiled Successfully (`npm run build`).
+**Current Status:** Application Architecture & All Core Nodes (1 through 19) **COMPLETE & PASS**.
+**Test Suite:** 16 Suites / 574 Unit & Integration Assertions Passing (`npm test`).
+**Production Build:** 65 Static & Dynamic App Router Pages Compiled Successfully (`npm run build`).
 
 NISHKÈA is a luxury animated jewellery and accessories storefront paired with an enterprise backoffice operations centre built with **Next.js 15 (App Router)**, **React 19**, and vanilla **JavaScript** (strictly `.js` / `.jsx`, no TypeScript).
 
@@ -36,18 +36,21 @@ NISHKÈA is a luxury animated jewellery and accessories storefront paired with a
 - **System Health Diagnostics (Node 15)**: Live runtime diagnostics endpoint (`/api/health`) without credential exposure.
 - **Payment Gateway Engine & EMI (Node 17)**: Live multi-provider payments (Razorpay, Stripe, deterministic sandbox), constant-time HMAC-SHA256 signature verification, zero-oversell stock consumption, and 3/6/9/12-month No-Cost Jewellery EMI calculator.
 - **Omnichannel Notifications Suite (Node 18)**: Automated Meta WhatsApp Business Cloud API alerts, luxury HTML5 transactional emails, and SMS fallback with live courier tracking links (BlueDart/Delhivery) and strict supplier cost privacy.
-
+- **Multi-Courier Shipping & Reverse Logistics (Node 19)**: Real-time postal circle PIN SLA checks (Tier 1 Metro 24-48h vs Tier 2 3-5 days), high-value Sequel Armoured routing ($\ge \text{₹1,00,000}$), deadweight/volumetric calculators, printable HTML/PDF shipping manifests with QR barcodes, and tamper-bag serial reverse pickup scheduling.
 
 ---
 
 ## 🛠️ Verification & Quality Assurance
 
 ```bash
-# 1. Run all 15 test suites (559 assertions)
+# 1. Run all 16 test suites (574 assertions)
 npm test
 
 # 2. Run ESLint checks
 npm run lint
+
+# 3. Compile production build (65 routes)
+npm run build
 
 # 3. Compile production build (62 routes)
 npm run build

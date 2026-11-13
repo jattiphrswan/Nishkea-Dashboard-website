@@ -636,5 +636,33 @@
   - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
   - `npm run build` — PASS (All 62 static & dynamic routes compiled in 7.6s).
 
+## Node 19 — Real-time Multi-Courier Logistics & Armoured Reverse Shipping
+- **Status:** COMPLETE / PASS
+- **Date:** 2026-11-13
+- **Deliverables:**
+  - **Multi-Courier Shipping Domain Service** ([`src/lib/server/shipping.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/lib/server/shipping.js)):
+    - Integrated multi-carrier registry supporting **BlueDart Express** (Apex Air), **Delhivery**, **Shiprocket**, and **Sequel Logistics** (Armoured Specie Vault).
+    - Domestic Indian 6-digit PIN code serviceability engine evaluating postal circle zones (`400` Mumbai, `110` Delhi, `560` Bangalore, `302` Jaipur Atelier, etc.) and returning exact delivery SLAs (24-48h Metro vs 3-5 days Tier 2).
+    - High-value routing policy: acquisitions $\ge \text{₹1,00,000.00}$ automatically prioritize Sequel Armoured Specie transit with full vault security.
+    - Volumetric vs deadweight calculator formula: $\text{Volumetric (g)} = \frac{\text{L} \times \text{W} \times \text{H}}{5000} \times 1000$.
+    - Outbound consignment manifesting with unique cryptographic tamper-evident seal numbering (`NSK-SEAL-xxxx`) and authentic carrier AWB issuance.
+    - Milestone tracking aggregator ingesting courier status changes (`MANIFESTED`, `IN_TRANSIT`, `OUT_FOR_DELIVERY`, `DELIVERED`, `RTO`) and updating order fulfillment states.
+    - Armoured reverse logistics engine scheduling return pickups with courier-provided tamper-evident bags (`TAMPER-BAG-xxxx`).
+    - Printable HTML/PDF shipping manifest labels with mock barcode tracing and high-value archival jewellery security notices.
+  - **REST API Endpoints**:
+    - `POST /api/shipping/serviceability` & `GET /api/shipping/serviceability` ([`src/app/api/shipping/serviceability/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/shipping/serviceability/route.js)): Public PIN code serviceability & delivery SLA checks.
+    - `POST /api/shipping/manifest` & `GET /api/shipping/manifest` ([`src/app/api/shipping/manifest/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/shipping/manifest/route.js)): RBAC-gated shipment manifesting and printable shipping label rendering (`?format=html`).
+    - `GET /api/shipping/track/[awb]` ([`src/app/api/shipping/track/[awb]/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/shipping/track/%5Bawb%5D/route.js)): Live milestone courier tracking lookup.
+    - `POST /api/shipping/reverse-pickup` ([`src/app/api/shipping/reverse-pickup/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/shipping/reverse-pickup/route.js)): RBAC-gated customer return reverse pickup scheduler.
+  - **System Diagnostics Update** ([`src/app/api/health/route.js`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/src/app/api/health/route.js)):
+    - Added `node19_shipping_logistics` diagnostics reporting active carriers, postal circle matrix, and armoured reverse pickup automation.
+  - **Automated Test Suite** ([`tests/shipping.test.mjs`](file:///c:/Users/SkyFish/OneDrive%20-%20SkyFish%20Private%20Limited/New%20folder/project/nishkea/tests/shipping.test.mjs)):
+    - 15 comprehensive unit and integration assertions verifying PIN code SLA resolution, volumetric weight calculation, high-value Sequel selection, AWB generation, duplicate protection, milestone ingestion, order status transitions, reverse logistics tamper-bag serials, RBAC security gates, and HTML shipping label rendering.
+- **Validation:**
+  - `npm test` — PASS (574/574 assertions passing across all 16 test suites).
+  - `npm run lint` — PASS (`✔ No ESLint warnings or errors`).
+  - `npm run build` — PASS (All 65 static & dynamic routes compiled in 11.3s).
+
+
 
 

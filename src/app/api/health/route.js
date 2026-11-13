@@ -117,6 +117,13 @@ export async function GET() {
         channels: getNotificationChannels(),
         triggers: ['ORDER_CONFIRMED', 'ORDER_DISPATCHED', 'CONSULTATION_BOOKED', 'RETURN_INSPECTED'],
         idempotencyEnforcement: 'ENFORCED (Zero Duplicate Client Alerts)'
+      },
+      node19_shipping_logistics: {
+        status: 'ACTIVE',
+        carriers: ['BLUEDART', 'DELHIVERY', 'SEQUEL', 'SHIPROCKET'],
+        pincodeEngine: 'Domestic Indian Postal Circle Matrix (Tier 1/2/3)',
+        armouredSpecieAvailable: true,
+        reversePickupAutomation: 'ENFORCED (Tamper-evident security bags)'
       }
     },
     securityPolicies: {
