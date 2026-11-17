@@ -29,3 +29,4 @@ export async function GET(request) {
   const result = await checkPincodeServiceability(pincode, { orderValueMinor: parseInt(orderValue, 10) });
   return NextResponse.json(result, { status: 200 });
 }
+
