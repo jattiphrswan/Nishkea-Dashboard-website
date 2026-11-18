@@ -4,5 +4,5 @@
   "buildCommand": "next build",
   "installCommand": "npm install",
   "cleanUrls": true,
-  "regions": ["bom1", "sin1"]
+  "regions": ["bom1"]
 }
